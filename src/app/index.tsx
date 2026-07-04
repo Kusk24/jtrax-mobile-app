@@ -52,7 +52,7 @@ export default function RoleSelectScreen() {
       </Text>
       <View className="mt-10 w-full max-w-md gap-4">
         {roles.map(({ href, labelKey, descKey, icon: Icon, chip, color }) => (
-          <Link key={href} href={href} asChild>
+          <Link key={href} href={href as never} asChild>
             <Pressable className="flex-row items-center gap-4 rounded-card border-2 border-line bg-card p-5 shadow-clay active:opacity-80">
               <View
                 className={`size-12 items-center justify-center rounded-xl ${chip}`}
