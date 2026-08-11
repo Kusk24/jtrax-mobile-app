@@ -2,6 +2,7 @@
   "name": "jtrax-mobile-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.29.3",
   "dependencies": {
     "@expo-google-fonts/fredoka": "^0.4.1",
     "@expo-google-fonts/mitr": "^0.4.1",
