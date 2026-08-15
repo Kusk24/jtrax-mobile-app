@@ -14,6 +14,7 @@ import {
   Nunito_800ExtraBold,
 } from "@expo-google-fonts/nunito";
 import { I18nProvider } from "@/i18n";
+import { SessionProvider } from "@/lib/session";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -28,13 +29,15 @@ export default function RootLayout() {
 
   return (
     <I18nProvider>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: "#f7f4ee" },
-        }}
-      />
+      <SessionProvider>
+        <StatusBar style="dark" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: "#f7f4ee" },
+          }}
+        />
+      </SessionProvider>
     </I18nProvider>
   );
 }

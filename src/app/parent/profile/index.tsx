@@ -1,3 +1,4 @@
+import { SignOutButton } from "@/components/SignOutButton";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
@@ -51,7 +52,11 @@ export default function ParentProfileScreen() {
         </Text>
         <View className="mt-3 flex-row flex-wrap gap-6">
           {children.map((child) => (
-            <Link key={child.id} href={`/parent/profile/${child.id}` as never} asChild>
+            <Link
+              key={child.id}
+              href={`/parent/profile/${child.id}` as never}
+              asChild
+            >
               <Pressable className="items-center gap-1">
                 <Avatar
                   name={child.name}
@@ -143,6 +148,7 @@ export default function ParentProfileScreen() {
             />
           </Pressable>
         </View>
+        <SignOutButton />
       </View>
     </Screen>
   );
