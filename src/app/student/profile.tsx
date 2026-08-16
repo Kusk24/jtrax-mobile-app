@@ -1,3 +1,4 @@
+import { SignOutButton } from "@/components/SignOutButton";
 import { Linking, Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import {
@@ -52,7 +53,10 @@ export default function StudentProfileScreen() {
               {t("common.idLabel", { id: student.studentId })}
             </Text>
             <Text className="font-sans text-xs text-muted">
-              {t("profile.levelAge", { level: student.level, age: student.age })}
+              {t("profile.levelAge", {
+                level: student.level,
+                age: student.age,
+              })}
             </Text>
           </View>
         </View>
@@ -214,6 +218,7 @@ export default function StudentProfileScreen() {
             />
           </Pressable>
         </View>
+        <SignOutButton />
       </View>
     </Screen>
   );

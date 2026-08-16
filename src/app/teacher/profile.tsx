@@ -1,3 +1,4 @@
+import { SignOutButton } from "@/components/SignOutButton";
 import { Linking, Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import {
@@ -83,22 +84,24 @@ export default function TeacherProfileScreen() {
           {t("profile.monthlyOverview")}
         </Text>
         <View className="mt-3 flex-row flex-wrap gap-3">
-          {overviewTiles.map(({ icon: Icon, value, labelKey, frame, color }) => (
-            <View
-              key={labelKey}
-              className={`w-[47%] flex-row items-center gap-3 rounded-card border-2 bg-card p-4 shadow-clay ${frame}`}
-            >
-              <Icon size={24} color={color} />
-              <View className="shrink">
-                <Text className="font-sans-extrabold text-base text-ink">
-                  {value}
-                </Text>
-                <Text className="font-sans text-[11px] leading-4 text-muted">
-                  {t(`profile.${labelKey}`)}
-                </Text>
+          {overviewTiles.map(
+            ({ icon: Icon, value, labelKey, frame, color }) => (
+              <View
+                key={labelKey}
+                className={`w-[47%] flex-row items-center gap-3 rounded-card border-2 bg-card p-4 shadow-clay ${frame}`}
+              >
+                <Icon size={24} color={color} />
+                <View className="shrink">
+                  <Text className="font-sans-extrabold text-base text-ink">
+                    {value}
+                  </Text>
+                  <Text className="font-sans text-[11px] leading-4 text-muted">
+                    {t(`profile.${labelKey}`)}
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
+            ),
+          )}
         </View>
       </View>
 
@@ -176,6 +179,7 @@ export default function TeacherProfileScreen() {
           </View>
           <LanguageToggle />
         </View>
+        <SignOutButton />
       </View>
     </Screen>
   );

@@ -1,4 +1,4 @@
-import { CalendarDays, History, Home, User } from "lucide-react-native";
+import { CalendarDays, History, Home, Swords, User } from "lucide-react-native";
 import { PortalBottomNav, type PortalTab } from "./PortalNav";
 
 const tabs: PortalTab[] = [
@@ -16,6 +16,7 @@ const tabs: PortalTab[] = [
     activeAliases: ["/student/checkin"],
   },
   { href: "/student/attendance", labelKey: "attendances", icon: History },
+  { href: "/student/play", labelKey: "play", icon: Swords },
   { href: "/student/profile", labelKey: "profile", icon: User },
 ];
 
