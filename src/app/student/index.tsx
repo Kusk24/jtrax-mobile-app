@@ -7,12 +7,15 @@ import { StudentHeader } from "@/components/StudentHeader";
 import { ClassCard } from "@/components/ClassCard";
 import { student, upcomingToday } from "@/lib/student-data";
 import { C } from "@/lib/colors";
+import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
 
 export default function StudentHome() {
   const t = useTranslations("home");
   return (
     <Screen>
       <StudentHeader />
+
+      <LiveTournamentBanner />
 
       {student.lowCredits && (
         <View className="flex-row items-center gap-4 rounded-card bg-highlight px-5 py-4">

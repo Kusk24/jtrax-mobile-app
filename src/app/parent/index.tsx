@@ -8,6 +8,7 @@ import { Avatar } from "@/components/Avatar";
 import { ClassCard } from "@/components/ClassCard";
 import { children, getChild, upcomingClasses } from "@/lib/parent-data";
 import { C } from "@/lib/colors";
+import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
 
 export default function ParentHome() {
   const t = useTranslations("home");
@@ -16,6 +17,8 @@ export default function ParentHome() {
   return (
     <Screen>
       <ParentHeader />
+
+      <LiveTournamentBanner />
 
       {lowCreditChild && (
         <View className="flex-row items-center gap-4 rounded-card bg-highlight px-5 py-4">

@@ -236,6 +236,27 @@
       "engine": "The computer opponent could not start on this device."
     }
   },
+  "tournament": {
+    "title": "Tournament",
+    "back": "Back",
+    "loadFailed": "Could not load the tournament. Pull back and try again.",
+    "findPlayer": "Find a player…",
+    "clearSearch": "Clear search",
+    "gamesOf": "Games of “{query}”",
+    "noMatches": "Nobody by that name in this tournament.",
+    "noPlayers": "No players yet.",
+    "rounds": "Rounds",
+    "roundN": "Round {n}",
+    "rShort": "R{n}",
+    "finished": "Finished",
+    "upcoming": "Pairings up",
+    "standings": "Standings",
+    "bye": "bye",
+    "updatesAutomatically": "Updates automatically.",
+    "liveNow": "Live now",
+    "startingSoon": "Starting soon",
+    "openLive": "Open live results for {name}"
+  },
   "signIn": {
     "tagline": "Chess school, organised.",
     "email": "Email",
