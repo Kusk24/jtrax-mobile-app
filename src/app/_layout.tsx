@@ -15,6 +15,7 @@ import {
 } from "@expo-google-fonts/nunito";
 import { I18nProvider } from "@/i18n";
 import { SessionProvider } from "@/lib/session";
+import { C } from "@/lib/colors";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -34,7 +35,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: "#f7f4ee" },
+            contentStyle: { backgroundColor: C.paper },
           }}
         />
       </SessionProvider>

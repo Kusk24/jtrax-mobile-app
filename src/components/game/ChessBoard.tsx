@@ -3,6 +3,7 @@ import { Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useTranslations } from "use-intl";
 import type { Chess } from "chess.js";
 import { PIECE_GLYPH, isPromotion, movesFrom, squareName, toGrid } from "@/lib/chess-core";
+import { C } from "@/lib/colors";
 
 /**
  * The board, in React Native.
@@ -12,10 +13,17 @@ import { PIECE_GLYPH, isPromotion, movesFrom, squareName, toGrid } from "@/lib/c
  * width it is and a chess board that needs scrolling is not a chess board.
  */
 
-const LIGHT = "#f8f6eb";
-const DARK = "#c4a5a5";
-const SELECTED = "#ffe387";
-const LAST = "#eedea8";
+/* Board squares in the academy's blues, matching the web board. The move
+   highlights stay warm on purpose: a blue highlight on a blue board is not a
+   highlight. */
+const LIGHT = "#eef3fa";
+const DARK = "#a3b6d2";
+const SELECTED = "#f2d98c";
+const LAST = "#e4d7b0";
+/* White pieces are near-white on a pale board, so the glyph carries its own
+   navy edge — without it the white side is very nearly invisible. */
+const WHITE_PIECE = "#fdfefe";
+const BLACK_PIECE = "#1b3260";
 const PROMOTION_CHOICES = ["q", "r", "b", "n"] as const;
 
 export function ChessBoard({
@@ -69,7 +77,7 @@ export function ChessBoard({
   }
 
   return (
-    <View className="self-center rounded-[20px] border-2 border-peach bg-peach p-2.5">
+    <View className="self-center rounded-[20px] border-2 border-highlight bg-highlight p-2.5">
       <View style={{ width: cell * 8, height: cell * 8 }} className="overflow-hidden rounded-lg">
         {rows.map((r) => (
           <View key={r} className="flex-row">
@@ -94,7 +102,10 @@ export function ChessBoard({
                       style={{
                         fontSize: cell * 0.72,
                         lineHeight: cell,
-                        color: piece.color === "w" ? "#fffbf0" : "#5a322a",
+                        color: piece.color === "w" ? WHITE_PIECE : BLACK_PIECE,
+                        textShadowColor: piece.color === "w" ? C.navy : "transparent",
+                        textShadowOffset: { width: 1, height: 1 },
+                        textShadowRadius: 0.5,
                       }}
                     >
                       {PIECE_GLYPH[piece.color + piece.type]}
@@ -103,11 +114,11 @@ export function ChessBoard({
                   {dest &&
                     (isCapture ? (
                       <View
-                        style={{ borderWidth: 3, borderColor: "rgba(207,132,40,0.85)" }}
+                        style={{ borderWidth: 3, borderColor: C.gold }}
                         className="absolute inset-0.5 rounded-md"
                       />
                     ) : (
-                      <View className="absolute size-3 rounded-full bg-[rgba(116,84,44,0.5)]" />
+                      <View className="absolute size-3 rounded-full bg-navy/50" />
                     ))}
                 </Pressable>
               );
@@ -117,8 +128,8 @@ export function ChessBoard({
       </View>
 
       {pending && (
-        <View className="absolute inset-0 items-center justify-center rounded-[20px] bg-[rgba(109,61,52,0.55)]">
-          <View className="items-center rounded-2xl border-2 border-peach bg-cream p-4">
+        <View className="absolute inset-0 items-center justify-center rounded-[20px] bg-navy/60">
+          <View className="items-center rounded-2xl border-2 border-highlight bg-paper p-4">
             <Text className="mb-2 font-sans-bold text-xs text-maroon">{t("promote")}</Text>
             <View className="flex-row gap-1.5">
               {PROMOTION_CHOICES.map((p) => (
@@ -130,9 +141,15 @@ export function ChessBoard({
                     setPending(null);
                     setFrom(null);
                   }}
-                  className="size-12 items-center justify-center rounded-xl border-2 border-peach bg-peach"
+                  className="size-12 items-center justify-center rounded-xl border-2 border-highlight bg-highlight"
                 >
-                  <Text style={{ fontSize: 30, color: game.turn() === "w" ? "#fffbf0" : "#5a322a" }}>
+                  <Text style={{
+                      fontSize: 30,
+                      color: game.turn() === "w" ? WHITE_PIECE : BLACK_PIECE,
+                      textShadowColor: game.turn() === "w" ? C.navy : "transparent",
+                      textShadowOffset: { width: 1, height: 1 },
+                      textShadowRadius: 0.5,
+                    }}>
                     {PIECE_GLYPH[game.turn() + p]}
                   </Text>
                 </Pressable>

@@ -82,7 +82,7 @@ export default function AiScreen() {
                   onPress={() => setLevel(l)}
                   accessibilityLabel={`level-${l}`}
                   className={`flex-1 items-center rounded-xl border-2 py-2 ${
-                    level === l ? "border-peach bg-peach" : "border-line bg-cream"
+                    level === l ? "border-highlight bg-highlight" : "border-line bg-paper"
                   }`}
                 >
                   <Text className="font-sans-bold text-sm text-ink">{l}</Text>

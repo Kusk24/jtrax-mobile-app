@@ -40,15 +40,15 @@ const overviewTiles = [
     icon: ChartColumn,
     value: `${monthlyOverview.attendancePct}%`,
     labelKey: "attendanceRate",
-    frame: "border-teal-500/40",
-    color: "#0d9488",
+    frame: "border-accent/50",
+    color: C.accent,
   },
   {
     icon: CircleDollarSign,
     value: `${monthlyOverview.creditsConsumed}`,
     labelKey: "creditConsumed",
-    frame: "border-amber-400/60",
-    color: "#f59e0b",
+    frame: "border-gold/50",
+    color: C.gold,
   },
 ] as const;
 

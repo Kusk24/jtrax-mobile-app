@@ -7,7 +7,7 @@ import { C } from "@/lib/colors";
     PlayShell, minus the phone frame — this *is* the phone. */
 export function PlayShell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View className="flex-1 bg-cream">
+    <View className="flex-1 bg-paper">
       <View className="flex-row items-center gap-3 px-4 pb-2 pt-3">
         <Pressable
           onPress={() => (router.canGoBack() ? router.back() : router.replace("/student"))}

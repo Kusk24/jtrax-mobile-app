@@ -18,8 +18,8 @@ export default function PlayIndexScreen() {
         <Link key={href} href={href} asChild>
           <Pressable className="active:opacity-80">
             <Panel className="flex-row items-center gap-3.5">
-              <View className="size-12 items-center justify-center rounded-xl bg-peach">
-                <Icon size={24} color={C.peachInk} />
+              <View className="size-12 items-center justify-center rounded-xl bg-highlight">
+                <Icon size={24} color={C.highlightInk} />
               </View>
               <View className="min-w-0 flex-1">
                 <Text className="font-sans-bold text-base text-ink">{title}</Text>

@@ -15,8 +15,8 @@ export default function StudentHome() {
       <StudentHeader />
 
       {student.lowCredits && (
-        <View className="flex-row items-center gap-4 rounded-card bg-peach px-5 py-4">
-          <TriangleAlert size={28} color={C.peach} fill={C.peachInk} />
+        <View className="flex-row items-center gap-4 rounded-card bg-highlight px-5 py-4">
+          <TriangleAlert size={28} color={C.highlight} fill={C.highlightInk} />
           <View className="min-w-0 flex-1">
             <Text className="font-sans-bold text-base text-ink">
               {t("lowCreditsTitleSelf")}

@@ -159,7 +159,7 @@ export default function TeacherStudentProfileScreen() {
           <Text className="text-right font-sans-semibold text-xs text-navy">
             {cls.pct}%
           </Text>
-          <View className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+          <View className="mt-1 h-2 w-full overflow-hidden rounded-full bg-line">
             <View
               className="h-full rounded-full bg-navy"
               style={{ width: `${cls.pct}%` }}

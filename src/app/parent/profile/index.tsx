@@ -125,7 +125,7 @@ export default function ParentProfileScreen() {
               <LanguageToggle />
             </View>
           </View>
-          <Pressable className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-cream">
+          <Pressable className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-paper">
             <Phone size={16} color={C.navy} />
             <Text className="font-sans text-sm text-ink">
               {t("profile.contactSchool")}
@@ -136,7 +136,7 @@ export default function ParentProfileScreen() {
               style={{ marginLeft: "auto" }}
             />
           </Pressable>
-          <Pressable className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-cream">
+          <Pressable className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-paper">
             <Settings size={16} color={C.navy} />
             <Text className="font-sans text-sm text-ink">
               {t("profile.settings")}

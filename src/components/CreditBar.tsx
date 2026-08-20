@@ -4,7 +4,7 @@ export function CreditBar({
   remaining,
   total,
   low,
-  trackClass = "bg-gray-200",
+  trackClass = "bg-line",
 }: {
   remaining: number;
   total: number;
