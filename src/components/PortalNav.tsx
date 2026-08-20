@@ -33,7 +33,10 @@ export function PortalBottomNav({ tabs }: { tabs: PortalTab[] }) {
           return (
             <Link key={tab.href} href={tab.href as never} asChild>
               <Pressable
-                className={`items-center gap-0.5 rounded-2xl px-4 py-1.5 ${
+                /* flex-1 rather than px-4: five fixed-padding tabs overflowed
+                   a 320px screen by 37px — the bar's width belongs to the
+                   screen, and the tabs share whatever it has. */
+                className={`min-w-0 flex-1 items-center gap-0.5 rounded-2xl px-1 py-1.5 ${
                   active ? "bg-navy-soft/50" : ""
                 }`}
               >
@@ -43,6 +46,7 @@ export function PortalBottomNav({ tabs }: { tabs: PortalTab[] }) {
                   strokeWidth={active ? 2.4 : 2}
                 />
                 <Text
+                  numberOfLines={1}
                   className={`text-[10px] ${
                     active ? "font-sans-bold text-navy" : "font-sans text-muted"
                   }`}
