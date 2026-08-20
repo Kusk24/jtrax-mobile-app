@@ -31,7 +31,7 @@ export function ParentHeader() {
           <Pressable className="relative rounded-full p-1.5">
             <Bell size={24} color={C.navy} fill={C.navy} />
             {hasUnread && (
-              <View className="absolute right-1 top-1 size-2.5 rounded-full border-2 border-cream bg-brick" />
+              <View className="absolute right-1 top-1 size-2.5 rounded-full border-2 border-paper bg-brick" />
             )}
           </Pressable>
         </Link>

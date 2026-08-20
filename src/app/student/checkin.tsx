@@ -23,10 +23,10 @@ const VERIFY_DURATION_MS = 3000;
 
 const pieces = [
   { Icon: ChessPawn, color: C.navy },
-  { Icon: ChessKnight, color: "#f59e0b" },
-  { Icon: ChessBishop, color: "#ea580c" },
-  { Icon: ChessRook, color: "#2dd4bf" },
-  { Icon: ChessKing, color: "#059669" },
+  { Icon: ChessKnight, color: C.accent },
+  { Icon: ChessBishop, color: C.gold },
+  { Icon: ChessRook, color: C.olive },
+  { Icon: ChessKing, color: C.maroon },
 ];
 
 export default function CheckinScreen() {

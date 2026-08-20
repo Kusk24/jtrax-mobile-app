@@ -24,7 +24,7 @@ export function RequireRole({
   // user to the login screen on every cold start.
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-cream">
+      <View className="flex-1 items-center justify-center bg-paper">
         <ActivityIndicator color={C.navy} />
       </View>
     );

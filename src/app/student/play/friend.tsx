@@ -47,7 +47,7 @@ export default function JoinScreen() {
           placeholderTextColor={C.line}
           onSubmitEditing={submit}
           returnKeyType="go"
-          className="rounded-xl border-2 border-line bg-cream py-3 text-center font-sans-bold text-3xl tracking-[8px] text-ink"
+          className="rounded-xl border-2 border-line bg-paper py-3 text-center font-sans-bold text-3xl tracking-[8px] text-ink"
         />
         <Text className="mt-2 font-sans text-xs leading-5 text-muted">{t("codeHint")}</Text>
       </Panel>

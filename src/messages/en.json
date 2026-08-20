@@ -37,6 +37,7 @@
     "validUntil": "Valid until {date}",
     "creditsOf": "{remaining}/{total} credits",
     "language": "Language",
+    "signOut": "Sign out",
     "studentBadge": "Student",
     "parentBadge": "Parent",
     "teacherBadge": "Teacher"

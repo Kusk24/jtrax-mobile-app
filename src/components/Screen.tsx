@@ -11,7 +11,7 @@ export function Screen({
 }) {
   return (
     <ScrollView
-      className="flex-1 bg-cream"
+      className="flex-1 bg-paper"
       contentContainerClassName={`px-4 pb-32 pt-6 ${gapClass}`}
       showsVerticalScrollIndicator={false}
     >

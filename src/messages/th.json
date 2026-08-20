@@ -37,6 +37,7 @@
     "validUntil": "ใช้ได้ถึง {date}",
     "creditsOf": "{remaining}/{total} เครดิต",
     "language": "ภาษา",
+    "signOut": "ออกจากระบบ",
     "studentBadge": "นักเรียน",
     "parentBadge": "ผู้ปกครอง",
     "teacherBadge": "คุณครู"

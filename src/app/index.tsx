@@ -33,7 +33,7 @@ export default function SignInScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-cream">
+      <View className="flex-1 items-center justify-center bg-paper">
         <ActivityIndicator color={C.navy} />
       </View>
     );
@@ -69,7 +69,7 @@ export default function SignInScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-cream"
+      className="flex-1 bg-paper"
       contentContainerClassName="min-h-full justify-center px-6 py-12"
       keyboardShouldPersistTaps="handled"
     >
@@ -89,7 +89,7 @@ export default function SignInScreen() {
 
         <View>
           <Text className="mb-1.5 font-sans-bold text-sm text-ink">{t("email")}</Text>
-          <View className="flex-row items-center gap-2 rounded-xl border-2 border-line bg-cream px-3">
+          <View className="flex-row items-center gap-2 rounded-xl border-2 border-line bg-paper px-3">
             <Mail size={16} color={C.muted} />
             <TextInput
               value={email}
@@ -106,7 +106,7 @@ export default function SignInScreen() {
 
         <View>
           <Text className="mb-1.5 font-sans-bold text-sm text-ink">{t("password")}</Text>
-          <View className="flex-row items-center gap-2 rounded-xl border-2 border-line bg-cream px-3">
+          <View className="flex-row items-center gap-2 rounded-xl border-2 border-line bg-paper px-3">
             <Lock size={16} color={C.muted} />
             <TextInput
               value={password}

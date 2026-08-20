@@ -21,8 +21,8 @@ export function AttendanceActions() {
         </Pressable>
       </Link>
       <Link href="/teacher/checkin/scan" asChild>
-        <Pressable className="size-11 items-center justify-center rounded-full bg-peach shadow-clay active:opacity-80">
-          <Nfc size={20} color={C.peachInk} />
+        <Pressable className="size-11 items-center justify-center rounded-full bg-highlight shadow-clay active:opacity-80">
+          <Nfc size={20} color={C.highlightInk} />
         </Pressable>
       </Link>
     </View>

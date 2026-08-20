@@ -6,7 +6,7 @@ import { C } from "@/lib/colors";
 import type { NotificationItem } from "@/lib/types";
 
 const kindStyles = {
-  alert: { icon: TriangleAlert, box: "bg-peach", color: C.peachInk },
+  alert: { icon: TriangleAlert, box: "bg-highlight", color: C.highlightInk },
   success: { icon: Check, box: "bg-olive", color: C.white },
   expiry: { icon: Hourglass, box: "bg-brick-soft", color: C.brick },
 } as const;

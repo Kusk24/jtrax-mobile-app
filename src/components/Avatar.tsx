@@ -28,7 +28,7 @@ export function Avatar({
         </Text>
       </View>
       {badge && (
-        <View className="absolute -right-0.5 -top-0.5 size-4 items-center justify-center rounded-full border-2 border-cream bg-brick">
+        <View className="absolute -right-0.5 -top-0.5 size-4 items-center justify-center rounded-full border-2 border-paper bg-brick">
           <Text className="font-sans-bold text-[9px] text-white">!</Text>
         </View>
       )}

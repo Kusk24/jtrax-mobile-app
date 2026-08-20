@@ -17,7 +17,7 @@ export function SignOutButton() {
         await signOut();
         router.replace("/");
       }}
-      className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-cream"
+      className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-paper"
     >
       <LogOut size={16} color={C.brick} />
       <Text className="font-sans-bold text-sm text-brick">{t("signOut")}</Text>

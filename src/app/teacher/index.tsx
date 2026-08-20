@@ -40,7 +40,7 @@ export default function TeacherHome() {
     <Screen>
       <TeacherHeader classCount={1} />
 
-      <View className="rounded-card bg-peach/60 px-5 py-4">
+      <View className="rounded-card bg-highlight/60 px-5 py-4">
         <View className="flex-row items-center justify-between">
           <Text className="font-sans-bold text-base text-ink">
             {t("weeklyProgress")}
