@@ -58,7 +58,7 @@ export default function CheckinScreen() {
     <Screen gapClass="gap-4">
       <View className="flex-row items-start gap-3">
         <Pressable
-          onPress={() => router.push("/student")}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace("/student"))}
           className="mt-0.5 rounded-full p-1"
         >
           <ArrowLeft size={24} color={C.navy} />
@@ -197,7 +197,7 @@ export default function CheckinScreen() {
 
       {(phase === "success" || notStarted) && (
         <Pressable
-          onPress={() => router.push("/student")}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace("/student"))}
           className="rounded-xl bg-navy py-3 shadow-clay active:bg-navy-deep"
         >
           <Text className="text-center font-sans-semibold text-base text-white">

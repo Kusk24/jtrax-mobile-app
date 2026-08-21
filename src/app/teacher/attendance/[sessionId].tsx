@@ -10,11 +10,13 @@ import { RosterRow } from "@/components/RosterRow";
 import { roster, sessionHistory } from "@/lib/teacher-data";
 import { C } from "@/lib/colors";
 import type { RosterStudent } from "@/lib/types";
+import { NotHere } from "@/components/NotHere";
 
 const PREVIEW_COUNT = 3;
 
 export default function AttendanceSummaryScreen() {
   const t = useTranslations();
+  const tCheckin = useTranslations("checkin");
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const session = sessionHistory.find((s) => s.id === sessionId);
 
@@ -24,7 +26,7 @@ export default function AttendanceSummaryScreen() {
   const [editing, setEditing] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
-  if (!session) return null;
+  if (!session) return <NotHere />;
 
   const inSession = new Set([...session.presentIds, ...session.absentIds]);
   const students = roster.filter((s) => inSession.has(s.id));
@@ -69,7 +71,7 @@ export default function AttendanceSummaryScreen() {
     <Screen gapClass="gap-4">
       <CheckinHeader
         titleKey="attendance.summaryTitle"
-        subtitle={`${session.course} - Section ${session.section.replace("Sec ", "")}`}
+        subtitle={tCheckin("classSubtitle", { course: session.course, section: session.section.replace("Sec ", "") })}
         backHref="/teacher/attendance"
       />
 

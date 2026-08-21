@@ -17,7 +17,15 @@ export function CheckinHeader({
   return (
     <View className="flex-row items-center gap-3">
       <Pressable
-        onPress={() => router.push(backHref as never)}
+        onPress={() => {
+          /* Pop rather than push: pushing meant tapping back grew the stack,
+             and the OS gesture then retraced forward through screens the
+             person had just left. `backHref` remains the fallback for a
+             screen opened directly from a link, where there is nothing to
+             pop to. */
+          if (router.canGoBack()) router.back();
+          else router.replace(backHref as never);
+        }}
         className="rounded-full p-1.5"
       >
         <ArrowLeft size={20} color={C.navy} />

@@ -17,12 +17,21 @@ const LocaleContext = createContext<{
     the engine inside next-intl); the cookie becomes AsyncStorage. */
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
+  /* The stored choice arrives asynchronously, so rendering before it lands
+     showed a Thai reader one frame of English on every cold start. Nothing is
+     drawn until the answer is known — the splash screen is still up, so this
+     costs no visible delay. */
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem("locale").then((value) => {
-      if (value === "th" || value === "en") setLocaleState(value);
-    });
+    AsyncStorage.getItem("locale")
+      .then((value) => {
+        if (value === "th" || value === "en") setLocaleState(value);
+      })
+      .finally(() => setReady(true));
   }, []);
+
+  if (!ready) return null;
 
   const setLocale = (next: Locale) => {
     setLocaleState(next);

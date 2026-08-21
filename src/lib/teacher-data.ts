@@ -169,14 +169,14 @@ export const studentDetail = {
   parents: [
     {
       name: "Sandy Jones",
-      relation: "Mother",
+      relation: "Mother", relationKey: "mother",
       avatarColor: AVATAR_TINTS.rose,
       phone: "+66123456789",
       email: "sandy01234@gmail.com",
     },
     {
       name: "Mile Jones",
-      relation: "Father",
+      relation: "Father", relationKey: "father",
       avatarColor: AVATAR_TINTS.sky,
       phone: "+66123456790",
       email: "mile.jones@gmail.com",

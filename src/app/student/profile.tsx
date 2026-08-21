@@ -31,6 +31,7 @@ const card = "rounded-card border-2 border-line bg-card p-4 shadow-clay";
 
 export default function StudentProfileScreen() {
   const t = useTranslations();
+  const tCommon = useTranslations("common");
   const low = student.lowCredits;
   return (
     <Screen gapClass="gap-5">
@@ -112,7 +113,7 @@ export default function StudentProfileScreen() {
                   {contact.name}
                 </Text>
                 <Text className="font-sans text-xs text-muted">
-                  {contact.relation}
+                  {tCommon(`${contact.relationKey}` as never)}
                 </Text>
               </View>
               <Pressable

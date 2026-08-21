@@ -6,7 +6,7 @@
  * pairings, and a search that answers "where is my child playing".
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslations } from "use-intl";
 import { ArrowLeft, Search, X } from "lucide-react-native";
@@ -40,6 +40,7 @@ function isPlayed(status: string): boolean {
 export default function TournamentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useTranslations("tournament");
+  const tCommon = useTranslations("common");
   const [data, setData] = useState<PublicResults | null>(null);
   const [failed, setFailed] = useState(false);
   const [query, setQuery] = useState("");
@@ -115,6 +116,13 @@ export default function TournamentScreen() {
         </View>
       )}
 
+      {!data && !failed && (
+        <View className="items-center gap-3 py-16">
+          <ActivityIndicator color={C.navy} />
+          <Text className="font-sans text-sm text-muted">{tCommon("loading")}</Text>
+        </View>
+      )}
+
       {data && (
         <>
           <View className="flex-row items-center gap-2.5 rounded-card border-2 border-line bg-card px-4">
@@ -184,7 +192,11 @@ export default function TournamentScreen() {
                 <Text className="font-sans-bold text-sm text-ink">{t("roundN", { n: current.round })}</Text>
                 <View className={`rounded-full px-2 py-0.5 ${isPlayed(current.status) ? "bg-olive-soft" : "bg-brick-soft"}`}>
                   <Text className={`font-sans-bold text-[11px] ${isPlayed(current.status) ? "text-olive" : "text-maroon"}`}>
-                    {isPlayed(current.status) ? t("finished") : t("upcoming")}
+                    {isPlayed(current.status)
+                      ? t("finished")
+                      : current.status === "Playing"
+                        ? t("playing")
+                        : t("upcoming")}
                   </Text>
                 </View>
               </View>

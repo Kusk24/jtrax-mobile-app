@@ -22,6 +22,7 @@ import {
   getChild,
 } from "@/lib/parent-data";
 import { C } from "@/lib/colors";
+import { NotHere } from "@/components/NotHere";
 
 const card = "rounded-card border-2 border-line bg-card p-4 shadow-clay";
 
@@ -29,7 +30,7 @@ export default function ChildProfileScreen() {
   const t = useTranslations();
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const child = getChild(childId);
-  if (!child) return null;
+  if (!child) return <NotHere />;
 
   const low = child.lowCredits;
   const classes = enrolledClasses[child.id] ?? [];
