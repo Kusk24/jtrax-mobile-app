@@ -33,6 +33,9 @@
     "back": "ย้อนกลับ",
     "notifications": "การแจ้งเตือน",
     "myProfile": "โปรไฟล์ของฉัน",
+    "loading": "กำลังโหลด…",
+    "notFound": "ไม่พบรายการนี้แล้ว",
+    "goBack": "ย้อนกลับ",
     "idLabel": "รหัส: {id}",
     "validUntil": "ใช้ได้ถึง {date}",
     "creditsOf": "{remaining}/{total} เครดิต",
@@ -40,7 +43,10 @@
     "signOut": "ออกจากระบบ",
     "studentBadge": "นักเรียน",
     "parentBadge": "ผู้ปกครอง",
-    "teacherBadge": "คุณครู"
+    "teacherBadge": "คุณครู",
+    "mother": "แม่",
+    "father": "พ่อ",
+    "guardian": "ผู้ปกครอง"
   },
   "days": {
     "MON": "จ.",
@@ -120,7 +126,8 @@
     "secondsAgo": "{s} วินาทีที่แล้ว",
     "minutesAgo": "{m} นาทีที่แล้ว",
     "markPresent": "เช็คชื่อ {name} มาเรียน",
-    "markAbsent": "เช็คชื่อ {name} ขาดเรียน"
+    "markAbsent": "เช็คชื่อ {name} ขาดเรียน",
+    "classSubtitle": "{course} - เซกชัน {section}"
   },
   "roster": {
     "sessions": "{used}/{total} คาบ",
@@ -247,6 +254,7 @@
     "noPlayers": "ยังไม่มีผู้เล่น",
     "rounds": "รอบ",
     "roundN": "รอบ {n}",
+    "playing": "กำลังแข่งขัน",
     "rShort": "รอบ {n}",
     "finished": "จบแล้ว",
     "upcoming": "ประกาศคู่แล้ว",

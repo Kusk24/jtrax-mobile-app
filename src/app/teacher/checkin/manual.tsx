@@ -31,7 +31,7 @@ export default function ManualCheckinScreen() {
   return (
     <Screen gapClass="gap-4">
       <CheckinHeader
-        subtitle={`${upcomingClass.course} - Section ${upcomingClass.section.replace("Sec ", "")}`}
+        subtitle={t("classSubtitle", { course: upcomingClass.course, section: upcomingClass.section.replace("Sec ", "") })}
       />
 
       <SessionProgress count={presentIds.size} total={roster.length} />

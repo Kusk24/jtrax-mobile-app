@@ -52,7 +52,7 @@ export default function ScanCheckinScreen() {
   return (
     <Screen gapClass="gap-4">
       <CheckinHeader
-        subtitle={`${upcomingClass.course} - Section ${upcomingClass.section.replace("Sec ", "")}`}
+        subtitle={t("classSubtitle", { course: upcomingClass.course, section: upcomingClass.section.replace("Sec ", "") })}
       />
 
       <View className="items-center py-4">

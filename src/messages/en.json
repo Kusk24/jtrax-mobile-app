@@ -33,6 +33,9 @@
     "back": "Back",
     "notifications": "Notifications",
     "myProfile": "My profile",
+    "loading": "Loading…",
+    "notFound": "That is not here any more.",
+    "goBack": "Go back",
     "idLabel": "ID: {id}",
     "validUntil": "Valid until {date}",
     "creditsOf": "{remaining}/{total} credits",
@@ -40,7 +43,10 @@
     "signOut": "Sign out",
     "studentBadge": "Student",
     "parentBadge": "Parent",
-    "teacherBadge": "Teacher"
+    "teacherBadge": "Teacher",
+    "mother": "Mother",
+    "father": "Father",
+    "guardian": "Guardian"
   },
   "days": {
     "MON": "MON",
@@ -120,7 +126,8 @@
     "secondsAgo": "{s}s ago",
     "minutesAgo": "{m}m ago",
     "markPresent": "Mark {name} present",
-    "markAbsent": "Mark {name} absent"
+    "markAbsent": "Mark {name} absent",
+    "classSubtitle": "{course} - Section {section}"
   },
   "roster": {
     "sessions": "{used}/{total} sessions",
@@ -247,6 +254,7 @@
     "noPlayers": "No players yet.",
     "rounds": "Rounds",
     "roundN": "Round {n}",
+    "playing": "Playing now",
     "rShort": "R{n}",
     "finished": "Finished",
     "upcoming": "Pairings up",

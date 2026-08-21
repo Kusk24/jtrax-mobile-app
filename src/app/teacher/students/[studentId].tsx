@@ -17,14 +17,16 @@ import { Avatar } from "@/components/Avatar";
 import { CheckinHeader } from "@/components/CheckinHeader";
 import { roster, studentDetail } from "@/lib/teacher-data";
 import { C } from "@/lib/colors";
+import { NotHere } from "@/components/NotHere";
 
 const card = "rounded-card border-2 border-line bg-card p-4 shadow-clay";
 
 export default function TeacherStudentProfileScreen() {
   const t = useTranslations();
+  const tCommon = useTranslations("common");
   const { studentId } = useLocalSearchParams<{ studentId: string }>();
   const student = roster.find((s) => s.id === studentId);
-  if (!student) return null;
+  if (!student) return <NotHere />;
 
   // Mock: detail data (parents, enrolment) is only modelled for one student.
   const detail = studentDetail;
@@ -108,7 +110,7 @@ export default function TeacherStudentProfileScreen() {
                   {parent.name}
                 </Text>
                 <Text className="font-sans text-xs text-muted">
-                  {parent.relation}
+                  {tCommon(`${parent.relationKey}` as never)}
                 </Text>
               </View>
               <Pressable
