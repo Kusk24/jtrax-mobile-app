@@ -86,10 +86,10 @@ export function useSession() {
 }
 
 /** Where each role lands after signing in. Staff use the separate admin
-    console, so this app has nowhere to send them. */
-export function homeFor(role: Identity["role"]): "/parent" | "/student" | "/teacher" | null {
+    console, so this app has nowhere to send them — and neither does Teacher:
+    the academy has no teacher workflow, so no teacher accounts are issued. */
+export function homeFor(role: Identity["role"]): "/parent" | "/student" | null {
   if (role === "Parent") return "/parent";
   if (role === "Student") return "/student";
-  if (role === "Teacher") return "/teacher";
   return null;
 }

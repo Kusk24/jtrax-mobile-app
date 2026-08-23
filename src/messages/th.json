@@ -5,27 +5,18 @@
     "studentDesc": "ดูตารางเรียน เครดิต และประวัติการเข้าเรียนของคุณ",
     "parentLabel": "ผู้ปกครอง",
     "parentDesc": "ติดตามคลาสเรียน เครดิต และการเช็คอินของบุตรหลาน",
-    "teacherLabel": "คุณครู",
-    "teacherDesc": "จัดการคลาสเรียนและเช็คชื่อนักเรียน",
     "tempNote": "หน้าเลือกบทบาทชั่วคราว — จะเปลี่ยนเป็นระบบเข้าสู่ระบบเมื่อระบบหลังบ้านพร้อมใช้งาน"
   },
   "nav": {
     "home": "หน้าแรก",
     "schedule": "ตารางเรียน",
-    "teacherSchedule": "ตารางสอน",
     "attendances": "การเข้าเรียน",
-    "teacherAttendances": "เช็คชื่อ",
     "profile": "โปรไฟล์",
-    "studentPortal": "สำหรับนักเรียน",
-    "parentPortal": "สำหรับผู้ปกครอง",
-    "teacherPortal": "สำหรับคุณครู",
-    "switchRole": "เปลี่ยนบทบาท",
     "play": "เล่น"
   },
   "common": {
     "hi": "สวัสดี คุณ{name} !",
     "viewAll": "ดูทั้งหมด",
-    "showLess": "ย่อ",
     "edit": "แก้ไข",
     "done": "เสร็จสิ้น",
     "present": "มาเรียน",
@@ -43,7 +34,6 @@
     "signOut": "ออกจากระบบ",
     "studentBadge": "นักเรียน",
     "parentBadge": "ผู้ปกครอง",
-    "teacherBadge": "คุณครู",
     "mother": "แม่",
     "father": "พ่อ",
     "guardian": "ผู้ปกครอง"
@@ -68,33 +58,16 @@
     "upcomingClass": "คลาสที่กำลังจะถึง",
     "viewAll": "ดูทั้งหมด",
     "myChildren": "บุตรหลานของฉัน",
-    "myClasses": "คลาสของฉัน ({count})",
-    "checkIn": "เช็คอิน",
-    "weeklyProgress": "ความคืบหน้าสัปดาห์นี้",
-    "totalSessions": "คาบสอนทั้งหมด",
-    "remainingSessions": "คาบสอนที่เหลือ",
-    "hoursTaught": "ชั่วโมงที่สอน",
-    "studentsCount": "นักเรียน {count} คน",
-    "studentsOfCapacity": "นักเรียน {count}/{capacity} คน"
+    "checkIn": "เช็คอิน"
   },
   "schedule": {
     "title": "ตารางเรียนของฉัน",
-    "teacherTitle": "ตารางสอนของฉัน",
     "todayClass": "คลาสวันนี้ ({count})",
     "classes": "คลาสเรียน ({count})",
-    "empty": "ไม่มีคลาสเรียนในวันนี้",
-    "takeManually": "เช็คชื่อด้วยตนเอง",
-    "takeByScan": "เช็คชื่อด้วยการสแกน"
+    "empty": "ไม่มีคลาสเรียนในวันนี้"
   },
   "attendance": {
-    "historyTitle": "ประวัติการเข้าเรียน",
-    "teacherHistoryTitle": "ประวัติการเช็คชื่อ",
-    "presentOf": "มาเรียน {present}/{total} คน",
-    "summaryTitle": "สรุปการเช็คชื่อ",
-    "sessionProgress": "ความคืบหน้าการเช็คชื่อ",
-    "presentStudents": "นักเรียนที่มาเรียน ({count})",
-    "absentStudents": "นักเรียนที่ขาดเรียน ({count})",
-    "everyonePresent": "มาเรียนครบทุกคน"
+    "historyTitle": "ประวัติการเข้าเรียน"
   },
   "checkin": {
     "attendance": "เช็คชื่อ",
@@ -102,7 +75,6 @@
     "selfSubtitle": "เช็คอินได้เมื่อคุณอยู่ในห้องเรียนแล้ว",
     "enterCode": "กรอกรหัสคลาสเรียน",
     "codeHint": "พิมพ์รหัส 6 หลักที่แสดงบนจอในห้องเรียน",
-    "codeAria": "รหัสคลาสเรียน 6 หลัก",
     "codeError": "รหัสไม่ถูกต้อง กรุณาตรวจสอบรหัสบนจอในห้องเรียนแล้วลองอีกครั้ง",
     "checkInBtn": "เช็คอิน",
     "or": "หรือ",
@@ -115,23 +87,8 @@
     "minusCredit": "-1 เครดิต",
     "notStarted": "คุณครูยังไม่เปิดการเช็คชื่อ !",
     "backHome": "กลับหน้าแรก",
-    "searchStudents": "ค้นหานักเรียน...",
-    "allAbsent": "ขาดทั้งหมด",
-    "allPresent": "มาทั้งหมด",
     "finish": "เสร็จสิ้นการเช็คชื่อ",
-    "noMatch": "ไม่พบนักเรียนชื่อ “{query}”",
-    "scannedIn": "นักเรียนที่สแกนแล้ว",
-    "recentScans": "สแกนล่าสุด",
-    "justNow": "เมื่อสักครู่",
-    "secondsAgo": "{s} วินาทีที่แล้ว",
-    "minutesAgo": "{m} นาทีที่แล้ว",
-    "markPresent": "เช็คชื่อ {name} มาเรียน",
-    "markAbsent": "เช็คชื่อ {name} ขาดเรียน",
-    "classSubtitle": "{course} - เซกชัน {section}"
-  },
-  "roster": {
-    "sessions": "{used}/{total} คาบ",
-    "creditsLine": "เหลือ {count} เครดิต | หมดอายุ {date}"
+    "noMatch": "ไม่พบนักเรียนชื่อ “{query}”"
   },
   "notifications": {
     "title": "การแจ้งเตือน",
@@ -144,14 +101,11 @@
     "studentProfile": "โปรไฟล์นักเรียน",
     "childProfile": "โปรไฟล์ของ{name}",
     "levelAge": "ระดับ{level} | อายุ {age} ปี",
-    "teacherLine": "คุณครู | ประสบการณ์สอน {years} ปี",
-    "msName": "ครู{name}",
     "remainingCredits": "เครดิตคงเหลือ",
     "parentsContact": "ข้อมูลติดต่อผู้ปกครอง",
     "enrolledClasses": "คลาสที่ลงทะเบียน",
     "classesAttended": "คลาสที่เข้าเรียนแล้ว",
     "classesRemaining": "คลาสที่เหลือ",
-    "classesOf": "{attended}/{total} คลาส",
     "attendanceHistory": "ประวัติการเข้าเรียน",
     "contactInfo": "ข้อมูลติดต่อ",
     "phone": "เบอร์โทรศัพท์",
@@ -159,12 +113,8 @@
     "more": "เพิ่มเติม",
     "contactSchool": "ติดต่อโรงเรียน",
     "settings": "การตั้งค่า",
-    "monthlyOverview": "ภาพรวมเดือนนี้",
     "sessions": "คาบสอน",
     "students": "นักเรียน",
-    "attendanceRate": "อัตราการมาเรียน",
-    "creditConsumed": "เครดิตที่ใช้ไป",
-    "assignedBranches": "สาขาที่รับผิดชอบ",
     "callTo": "โทรหา {name}",
     "emailTo": "ส่งอีเมลถึง {name}"
   },
