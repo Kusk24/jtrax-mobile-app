@@ -9,7 +9,7 @@ import type { Identity } from "@/lib/api";
  *
  * It lives on the layout, not on each screen, so a route added later inherits
  * the guard rather than shipping open — the web app learned that the hard way
- * when /teacher was reachable by anyone with the URL.
+ * when a whole portal was reachable by anyone with the URL.
  */
 export function RequireRole({
   role,
