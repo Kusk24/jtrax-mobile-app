@@ -218,6 +218,8 @@
   "signIn": {
     "tagline": "Chess school, organised.",
     "email": "Email",
+    "signInId": "Email or ID",
+    "signInIdPlaceholder": "you@jca.ac.th or stu_your_name",
     "password": "Password",
     "submit": "Sign in",
     "forgot": "Forgot your password?",
@@ -225,8 +227,8 @@
     "accountHint": "Your account decides what you see — a student signs in to the student app, a parent to the parent app.",
     "staffUseConsole": "Admin accounts use the JTrax console, not this app.",
     "error": {
-      "badCredentials": "That email and password don't match an account.",
-      "needEmail": "Enter your email address first.",
+      "badCredentials": "That doesn't match an account. Students sign in with the ID on their card, not an email address.",
+      "needEmail": "Enter your email address first. A student ID cannot be sent a reset link — ask the academy.",
       "tooMany": "Too many attempts. Try again in a minute.",
       "offline": "Can't reach the server. Check your connection.",
       "failed": "Something went wrong. Try again."
