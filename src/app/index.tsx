@@ -88,16 +88,22 @@ export default function SignInScreen() {
         )}
 
         <View>
-          <Text className="mb-1.5 font-sans-bold text-sm text-ink">{t("email")}</Text>
+          <Text className="mb-1.5 font-sans-bold text-sm text-ink">{t("signInId")}</Text>
           <View className="flex-row items-center gap-2 rounded-xl border-2 border-line bg-paper px-3">
             <Mail size={16} color={C.muted} />
+            {/* A student signs in with `stu_penny_ward`, so the field is no
+                longer an email field. `keyboardType="email-address"` puts an
+                @ where the underscore should be and hides it behind a modifier
+                key — a small thing on a laptop and the whole task on a phone,
+                which is where a child actually types this. */}
             <TextInput
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              placeholder="you@jca.ac.th"
+              autoComplete="username"
+              autoCorrect={false}
+              keyboardType="default"
+              placeholder={t("signInIdPlaceholder")}
               placeholderTextColor={C.muted}
               className="flex-1 py-3 font-sans text-sm text-ink"
             />
