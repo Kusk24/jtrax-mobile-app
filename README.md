@@ -25,6 +25,17 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Environment
+
+Set per build (an `EXPO_PUBLIC_*` variable, or `expo.extra` in `app.json`):
+
+| Variable | What it does |
+| --- | --- |
+| `EXPO_PUBLIC_API_URL` | The JTrax backend. Defaults to `http://localhost:8790`, useless on a real device — a phone cannot reach the laptop's localhost, so supply a LAN address or the deployed API. |
+| `EXPO_PUBLIC_MODEL_BASE_URL` | Where the two trained chess models and onnxruntime-web are served from — the same host the web app points `NEXT_PUBLIC_MODEL_BASE_URL` at. Must be an absolute `https://` URL. With none set, the **Play the computer** screen offers Stockfish only; the Beginner and Club-player opponents report unavailable. |
+
+That host must serve `novice_int8.onnx`, `strong_fp16.onnx`, and an `ort/` directory with onnxruntime-web's `ort.min.js` and its `.wasm`. The web app's `pnpm models:setup` stages exactly that layout under `jtrax-web-app/public/models/` — point both apps at the same place.
+
 ## Get a fresh project
 
 When you're ready, run:

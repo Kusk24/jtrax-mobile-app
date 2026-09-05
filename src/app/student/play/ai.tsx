@@ -5,35 +5,46 @@ import { Chess } from "chess.js";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
 import { ChessBoard } from "@/components/game/ChessBoard";
 import { StockfishWebView, type StockfishHandle } from "@/components/game/StockfishWebView";
+import { OnnxWebView, type OnnxHandle } from "@/components/game/OnnxWebView";
+import { useAiOpponent } from "@/components/game/useAiOpponent";
+import { MODEL_BASE_URL, OPPONENTS, type Opponent } from "@/lib/engines";
 import { endingOf, gameFrom, pairedMoves, type Ending } from "@/lib/chess-core";
 import { C } from "@/lib/colors";
 
-/** Difficulty as a chess school would set it. Stockfish's floor is Elo 1320,
-    which still beats every pupil here, so the easy levels are made easy by
-    capping search depth instead. Identical to the web app's table. */
-const LEVELS = {
-  1: { depth: 1 },
-  2: { depth: 2 },
-  3: { depth: 4 },
-  4: { depth: 8, elo: 1500 },
-  5: { depth: 12, elo: 2000 },
-} as const;
+/* A game against the computer. Entirely local: no room, no API call, no record
+   kept. Three opponents, and they are three different models rather than one
+   engine turned down — see useAiOpponent.ts. Mirrors the web app's AiGame.
 
-type Level = keyof typeof LEVELS;
-
+   Two engines are mounted at once: Stockfish for Master, and a shared ONNX
+   WebView for the two models the academy trained. The trained pair need
+   EXPO_PUBLIC_MODEL_BASE_URL set; without it they report unavailable and
+   Stockfish still works. */
 export default function AiScreen() {
   const t = useTranslations("play");
-  const engine = useRef<StockfishHandle>(null);
+  const stockfish = useRef<StockfishHandle>(null);
+  const onnx = useRef<OnnxHandle>(null);
 
-  const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [level, setLevel] = useState<Level>(2);
+  const [opponent, setOpponent] = useState<Opponent>("novice");
+  const [stockfishReady, setStockfishReady] = useState(false);
+  const [stockfishFailed, setStockfishFailed] = useState(false);
+  const [onnxReady, setOnnxReady] = useState(false);
+  const [onnxFailed, setOnnxFailed] = useState(false);
+
   const [moves, setMoves] = useState<string[]>([]);
   const [game, setGame] = useState<Chess>(() => new Chess());
   const [ending, setEnding] = useState<Ending>(null);
   const [thinking, setThinking] = useState(false);
   // Guards a reply arriving for a game the player already restarted.
   const generation = useRef(0);
+
+  const { failed: runtimeFailed, setFailed: setRuntimeFailed, bestMove } = useAiOpponent(
+    opponent,
+    { onnx, stockfish },
+  );
+
+  const usesStockfish = opponent === "expert";
+  const ready = usesStockfish ? stockfishReady : onnxReady;
+  const failed = runtimeFailed || (usesStockfish ? stockfishFailed : onnxFailed);
 
   const sync = useCallback((next: string[]) => {
     const replayed = gameFrom(next);
@@ -43,12 +54,10 @@ export default function AiScreen() {
     setEnding(endingOf(replayed));
   }, []);
 
-  const onReady = useCallback(() => setReady(true), []);
-  const onFailed = useCallback(() => setFailed(true), []);
-
   function reset() {
     generation.current += 1;
     setThinking(false);
+    setRuntimeFailed(false);
     sync([]);
   }
 
@@ -57,84 +66,111 @@ export default function AiScreen() {
     if (!ready || ending || thinking || game.turn() !== "b") return;
     const mine = generation.current;
     setThinking(true);
-    const { depth, elo } = LEVELS[level] as { depth: number; elo?: number };
-    void engine.current?.bestMove(moves, depth, elo).then((uci) => {
+    // Each opponent wants the position in its own terms: Stockfish takes the
+    // UCI move list, the novice model reads the game as PGN text, Maia a FEN.
+    void bestMove(moves, game.history(), game.fen()).then((uci) => {
       if (mine !== generation.current) return; // restarted mid-think
       setThinking(false);
       if (uci) sync([...moves, uci]);
     });
-  }, [ready, ending, thinking, game, moves, level, sync]);
+  }, [ready, ending, thinking, game, moves, bestMove, sync]);
 
   return (
     <PlayShell title={t("vsComputer")}>
-      {!failed && <StockfishWebView ref={engine} onReady={onReady} onFailed={onFailed} />}
+      <StockfishWebView
+        ref={stockfish}
+        onReady={() => setStockfishReady(true)}
+        onFailed={() => setStockfishFailed(true)}
+      />
+      <OnnxWebView
+        ref={onnx}
+        baseUrl={MODEL_BASE_URL}
+        onReady={() => setOnnxReady(true)}
+        onFailed={() => setOnnxFailed(true)}
+      />
 
-      {failed ? (
-        <Panel><Text className="font-sans-bold text-sm text-ink">{t("error.engine")}</Text></Panel>
-      ) : (
-        <>
-          <Panel className="!p-3">
-            <Text className="mb-2 font-sans-bold text-sm text-ink">{t("level")}</Text>
-            <View className="flex-row gap-1.5">
-              {([1, 2, 3, 4, 5] as Level[]).map((l) => (
-                <Pressable
-                  key={l}
-                  onPress={() => setLevel(l)}
-                  accessibilityLabel={`level-${l}`}
-                  className={`flex-1 items-center rounded-xl border-2 py-2 ${
-                    level === l ? "border-highlight bg-highlight" : "border-line bg-paper"
-                  }`}
-                >
-                  <Text className="font-sans-bold text-sm text-ink">{l}</Text>
-                </Pressable>
-              ))}
+      <Panel className="!p-3">
+        <Text className="mb-2 font-sans-bold text-sm text-ink">{t("opponent")}</Text>
+        <View className="flex-row gap-1.5">
+          {OPPONENTS.map((o) => {
+            const selected = opponent === o;
+            return (
+              <Pressable
+                key={o}
+                onPress={() => {
+                  setRuntimeFailed(false);
+                  setOpponent(o);
+                }}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                accessibilityLabel={t(`opponentName.${o}`)}
+                // The navy fill for selected, not the pale `highlight` — the
+                // same fix the web app made, where gold-on-paper was invisible.
+                className={`min-h-11 flex-1 items-center justify-center rounded-xl border-2 px-2 py-2 ${
+                  selected ? "border-navy bg-navy" : "border-line bg-paper"
+                }`}
+              >
+                <Text className={`font-sans-bold text-[13px] ${selected ? "text-white" : "text-ink"}`}>
+                  {t(`opponentName.${o}`)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <Text className="mt-2 font-sans text-xs leading-5 text-muted">
+          {t(`opponentHint.${opponent}`)}
+        </Text>
+      </Panel>
+
+      <ChessBoard
+        game={game}
+        orientation="w"
+        canMove={ready && !thinking && !ending && game.turn() === "w"}
+        onMove={(uci) => !thinking && !ending && sync([...moves, uci])}
+        lastMove={moves.length ? moves[moves.length - 1].slice(2, 4) : undefined}
+      />
+
+      <Panel className="!py-2.5">
+        {failed ? (
+          <Text className="text-center font-sans-bold text-sm text-ink">
+            {usesStockfish ? t("error.engine") : t("modelFailed")}
+          </Text>
+        ) : !ready ? (
+          <View className="flex-row items-center justify-center gap-2">
+            <ActivityIndicator color={C.navy} />
+            <Text className="font-sans-bold text-sm text-ink">
+              {/* The two trained models are a 26 MB and 47 MB download, so the
+                  first wait is longer than waking a worker and says so. */}
+              {usesStockfish ? t("engineLoading") : t("modelLoading")}
+            </Text>
+          </View>
+        ) : (
+          <Text className="text-center font-sans-bold text-sm text-ink">
+            {ending
+              ? t(`result.${ending.result === "1/2-1/2" ? "draw" : ending.result === "1-0" ? "youWon" : "youLost"}`) +
+                ` — ${t(`reason.${ending.reason}`)}`
+              : thinking
+                ? t("thinking")
+                : t("yourMove")}
+          </Text>
+        )}
+      </Panel>
+
+      {moves.length > 0 && (
+        <Panel className="!py-2.5">
+          {pairedMoves(game.history()).map((pair) => (
+            <View key={pair.no} className="flex-row">
+              <Text className="w-8 font-sans text-xs text-muted">{pair.no}.</Text>
+              <Text className="w-16 font-sans text-xs text-ink">{pair.white}</Text>
+              <Text className="w-16 font-sans text-xs text-ink">{pair.black ?? ""}</Text>
             </View>
-            <Text className="mt-2 font-sans text-xs leading-5 text-muted">{t(`levelHint.${level}`)}</Text>
-          </Panel>
-
-          <ChessBoard
-            game={game}
-            orientation="w"
-            canMove={ready && !thinking && !ending && game.turn() === "w"}
-            onMove={(uci) => !thinking && !ending && sync([...moves, uci])}
-            lastMove={moves.length ? moves[moves.length - 1].slice(2, 4) : undefined}
-          />
-
-          <Panel className="!py-2.5">
-            {!ready ? (
-              <View className="flex-row items-center justify-center gap-2">
-                <ActivityIndicator color={C.navy} />
-                <Text className="font-sans-bold text-sm text-ink">{t("engineLoading")}</Text>
-              </View>
-            ) : (
-              <Text className="text-center font-sans-bold text-sm text-ink">
-                {ending
-                  ? t(`result.${ending.result === "1/2-1/2" ? "draw" : ending.result === "1-0" ? "youWon" : "youLost"}`) +
-                    ` — ${t(`reason.${ending.reason}`)}`
-                  : thinking
-                    ? t("thinking")
-                    : t("yourMove")}
-              </Text>
-            )}
-          </Panel>
-
-          {moves.length > 0 && (
-            <Panel className="!py-2.5">
-              {pairedMoves(game.history()).map((pair) => (
-                <View key={pair.no} className="flex-row">
-                  <Text className="w-8 font-sans text-xs text-muted">{pair.no}.</Text>
-                  <Text className="w-16 font-sans text-xs text-ink">{pair.white}</Text>
-                  <Text className="w-16 font-sans text-xs text-ink">{pair.black ?? ""}</Text>
-                </View>
-              ))}
-            </Panel>
-          )}
-
-          <Pressable onPress={reset} className="items-center rounded-xl bg-navy py-3.5 active:opacity-80">
-            <Text className="font-sans-bold text-sm text-white">{t("newGame")}</Text>
-          </Pressable>
-        </>
+          ))}
+        </Panel>
       )}
+
+      <Pressable onPress={reset} className="items-center rounded-xl bg-navy py-3.5 active:opacity-80">
+        <Text className="font-sans-bold text-sm text-white">{t("newGame")}</Text>
+      </Pressable>
     </PlayShell>
   );
 }
