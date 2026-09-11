@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { ChevronRight, Trophy, TriangleAlert } from "lucide-react-native";
+import { ChevronRight, Swords, Trophy, TriangleAlert } from "lucide-react-native";
 import { Screen } from "@/components/Screen";
 import { StudentHeader } from "@/components/StudentHeader";
 import { ClassCard } from "@/components/ClassCard";
@@ -44,6 +44,23 @@ export default function StudentHome() {
             <Text className="font-sans-bold text-base text-ink">{tp("todaysChallenge")}</Text>
             <Text className="mt-1 font-sans text-xs leading-5 text-muted">
               {tp("challengeHint")}
+            </Text>
+          </View>
+          <ChevronRight size={18} color={C.muted} />
+        </Pressable>
+      </Link>
+
+      {/* Inviting a classmate. The portal's home has this card next to Play;
+          here it is the only way in until the nav gains a Challenge tab. */}
+      <Link href="/student/challenge" asChild>
+        <Pressable className="flex-row items-center gap-3.5 rounded-card border-2 border-line bg-card p-4 shadow-clay active:opacity-80">
+          <View className="size-12 items-center justify-center rounded-2xl bg-olive-soft">
+            <Swords size={24} color={C.olive} strokeWidth={2.2} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-sans-bold text-base text-ink">{tp("playFriend")}</Text>
+            <Text className="mt-1 font-sans text-xs leading-5 text-muted">
+              {tp("playTogether")}
             </Text>
           </View>
           <ChevronRight size={18} color={C.muted} />
