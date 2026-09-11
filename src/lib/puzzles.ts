@@ -81,6 +81,21 @@ export function gameAt(fen: string): Chess | null {
   }
 }
 
+/** How many of today's set are done. */
+export const solvedCount = (puzzles: DailyPuzzle[]) => puzzles.filter((p) => p.solved).length;
+
+/**
+ * Where to send a pupil after they solve one: the first still unsolved,
+ * skipping the one they have just finished, or -1 when the set is done.
+ *
+ * `justSolved` is skipped explicitly rather than trusted to be marked, because
+ * the caller is mid-update — the row is flagged solved in the same tick and
+ * reading it back here would depend on which state landed first.
+ */
+export function nextUnsolved(puzzles: DailyPuzzle[], justSolved: number): number {
+  return puzzles.findIndex((p, i) => i !== justSolved && !p.solved);
+}
+
 /** What to call the puzzle in one line: "Mate in 2", else the best move. */
 export function puzzleGoal(p: DailyPuzzle): { key: "mateIn" | "winIn"; count: number } {
   const mate = /\bmateIn\d?\b/i.test(p.themes) || /\bmate\b/i.test(p.themes);
