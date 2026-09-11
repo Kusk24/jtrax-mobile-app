@@ -50,7 +50,7 @@ export default function PuzzlesScreen() {
   const total = puzzles.length || 3;
 
   return (
-    <PlayShell title={t("puzzles")} back="/student">
+    <PlayShell title={t("puzzles")} nav>
       <Text className="-mt-1 mb-1 font-sans text-xs text-muted">{t("puzzlesSub")}</Text>
 
       <Panel>
