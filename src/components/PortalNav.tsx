@@ -3,27 +3,26 @@ import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import type { LucideIcon } from "lucide-react-native";
 import { C } from "@/lib/colors";
+import { isActive, isRoot, type TabPath } from "@/lib/portal-tabs";
 
-export type PortalTab = {
-  href: string;
+export type PortalTab = TabPath & {
   labelKey: string;
   icon: LucideIcon;
-  /** Match this tab only on an exact path (used for the portal home tab). */
-  exact?: boolean;
-  /** Extra path prefixes that should also highlight this tab. */
-  activeAliases?: string[];
 };
 
-function isActive(pathname: string, tab: PortalTab) {
-  if (tab.activeAliases?.some((alias) => pathname.startsWith(alias))) {
-    return true;
-  }
-  return tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
-}
-
-export function PortalBottomNav({ tabs }: { tabs: PortalTab[] }) {
+export function PortalBottomNav({
+  tabs,
+  rootsOnly = false,
+}: {
+  tabs: PortalTab[];
+  /** Show the bar only on the tabs themselves. A pushed screen takes the back
+      arrow instead and keeps the whole phone — a board with a nav bar across
+      the bottom of it is eight ranks in seven ranks' worth of space. */
+  rootsOnly?: boolean;
+}) {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  if (rootsOnly && !isRoot(pathname, tabs)) return null;
   return (
     <View className="absolute bottom-3 left-3 right-3 z-20 rounded-3xl border-2 border-line bg-card px-2 py-1.5 shadow-clay-lg">
       <View className="flex-row items-stretch justify-around">
