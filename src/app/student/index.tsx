@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { ChevronRight, TriangleAlert } from "lucide-react-native";
+import { ChevronRight, Trophy, TriangleAlert } from "lucide-react-native";
 import { Screen } from "@/components/Screen";
 import { StudentHeader } from "@/components/StudentHeader";
 import { ClassCard } from "@/components/ClassCard";
@@ -11,6 +11,7 @@ import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
 
 export default function StudentHome() {
   const t = useTranslations("home");
+  const tp = useTranslations("sv2");
   return (
     <Screen>
       <StudentHeader />
@@ -30,6 +31,24 @@ export default function StudentHome() {
           </View>
         </View>
       )}
+
+      {/* The way in to today's puzzles. The nav gains a Puzzles tab when the
+          home screen itself becomes the portal's; until then this card is how
+          a pupil reaches them at all. */}
+      <Link href="/student/puzzles" asChild>
+        <Pressable className="flex-row items-center gap-3.5 rounded-card border-2 border-line bg-card p-4 shadow-clay active:opacity-80">
+          <View className="size-12 items-center justify-center rounded-2xl bg-highlight">
+            <Trophy size={24} color={C.highlightInk} strokeWidth={2.2} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-sans-bold text-base text-ink">{tp("todaysChallenge")}</Text>
+            <Text className="mt-1 font-sans text-xs leading-5 text-muted">
+              {tp("challengeHint")}
+            </Text>
+          </View>
+          <ChevronRight size={18} color={C.muted} />
+        </Pressable>
+      </Link>
 
       <View>
         <Text className="font-sans-extrabold text-lg text-ink">

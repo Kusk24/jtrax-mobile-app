@@ -7,7 +7,15 @@
  * developer menu open could decide for it.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { attemptMove, gameAt, getDailyPuzzles, puzzleGoal, type DailyPuzzle } from "./puzzles";
+import {
+  attemptMove,
+  gameAt,
+  getDailyPuzzles,
+  nextUnsolved,
+  puzzleGoal,
+  solvedCount,
+  type DailyPuzzle,
+} from "./puzzles";
 
 const puzzle = (over: Partial<DailyPuzzle> = {}): DailyPuzzle => ({
   puzzleId: "001gi",
@@ -51,6 +59,38 @@ describe("puzzleGoal", () => {
 
   it("asks for the best move when the puzzle is not a mate", () => {
     expect(puzzleGoal(puzzle({ themes: "skewer", moveCount: 2 })).key).toBe("winIn");
+  });
+});
+
+describe("where a solved puzzle sends you next", () => {
+  const set = (...solved: boolean[]) =>
+    solved.map((s, i) => puzzle({ puzzleId: `p${i}`, solved: s }));
+
+  it("goes to the first one still unsolved", () => {
+    expect(nextUnsolved(set(true, false, false), 0)).toBe(1);
+    expect(nextUnsolved(set(true, true, false), 1)).toBe(2);
+  });
+
+  it("skips past one already done to reach one that is not", () => {
+    // Solving #3 first should send them back to #1, not stop.
+    expect(nextUnsolved(set(false, false, true), 2)).toBe(0);
+  });
+
+  it("returns -1 when the set is finished, which is what ends the run", () => {
+    expect(nextUnsolved(set(true, true, true), 2)).toBe(-1);
+  });
+
+  it("never sends you back to the one you have just solved", () => {
+    // The caller marks it solved in the same tick, so this cannot depend on
+    // that having landed — the index is skipped outright.
+    const stale = set(true, false, false);
+    stale[0].solved = false;
+    expect(nextUnsolved(stale, 0)).toBe(1);
+  });
+
+  it("counts what is done", () => {
+    expect(solvedCount(set(true, false, true))).toBe(2);
+    expect(solvedCount([])).toBe(0);
   });
 });
 
