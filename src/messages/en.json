@@ -120,10 +120,12 @@
   },
   "play": {
     "title": "Play",
+    "chooseMode": "Choose how you want to play!",
     "vsComputer": "Play the computer",
     "vsComputerBody": "Practise on your own. Three opponents, from gentle to tough.",
-    "vsFriend": "Play a friend",
+    "vsFriend": "Join a class game",
     "vsFriendBody": "Enter the code your teacher gave you and play head to head.",
+    "classGame": "Class game",
     "codeLabel": "Room code",
     "codeHint": "Six letters and numbers, from your teacher.",
     "join": "Take my seat",
