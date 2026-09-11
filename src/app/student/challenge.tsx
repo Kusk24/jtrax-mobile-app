@@ -112,10 +112,8 @@ export default function ChallengeScreen() {
   const searching = longEnough && !answered;
   const shown = longEnough && answered ? found.players : [];
 
-  // Reached from the home screen until the nav gains a Challenge tab, so it
-  // takes the arrow. It becomes `nav` when it becomes a tab.
   return (
-    <PlayShell title={t("title")} back="/student">
+    <PlayShell title={t("title")} nav>
       {error !== "" && (
         <Panel className="!border-brick-soft !bg-brick-soft">
           <Text accessibilityRole="alert" className="font-sans-bold text-xs text-maroon">

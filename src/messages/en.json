@@ -9,6 +9,8 @@
   },
   "nav": {
     "home": "Home",
+    "puzzles": "Puzzles",
+    "challenge": "Challenge",
     "schedule": "Schedule",
     "attendances": "Attendances",
     "profile": "Profile",
@@ -68,27 +70,6 @@
   },
   "attendance": {
     "historyTitle": "Attendance History"
-  },
-  "checkin": {
-    "attendance": "Attendance",
-    "selfTitle": "Self Check-in",
-    "selfSubtitle": "Check-in once you are in the classroom.",
-    "enterCode": "Enter the class code",
-    "codeHint": "Type the 6-digit code shown on the classroom screen.",
-    "codeError": "That code didn't match. Check the classroom screen and try again.",
-    "checkInBtn": "Check In",
-    "or": "or",
-    "scanQr": "Scan QR Code",
-    "scanNote": "Camera scanning arrives with the mobile build — simulated for now. Demo code: {code}",
-    "verifying": "Verifying you are in the classroom...",
-    "successTitle": "Checked in successfully !",
-    "welcomeTo": "Welcome to {course}.",
-    "checkedInAt": "Checked in at {time}",
-    "minusCredit": "-1 credit",
-    "notStarted": "Teacher has not started attendance session yet !",
-    "backHome": "Back To Homepage",
-    "finish": "Finish Attendance",
-    "noMatch": "No students match “{query}”."
   },
   "notifications": {
     "title": "Notifications",
