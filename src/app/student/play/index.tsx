@@ -13,7 +13,8 @@ export default function PlayIndexScreen() {
   ] as const;
 
   return (
-    <PlayShell title={t("title")}>
+    <PlayShell title={t("title")} nav>
+      <Text className="mb-1 font-sans text-xs text-muted">{t("chooseMode")}</Text>
       {modes.map(({ href, Icon, title, body }) => (
         <Link key={href} href={href} asChild>
           <Pressable className="active:opacity-80">
