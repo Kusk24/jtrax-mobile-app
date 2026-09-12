@@ -34,7 +34,7 @@ export default function JoinScreen() {
   }
 
   return (
-    <PlayShell title={t("vsFriend")}>
+    <PlayShell title={t("vsFriend")} back="/student/play">
       <Panel>
         <Text className="mb-2 font-sans-bold text-sm text-ink">{t("codeLabel")}</Text>
         <TextInput

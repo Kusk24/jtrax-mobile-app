@@ -76,7 +76,7 @@ export default function AiScreen() {
   }, [ready, ending, thinking, game, moves, bestMove, sync]);
 
   return (
-    <PlayShell title={t("vsComputer")}>
+    <PlayShell title={t("vsComputer")} back="/student/play">
       <StockfishWebView
         ref={stockfish}
         onReady={() => setStockfishReady(true)}
