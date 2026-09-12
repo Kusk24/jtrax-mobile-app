@@ -39,6 +39,7 @@ const MIN_QUERY = 2;
 
 export default function ChallengeScreen() {
   const t = useTranslations("challenge");
+  const tCommon = useTranslations("common");
   const { user } = useSession();
   const myStudentId = user?.studentId ?? "";
 
@@ -56,12 +57,19 @@ export default function ChallengeScreen() {
   const [clock, setClock] = useState(2); // 15+10, the academy's usual
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const reload = useCallback(async () => {
     try {
       setChallenges(await listChallenges());
+      /* Cleared on success, so one blip while polling does not leave a warning
+         on screen for the rest of the session. */
+      setLoadFailed(false);
     } catch {
-      /* The empty state covers it. */
+      /* Not "no invitations" — we do not know. A child told nobody wants to
+         play them, while a classmate's invitation sits on the other side of a
+         failed request, is the one thing this screen must not say. */
+      setLoadFailed(true);
     }
   }, []);
 
@@ -114,6 +122,14 @@ export default function ChallengeScreen() {
 
   return (
     <PlayShell title={t("title")} nav>
+      {loadFailed && error === "" && (
+        <Panel className="!border-brick-soft !bg-brick-soft">
+          <Text accessibilityRole="alert" className="font-sans-bold text-xs text-maroon">
+            {tCommon("loadFailed")}
+          </Text>
+        </Panel>
+      )}
+
       {error !== "" && (
         <Panel className="!border-brick-soft !bg-brick-soft">
           <Text accessibilityRole="alert" className="font-sans-bold text-xs text-maroon">

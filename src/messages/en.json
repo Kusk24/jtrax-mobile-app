@@ -38,7 +38,8 @@
     "parentBadge": "Parent",
     "mother": "Mother",
     "father": "Father",
-    "guardian": "Guardian"
+    "guardian": "Guardian",
+    "loadFailed": "We couldn't load this just now. Please try again."
   },
   "days": {
     "MON": "MON",
