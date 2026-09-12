@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { Chess } from "chess.js";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
+import { ResultDialog } from "@/components/game/ResultDialog";
 import { ChessBoard } from "@/components/game/ChessBoard";
 import { StockfishWebView, type StockfishHandle } from "@/components/game/StockfishWebView";
 import { OnnxWebView, type OnnxHandle } from "@/components/game/OnnxWebView";
@@ -33,6 +34,9 @@ export default function AiScreen() {
   const [moves, setMoves] = useState<string[]>([]);
   const [game, setGame] = useState<Chess>(() => new Chess());
   const [ending, setEnding] = useState<Ending>(null);
+  /* Separate from `ending` so dismissing does not un-finish the game, and a
+     new game can raise it again. */
+  const [showResult, setShowResult] = useState(false);
   const [thinking, setThinking] = useState(false);
   // Guards a reply arriving for a game the player already restarted.
   const generation = useRef(0);
@@ -51,7 +55,9 @@ export default function AiScreen() {
     if (!replayed) return;
     setMoves(next);
     setGame(replayed);
-    setEnding(endingOf(replayed));
+    const over = endingOf(replayed);
+    setEnding(over);
+    setShowResult(!!over);
   }, []);
 
   function reset() {
@@ -127,7 +133,7 @@ export default function AiScreen() {
         orientation="w"
         canMove={ready && !thinking && !ending && game.turn() === "w"}
         onMove={(uci) => !thinking && !ending && sync([...moves, uci])}
-        lastMove={moves.length ? moves[moves.length - 1].slice(2, 4) : undefined}
+        lastMove={moves.length ? moves[moves.length - 1] : undefined}
       />
 
       <Panel className="!py-2.5">
@@ -171,6 +177,22 @@ export default function AiScreen() {
       <Pressable onPress={reset} className="items-center rounded-xl bg-navy py-3.5 active:opacity-80">
         <Text className="font-sans-bold text-sm text-white">{t("newGame")}</Text>
       </Pressable>
+
+      <ResultDialog
+        visible={!!ending && showResult}
+        title={
+          ending
+            ? t(`result.${ending.result === "1/2-1/2" ? "draw" : ending.result === "1-0" ? "youWon" : "youLost"}`)
+            : ""
+        }
+        detail={ending ? t("byReason", { reason: t(`reason.${ending.reason}`) }) : undefined}
+        primaryLabel={t("newGame")}
+        onPrimary={() => {
+          setShowResult(false);
+          reset();
+        }}
+        onClose={() => setShowResult(false)}
+      />
     </PlayShell>
   );
 }
