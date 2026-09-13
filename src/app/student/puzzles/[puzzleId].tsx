@@ -174,6 +174,22 @@ export default function PuzzleScreen() {
         })}
       </Text>
 
+      {/* Opening a puzzle you have already solved used to give you a board that
+          would not move and no word about why. The board is still locked — it is
+          finished — but now it says so. Driven by `solved`, which is true both
+          on reopening and the moment it is beaten. */}
+      {solved && (
+        <View className="flex-row items-center gap-3 rounded-card border-2 border-olive-soft bg-olive-soft px-3.5 py-2.5">
+          <View className="size-9 shrink-0 items-center justify-center rounded-full bg-olive">
+            <Check size={20} color={C.white} strokeWidth={3} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-sans-bold text-sm text-ink">{t("completedTitle")}</Text>
+            <Text className="font-sans text-[11px] text-muted">{t("completedBody")}</Text>
+          </View>
+        </View>
+      )}
+
       {/* The slot is always here and never takes a tap.
           Showing the banner only when there is something to say moved the
           board down by its height — so a child who had just been told "not
