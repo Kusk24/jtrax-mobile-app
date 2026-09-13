@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslations } from "use-intl";
 import { Wifi, WifiOff } from "lucide-react-native";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
+import { ResultDialog } from "@/components/game/ResultDialog";
 import { ChessBoard } from "@/components/game/ChessBoard";
 import { useRoom } from "@/components/game/useRoom";
 import { gameFrom, pairedMoves } from "@/lib/chess-core";
@@ -18,6 +19,20 @@ export default function RoomScreen() {
   const { room, moves, seat, connection, error, play, resign } = useRoom(roomId);
   const [moveError, setMoveError] = useState("");
   const [confirmResign, setConfirmResign] = useState(false);
+  /* Raised once when the room ends, and dismissible — a class game is often
+     looked back over with a teacher standing there. Declared with the other
+     hooks because there are early returns below, and a hook cannot sit after
+     one. `over` covers both ways a room ends: played out, or stopped from the
+     console. */
+  const over = room?.status === "Finished" || room?.status === "Cancelled";
+  const [showResult, setShowResult] = useState(false);
+  const announced = useRef(false);
+  useEffect(() => {
+    if (over && !announced.current) {
+      announced.current = true;
+      setShowResult(true);
+    }
+  }, [over]);
 
   const game = useMemo(() => gameFrom(moves.map((m) => m.uci)), [moves]);
 
@@ -42,7 +57,9 @@ export default function RoomScreen() {
   const orientation = seat === "Black" ? "b" : "w";
   const myTurn = room.status === "Active" && seat !== "" && room.turn === seat;
   const opponent = seat === "White" ? room.black : room.white;
-  const lastMove = moves.length ? moves[moves.length - 1].uci.slice(2, 4) : undefined;
+  // The whole move: the board highlights both its squares and slides the
+  // arriving piece in from the first.
+  const lastMove = moves.length ? moves[moves.length - 1].uci : undefined;
 
   async function onMove(uci: string) {
     setMoveError("");
@@ -73,6 +90,26 @@ export default function RoomScreen() {
       )}
 
       <ChessBoard game={game} orientation={orientation} canMove={myTurn} onMove={onMove} lastMove={lastMove} />
+
+      <ResultDialog
+        visible={over && showResult}
+        title={
+          room.status === "Cancelled"
+            ? t("cancelled")
+            : t(`result.${room.result === "1/2-1/2" ? "draw" : room.result === "1-0" ? "whiteWon" : "blackWon"}`)
+        }
+        detail={
+          room.status === "Finished" && room.resultReason
+            ? t("byReason", { reason: t(`reason.${room.resultReason}`) })
+            : undefined
+        }
+        /* Nothing to restart here — a teacher opens class games — so the way on
+           is back to the Play screen. Named for where it goes: two buttons both
+           reading "Back" is a dialog with two doors and one name. */
+        primaryLabel={t("backToPlay")}
+        onPrimary={() => router.replace("/student/play")}
+        onClose={() => setShowResult(false)}
+      />
 
       <Panel className="!py-2.5">
         <Text className="text-center font-sans-bold text-sm text-ink">
