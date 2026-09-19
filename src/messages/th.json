@@ -17,7 +17,7 @@
     "play": "เล่น"
   },
   "common": {
-    "hi": "สวัสดี คุณ{name} !",
+    "hi": "สวัสดี คุณ{name}!",
     "viewAll": "ดูทั้งหมด",
     "edit": "แก้ไข",
     "done": "เสร็จสิ้น",
@@ -377,7 +377,7 @@
     "roleParent": "ผู้ปกครอง",
     "verifiedAccount": "บัญชีผู้ปกครองยืนยันแล้ว",
     "verified": "ยืนยันแล้ว",
-    "hi": "สวัสดี คุณ{name} !",
+    "hi": "สวัสดี คุณ{name}!",
     "announcements": "ประกาศ",
     "noAnnouncements": "ยังไม่มีประกาศ",
     "viewAll": "ดูทั้งหมด",

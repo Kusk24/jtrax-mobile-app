@@ -17,7 +17,7 @@
     "play": "Play"
   },
   "common": {
-    "hi": "Hi, {name} !",
+    "hi": "Hi, {name}!",
     "viewAll": "View All",
     "edit": "Edit",
     "done": "Done",
@@ -377,7 +377,7 @@
     "roleParent": "Parent",
     "verifiedAccount": "Verified parent account",
     "verified": "Verified",
-    "hi": "Hi, {name} !",
+    "hi": "Hi, {name}!",
     "announcements": "Announcements",
     "noAnnouncements": "No announcements yet.",
     "viewAll": "View All",
