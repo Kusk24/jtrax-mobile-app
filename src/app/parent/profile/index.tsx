@@ -1,155 +1,133 @@
-import { SignOutButton } from "@/components/SignOutButton";
+/**
+ * Who the parent is: their children and their contact details.
+ *
+ * Everything they can *change* — alerts, language — is on the Settings tab,
+ * as in the portal.
+ */
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import {
-  ChevronRight,
-  ContactRound,
-  Info,
-  Languages,
-  Mail,
-  Phone,
-  Settings,
-} from "lucide-react-native";
-import { Screen } from "@/components/Screen";
-import { Avatar } from "@/components/Avatar";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import { children, parent } from "@/lib/parent-data";
-import { C } from "@/lib/colors";
+import { BadgeCheck, ChevronRight, Mail, Pencil, Phone } from "lucide-react-native";
+import { ChildFace } from "@/components/parent/ChildFace";
+import { useParentData } from "@/components/parent/ParentData";
+import { PP } from "@/lib/colors";
 
-const card = "rounded-card border-2 border-line bg-card p-4 shadow-clay";
-
-export default function ParentProfileScreen() {
-  const t = useTranslations();
+function SectionLabel({ children }: { children: string }) {
   return (
-    <Screen gapClass="gap-5">
-      <Text className="text-center font-sans-extrabold text-2xl text-navy">
-        {t("profile.myProfile")}
-      </Text>
+    <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+      {children}
+    </Text>
+  );
+}
 
-      <View className={`${card} flex-row items-center gap-4`}>
-        <Avatar
-          name={parent.name}
-          colorClass={parent.avatarColor}
-          sizeClass="size-14"
-        />
-        <View>
-          <Text className="font-sans-bold text-base text-ink">
-            {parent.name}
-          </Text>
-          <Text className="font-sans text-xs text-muted">
-            {t("common.idLabel", { id: parent.parentId })}
-          </Text>
-          <Text className="font-sans text-xs text-muted">
-            {t("common.parentBadge")}
-          </Text>
-        </View>
+export default function ParentProfile() {
+  const t = useTranslations("pv2");
+  const { children: childList, parent, parentId } = useParentData();
+  const initial = (parent.name.trim()[0] ?? "?").toUpperCase();
+
+  return (
+    <ScrollView
+      className="flex-1 bg-pp-bg"
+      contentContainerClassName="gap-5 px-4 pb-10 pt-4"
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="gap-1">
+        <Text className="font-display-semibold text-2xl leading-tight text-pp-ink">
+          {t("myProfile")}
+        </Text>
+        <Text className="font-sans text-[12.5px] text-pp-muted">{t("profileSub")}</Text>
       </View>
 
-      <View>
-        <Text className="font-sans-extrabold text-lg text-ink">
-          {t("home.myChildren")} ({children.length})
-        </Text>
-        <View className="mt-3 flex-row flex-wrap gap-6">
-          {children.map((child) => (
-            <Link
-              key={child.id}
-              href={`/parent/profile/${child.id}` as never}
-              asChild
-            >
-              <Pressable className="items-center gap-1">
-                <Avatar
-                  name={child.name}
-                  colorClass={child.avatarColor}
-                  sizeClass="size-14"
-                />
-                <Text className="font-sans-bold text-sm text-ink">
-                  {child.name}
-                </Text>
-                <Text className="font-sans text-[10px] text-muted">
-                  {t("common.idLabel", { id: child.studentId })}
-                </Text>
+      <View className="flex-row items-center gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-3.5 shadow-clay">
+        <View className="size-[58px] items-center justify-center rounded-[15px] border-[3px] border-pp-soft bg-pp-deep">
+          <Text className="font-display-semibold text-2xl text-white">{initial}</Text>
+        </View>
+        <View className="min-w-0 flex-1">
+          <View className="flex-row items-center gap-2">
+            <Text numberOfLines={1} className="shrink font-display-semibold text-[18px] text-pp-ink">
+              {parent.name}
+            </Text>
+            <View className="rounded-full bg-pp-soft px-2 py-0.5">
+              <Text className="font-sans-bold text-[9px] uppercase text-pp-blue">
+                {t("roleParent")}
+              </Text>
+            </View>
+          </View>
+          <Text numberOfLines={1} className="mt-1 font-sans text-[10.5px] text-pp-faint">
+            {t("idLabel", { id: parentId })}
+          </Text>
+          <View className="mt-1 flex-row items-center gap-1">
+            <BadgeCheck size={12} color={PP.green} />
+            <Text className="font-sans-semibold text-[10px] text-pp-green">
+              {t("verifiedAccount")}
+            </Text>
+          </View>
+        </View>
+        <Link href="/parent/settings" asChild>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("navSettings")}
+            className="size-9 items-center justify-center rounded-card border border-pp-line"
+          >
+            <Pencil size={16} color={PP.muted} />
+          </Pressable>
+        </Link>
+      </View>
+
+      <View className="gap-3">
+        <SectionLabel>{t("myChildren", { count: childList.length })}</SectionLabel>
+        <View className="overflow-hidden rounded-card border-[1.5px] border-pp-line bg-pp-card">
+          {childList.map((c, i) => (
+            <Link key={c.key} href={`/parent/child/${c.key}` as never} asChild>
+              <Pressable
+                className={`flex-row items-center gap-3 px-4 py-4 ${
+                  i < childList.length - 1 ? "border-b border-pp-panel" : ""
+                }`}
+              >
+                <ChildFace name={c.name} tint={c.avBg} size={42} />
+                <View className="flex-1 gap-0.5">
+                  <Text className="font-sans-bold text-sm text-pp-ink">{c.name}</Text>
+                  <Text className="font-sans text-[11px] text-pp-faint">
+                    {t("idLabel", { id: c.id })}
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={PP.line} />
               </Pressable>
             </Link>
           ))}
         </View>
       </View>
 
-      <View className={card}>
-        <View className="flex-row items-center gap-2">
-          <ContactRound size={20} color={C.navy} />
-          <Text className="font-sans-extrabold text-base text-ink">
-            {t("profile.contactInfo")}
-          </Text>
-        </View>
-        <View className="mt-4 gap-4">
-          <View className="flex-row items-center gap-3">
-            <View className="size-9 items-center justify-center rounded-lg bg-olive-soft">
-              <Phone size={16} color={C.olive} />
+      <View className="gap-3">
+        <SectionLabel>{t("contactInfo")}</SectionLabel>
+        <View className="overflow-hidden rounded-card border-[1.5px] border-pp-line bg-pp-card">
+          <View className="flex-row items-center gap-3 border-b border-pp-panel px-4 py-3.5">
+            <View className="size-8 items-center justify-center rounded-card bg-pp-soft">
+              <Phone size={16} color={PP.blue} />
             </View>
-            <View>
-              <Text className="font-sans text-[11px] text-muted">
-                {t("profile.phone")}
+            <View className="min-w-0 flex-1">
+              <Text className="font-sans text-[10px] text-pp-muted">{t("phone")}</Text>
+              <Text numberOfLines={1} className="font-sans-bold text-[13px] text-pp-ink">
+                {parent.phone || "—"}
               </Text>
-              <Text className="font-sans text-sm text-ink">{parent.phone}</Text>
             </View>
           </View>
-          <View className="flex-row items-center gap-3">
-            <View className="size-9 items-center justify-center rounded-lg bg-navy-soft">
-              <Mail size={16} color={C.navy} />
+          <View className="flex-row items-center gap-3 px-4 py-3.5">
+            <View className="size-8 items-center justify-center rounded-card bg-pp-soft">
+              <Mail size={16} color={PP.blue} />
             </View>
-            <View>
-              <Text className="font-sans text-[11px] text-muted">
-                {t("profile.email")}
+            <View className="min-w-0 flex-1">
+              <Text className="font-sans text-[10px] text-pp-muted">{t("email")}</Text>
+              <Text numberOfLines={1} className="font-sans-bold text-[13px] text-pp-ink">
+                {parent.email || "—"}
               </Text>
-              <Text className="font-sans text-sm text-ink">{parent.email}</Text>
+            </View>
+            <View className="rounded-full bg-pp-green-soft px-2 py-0.5">
+              <Text className="font-sans-bold text-[9px] text-pp-green">{t("verified")}</Text>
             </View>
           </View>
         </View>
       </View>
-
-      <View className={card}>
-        <View className="flex-row items-center gap-2">
-          <Info size={20} color={C.navy} />
-          <Text className="font-sans-extrabold text-base text-ink">
-            {t("profile.more")}
-          </Text>
-        </View>
-        <View className="mt-2">
-          <View className="flex-row items-center gap-3 px-1 py-2.5">
-            <Languages size={16} color={C.navy} />
-            <Text className="font-sans text-sm text-ink">
-              {t("common.language")}
-            </Text>
-            <View className="ml-auto">
-              <LanguageToggle />
-            </View>
-          </View>
-          <Pressable className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-paper">
-            <Phone size={16} color={C.navy} />
-            <Text className="font-sans text-sm text-ink">
-              {t("profile.contactSchool")}
-            </Text>
-            <ChevronRight
-              size={16}
-              color={C.muted}
-              style={{ marginLeft: "auto" }}
-            />
-          </Pressable>
-          <Pressable className="flex-row items-center gap-3 rounded-lg px-1 py-2.5 active:bg-paper">
-            <Settings size={16} color={C.navy} />
-            <Text className="font-sans text-sm text-ink">
-              {t("profile.settings")}
-            </Text>
-            <ChevronRight
-              size={16}
-              color={C.muted}
-              style={{ marginLeft: "auto" }}
-            />
-          </Pressable>
-        </View>
-        <SignOutButton />
-      </View>
-    </Screen>
+    </ScrollView>
   );
 }
