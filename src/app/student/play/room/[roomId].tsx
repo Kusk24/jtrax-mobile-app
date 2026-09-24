@@ -15,7 +15,11 @@ import { C } from "@/lib/colors";
     LiveGame. The board is drawn from the moves the server confirmed, never
     from local optimism, so a rejected move never has to be taken back. */
 export default function RoomScreen() {
-  const { roomId } = useLocalSearchParams<{ roomId: string }>();
+  const { roomId, from } = useLocalSearchParams<{ roomId: string; from?: string }>();
+  /* A board is reached from Play (a class game, by code) or from Challenge (a
+     game with a friend), and both ways out lead back to where the pupil came
+     from. The Challenge screen says so in the link. */
+  const home = from === "challenge" ? "/student/challenge" : "/student/play";
   const t = useTranslations("play");
   const { room, moves, seat, connection, error, play, resign } = useRoom(roomId);
   const [moveError, setMoveError] = useState("");
@@ -39,14 +43,14 @@ export default function RoomScreen() {
 
   if (error) {
     return (
-      <PlayShell title={t("classGame")} back="/student/play" sound>
+      <PlayShell title={t("classGame")} back={home} sound>
         <Panel><Text className="font-sans-bold text-sm text-ink">{t(`error.${error}`)}</Text></Panel>
       </PlayShell>
     );
   }
   if (!room || !game) {
     return (
-      <PlayShell title={t("classGame")} back="/student/play" sound>
+      <PlayShell title={t("classGame")} back={home} sound>
         <Panel className="flex-row items-center justify-center gap-2">
           <ActivityIndicator color={C.navy} />
           <Text className="font-sans-bold text-sm text-ink">{t("loading")}</Text>
@@ -89,7 +93,7 @@ export default function RoomScreen() {
   }
 
   return (
-    <PlayShell title={t("classGame")} back="/student/play" sound>
+    <PlayShell title={t("classGame")} back={home} sound>
       <Panel className="!flex-row !items-center !justify-between !p-3">
         <View>
           <Text className="font-sans-bold text-sm text-ink">
@@ -128,11 +132,13 @@ export default function RoomScreen() {
             ? t("byReason", { reason: t(`reason.${room.resultReason}`) })
             : undefined
         }
-        /* Nothing to restart here — a teacher opens class games — so the way on
-           is back to the Play screen. Named for where it goes: two buttons both
-           reading "Back" is a dialog with two doors and one name. */
-        primaryLabel={t("backToPlay")}
-        onPrimary={() => router.replace("/student/play")}
+        /* Nothing to restart here, so the way on is back to the screen the
+           board was opened from: Play for a class game, Challenge for a game
+           with a friend, where the next invitation is. Named for where it
+           goes: two buttons both reading "Back" is a dialog with two doors and
+           one name. */
+        primaryLabel={t(from === "challenge" ? "backToChallenge" : "backToPlay")}
+        onPrimary={() => router.replace(home)}
         onClose={() => setShowResult(false)}
       />
 
