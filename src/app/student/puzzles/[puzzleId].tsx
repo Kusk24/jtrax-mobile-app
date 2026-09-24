@@ -253,47 +253,40 @@ export default function PuzzleScreen() {
         })}
       </Text>
 
-      {/* Opening a puzzle you have already solved used to give you a board that
-          would not move and no word about why. The board is still locked — it is
-          finished — but now it says so. Driven by `solved`, which is true both
-          on reopening and the moment it is beaten. */}
-      {solved && (
-        <View className="flex-row items-center gap-3 rounded-card border-2 border-olive-soft bg-olive-soft px-3.5 py-2.5">
-          <View className="size-9 shrink-0 items-center justify-center rounded-full bg-olive">
-            <Check size={20} color={C.white} strokeWidth={3} />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text className="font-sans-bold text-sm text-ink">{t("completedTitle")}</Text>
-            <Text className="font-sans text-[11px] text-muted">{t("completedBody")}</Text>
-          </View>
-        </View>
-      )}
-
-      {/* The slot is always here and never takes a tap.
-          Showing the banner only when there is something to say moved the
+      {/* One slot above the board for whatever there is to say about this
+          puzzle, and only one thing at a time: what just happened, or — on
+          reopening one already beaten — that it is finished (the board is
+          locked then, and without the card it would give no word why).
+          The slot is always here, the height of the card, and never takes a
+          tap. Showing a banner only when there was something to say moved the
           board down by its height — so a child who had just been told "not
-          quite" tapped their next square and hit the message instead, or hit
-          the square above the one they meant. Reserved space and
-          `pointerEvents="none"` together mean the board does not move and the
-          message cannot be in the way. */}
-      <View pointerEvents="none" className="h-9 justify-center">
-        {message !== "" && (
-          <View
-            className={`flex-row items-center justify-center gap-1.5 self-center rounded-2xl px-3 py-2 ${
-              solved ? "bg-olive-soft" : wrong ? "bg-brick-soft" : "bg-highlight"
-            }`}
-          >
-            {solved && <Check size={16} color={C.olive} strokeWidth={3} />}
-            {wrong && <X size={16} color={C.maroon} strokeWidth={3} />}
+          quite" tapped their next square and hit the message instead. The
+          feedback used to be a small pill; it is plain, larger text now, which
+          reads at a glance. */}
+      <View pointerEvents="none" className="h-[60px] justify-center">
+        {message !== "" ? (
+          <View className="flex-row items-center justify-center gap-2">
+            {solved && <Check size={20} color={C.olive} strokeWidth={3} />}
+            {wrong && <X size={20} color={C.maroon} strokeWidth={3} />}
             <Text
-              className={`font-sans-bold text-xs ${
-                solved ? "text-olive" : wrong ? "text-maroon" : "text-highlight-ink"
+              className={`text-center font-sans-bold text-lg ${
+                solved ? "text-olive" : wrong ? "text-maroon" : "text-ink"
               }`}
             >
               {message}
             </Text>
           </View>
-        )}
+        ) : solved ? (
+          <View className="flex-row items-center gap-3 rounded-card border-2 border-olive-soft bg-olive-soft px-3.5 py-2.5">
+            <View className="size-9 shrink-0 items-center justify-center rounded-full bg-olive">
+              <Check size={20} color={C.white} strokeWidth={3} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="font-sans-bold text-sm text-ink">{t("completedTitle")}</Text>
+              <Text className="font-sans text-[11px] text-muted">{t("completedBody")}</Text>
+            </View>
+          </View>
+        ) : null}
       </View>
 
       <ChessBoard
