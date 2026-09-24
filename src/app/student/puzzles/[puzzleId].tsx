@@ -37,11 +37,12 @@ const WRONG_MS = 1200;
 /** The pause after the last move of a puzzle, before moving on. */
 const SOLVED_MS = 1400;
 
-/** The heading for each Free Play level. */
-const TIER_TITLE: Record<FreeTier, "beginnerPuzzles" | "intermediatePuzzles" | "advancedPuzzles"> = {
-  beginner: "beginnerPuzzles",
-  intermediate: "intermediatePuzzles",
-  advanced: "advancedPuzzles",
+/** The heading on a Free Play puzzle: one puzzle, so "Beginner puzzle" — the
+    plural is the name of the level on the list. */
+const TIER_TITLE: Record<FreeTier, "beginnerPuzzle" | "intermediatePuzzle" | "advancedPuzzle"> = {
+  beginner: "beginnerPuzzle",
+  intermediate: "intermediatePuzzle",
+  advanced: "advancedPuzzle",
 };
 
 export default function PuzzleScreen() {
