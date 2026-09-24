@@ -12,12 +12,14 @@ import { useCallback, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import { useTranslations } from "use-intl";
-import { BarChart3, Bot, ChevronRight, Flame, Puzzle, Star, Swords, Trophy } from "lucide-react-native";
+import { BarChart3, Bot, ChevronRight, Flame, GraduationCap, Puzzle, Swords, Trophy } from "lucide-react-native";
 import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
 import { HomeAction, StatTile } from "@/components/student/HomeTiles";
 import { useSession } from "@/lib/session";
 import { getDailyPuzzles, getPracticeSummary, solvedCount } from "@/lib/puzzles";
 import { getMyLichess } from "@/lib/lichess";
+import { api } from "@/lib/api";
+import { classesAttended } from "@/lib/classes-attended";
 import { C } from "@/lib/colors";
 
 /** Today's set is three. Kept as a name so the progress bar and the "0/3" do
@@ -40,6 +42,8 @@ export default function StudentHome() {
   const [solved, setSolved] = useState(0);
   const [total, setTotal] = useState(DAILY_TARGET);
   const [rating, setRating] = useState<{ perf: string; value: number } | null>(null);
+  /* Classes checked in to, as on the Profile. Null until it loads. */
+  const [classes, setClasses] = useState<number | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -67,6 +71,16 @@ export default function StudentHome() {
         .catch(() => {
           /* No link, or a cold API. The tile simply says "not rated yet". */
         });
+      // `attendance` is scoped to the pupil's own rows; the sessions are what
+      // the count checks each row against.
+      Promise.all([
+        api.get<{ session_id: string; check_in_time?: string }[]>("attendance"),
+        api.get<{ session_id: string }[]>("class-sessions"),
+      ])
+        .then(([attendance, sessions]) => {
+          if (!cancelled) setClasses(classesAttended(attendance, new Set(sessions.map((x) => x.session_id))));
+        })
+        .catch(() => {});
       return () => {
         cancelled = true;
       };
@@ -192,10 +206,12 @@ export default function StudentHome() {
             value={rating ? String(rating.value) : "—"}
             icon={<BarChart3 size={18} color={C.highlightInk} strokeWidth={2.2} />}
           />
+          {/* Classes, not a second "Daily Challenge": the same count already
+              sits at the top of the screen and fills the card below it. */}
           <StatTile
-            label={t("dailyChallenge")}
-            value={`${solved}/${total}`}
-            icon={<Star size={18} color={C.gold} strokeWidth={2.1} />}
+            label={t("classesLabel")}
+            value={classes === null ? "—" : String(classes)}
+            icon={<GraduationCap size={18} color={C.olive} strokeWidth={2.2} />}
           />
         </View>
       </View>
