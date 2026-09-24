@@ -5,7 +5,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useLocale, useTranslations } from "use-intl";
 import {
-  AlertTriangle, Check, Clock3, DoorOpen, Megaphone, Receipt, type LucideIcon,
+  AlertTriangle, CalendarX2, Check, Clock3, DoorOpen, Megaphone, Receipt, type LucideIcon,
 } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
 import { BackHeader } from "@/components/parent/BackHeader";
@@ -21,6 +21,7 @@ const TYPE_STYLE: Record<string, { icon: LucideIcon; color: string; bg: string }
   credit_expiry: { icon: Clock3, color: PP.amber, bg: PP.amberSoft },
   payment_received: { icon: Receipt, color: PP.green, bg: PP.greenSoft },
   announcement: { icon: Megaphone, color: PP.blue, bg: PP.soft },
+  class_cancelled: { icon: CalendarX2, color: PP.danger, bg: PP.redSoft },
 };
 const FALLBACK_STYLE = TYPE_STYLE.announcement;
 

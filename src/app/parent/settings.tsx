@@ -44,6 +44,7 @@ export default function ParentSettings() {
     { k: "credit_expiry" as const, label: t("prefExpiry"), sub: t("prefExpirySub") },
     { k: "announcement" as const, label: t("prefNews"), sub: t("prefNewsSub") },
     { k: "payment_received" as const, label: t("prefPayment"), sub: t("prefPaymentSub") },
+    { k: "class_cancelled" as const, label: t("prefCancelled"), sub: t("prefCancelledSub") },
   ];
 
   return (
