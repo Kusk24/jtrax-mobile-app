@@ -5,11 +5,12 @@ import { Chess } from "chess.js";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
 import { ResultDialog } from "@/components/game/ResultDialog";
 import { ChessBoard } from "@/components/game/ChessBoard";
+import { CapturedTray } from "@/components/game/CapturedTray";
 import { StockfishWebView, type StockfishHandle } from "@/components/game/StockfishWebView";
 import { OnnxWebView, type OnnxHandle } from "@/components/game/OnnxWebView";
 import { useAiOpponent } from "@/components/game/useAiOpponent";
 import { MODEL_BASE_URL, OPPONENTS, type Opponent } from "@/lib/engines";
-import { endingOf, gameFrom, pairedMoves, type Ending } from "@/lib/chess-core";
+import { capturedIn, endingOf, gameFrom, pairedMoves, type Ending } from "@/lib/chess-core";
 import { C } from "@/lib/colors";
 
 /* A game against the computer. Entirely local: no room, no API call, no record
@@ -81,6 +82,8 @@ export default function AiScreen() {
     });
   }, [ready, ending, thinking, game, moves, bestMove, sync]);
 
+  const captured = capturedIn(game);
+
   return (
     <PlayShell title={t("vsComputer")} back="/student/play">
       <StockfishWebView
@@ -128,19 +131,31 @@ export default function AiScreen() {
         </Text>
       </Panel>
 
-      <ChessBoard
-        game={game}
-        orientation="w"
-        /* Not gated on `ready`. Switching opponent mid-game keeps the position
-           — it always did — but the new model is a 26–47 MB download, and
-           while it arrived the board stopped accepting moves even on your own
-           turn. It looked frozen, so switching looked broken. Your move is
-           yours whether or not the opponent has finished loading; the reply
-           simply waits. */
-        canMove={!thinking && !ending && game.turn() === "w"}
-        onMove={(uci) => !thinking && !ending && sync([...moves, uci])}
-        lastMove={moves.length ? moves[moves.length - 1] : undefined}
-      />
+      {/* You always play White here, so the engine sits at the top of the
+          board, with what each side has taken beside its name. */}
+      <View className="gap-1.5">
+        <View className="flex-row items-center justify-between gap-2 px-1">
+          <Text className="font-sans-bold text-xs text-ink">{t("computer")}</Text>
+          <CapturedTray side="b" pieces={captured.byBlack} advantage={captured.advantage} />
+        </View>
+        <ChessBoard
+          game={game}
+          orientation="w"
+          /* Not gated on `ready`. Switching opponent mid-game keeps the position
+             — it always did — but the new model is a 26–47 MB download, and
+             while it arrived the board stopped accepting moves even on your own
+             turn. It looked frozen, so switching looked broken. Your move is
+             yours whether or not the opponent has finished loading; the reply
+             simply waits. */
+          canMove={!thinking && !ending && game.turn() === "w"}
+          onMove={(uci) => !thinking && !ending && sync([...moves, uci])}
+          lastMove={moves.length ? moves[moves.length - 1] : undefined}
+        />
+        <View className="flex-row items-center justify-between gap-2 px-1">
+          <Text className="font-sans-bold text-xs text-ink">{t("you")}</Text>
+          <CapturedTray side="w" pieces={captured.byWhite} advantage={captured.advantage} />
+        </View>
+      </View>
 
       <Panel className="!py-2.5">
         {failed ? (
