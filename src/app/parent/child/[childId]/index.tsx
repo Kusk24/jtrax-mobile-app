@@ -8,9 +8,9 @@
  */
 import { useState } from "react";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { Check, Flame } from "lucide-react-native";
+import { Check, Flame, Star } from "lucide-react-native";
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from "react-native-svg";
 import { PawnIcon } from "@/components/PawnIcon";
 import { ChildFace } from "@/components/parent/ChildFace";
@@ -19,7 +19,6 @@ import { BackHeader } from "@/components/parent/BackHeader";
 import { useParentData } from "@/components/parent/ParentData";
 import { PP } from "@/lib/colors";
 
-const FISH = require("../../../../../assets/images/shared/fish.png");
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const GOAL = 30;
 const W = 280, H = 64, P = 6;
@@ -236,7 +235,7 @@ export default function ChildProfile() {
                       />
                     </Svg>
                   </View>
-                  <Image source={FISH} style={{ width: 10, height: 10 }} />
+                  <Star size={10} color={PP.amber} fill={PP.amber} strokeWidth={2} />
                 </View>
               )}
             </View>
