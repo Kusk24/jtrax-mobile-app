@@ -6,8 +6,9 @@ import { Wifi, WifiOff } from "lucide-react-native";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
 import { ResultDialog } from "@/components/game/ResultDialog";
 import { ChessBoard } from "@/components/game/ChessBoard";
+import { CapturedTray } from "@/components/game/CapturedTray";
 import { useRoom } from "@/components/game/useRoom";
-import { gameFrom, pairedMoves } from "@/lib/chess-core";
+import { capturedIn, gameFrom, pairedMoves } from "@/lib/chess-core";
 import { C } from "@/lib/colors";
 
 /** A live game against another student — the mobile twin of the web app's
@@ -61,6 +62,26 @@ export default function RoomScreen() {
   // arriving piece in from the first.
   const lastMove = moves.length ? moves[moves.length - 1].uci : undefined;
 
+  const captured = capturedIn(game);
+  /* The board is drawn from the viewer's side, so whoever is at the top of it
+     is the other player — and their tray belongs above the board, next to
+     their name, the way it sits on any board they have seen before. */
+  const topSide = orientation === "w" ? "b" : "w";
+  const nameOf = (side: "w" | "b") =>
+    (side === "w" ? room.white : room.black)?.displayName ?? t("emptySeat");
+  const playerLine = (side: "w" | "b") => (
+    <View className="flex-row items-center justify-between gap-2 px-1">
+      <Text numberOfLines={1} className="min-w-0 flex-1 font-sans-bold text-xs text-ink">
+        {nameOf(side)}
+      </Text>
+      <CapturedTray
+        side={side}
+        pieces={side === "w" ? captured.byWhite : captured.byBlack}
+        advantage={captured.advantage}
+      />
+    </View>
+  );
+
   async function onMove(uci: string) {
     setMoveError("");
     const failure = await play(uci);
@@ -89,7 +110,11 @@ export default function RoomScreen() {
         </Panel>
       )}
 
-      <ChessBoard game={game} orientation={orientation} canMove={myTurn} onMove={onMove} lastMove={lastMove} />
+      <View className="gap-1.5">
+        {playerLine(topSide)}
+        <ChessBoard game={game} orientation={orientation} canMove={myTurn} onMove={onMove} lastMove={lastMove} />
+        {playerLine(orientation)}
+      </View>
 
       <ResultDialog
         visible={over && showResult}

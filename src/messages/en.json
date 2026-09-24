@@ -186,7 +186,10 @@
       "expert": "Stockfish. It will not go easy on you."
     },
     "modelLoading": "Getting your opponent ready…",
-    "modelFailed": "That opponent could not be loaded. Try another one."
+    "modelFailed": "That opponent could not be loaded. Try another one.",
+    "computer": "Computer",
+    "you": "You",
+    "emptySeat": "Empty seat"
   },
   "sv2": {
     "brand": "JTrax — Student",
