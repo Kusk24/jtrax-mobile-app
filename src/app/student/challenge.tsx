@@ -150,7 +150,7 @@ export default function ChallengeScreen() {
             </Text>
           </View>
           <Pressable
-            onPress={() => router.push(`/student/play/room/${c.gameRoomId}` as never)}
+            onPress={() => router.push(`/student/play/room/${c.gameRoomId}?from=challenge` as never)}
             className="shrink-0 rounded-full bg-navy px-4 py-3 active:opacity-80"
           >
             <Text className="font-sans-bold text-xs text-white">{t("openBoard")}</Text>
@@ -190,7 +190,7 @@ export default function ChallengeScreen() {
                       onPress={() =>
                         void run(c.challengeId, async () => {
                           const out = await acceptChallenge(c.challengeId);
-                          router.push(`/student/play/room/${out.gameRoomId}` as never);
+                          router.push(`/student/play/room/${out.gameRoomId}?from=challenge` as never);
                         })
                       }
                       className="size-11 items-center justify-center rounded-full border-2 border-olive bg-olive-soft active:opacity-80 disabled:opacity-60"
