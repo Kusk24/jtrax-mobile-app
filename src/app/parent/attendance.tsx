@@ -111,7 +111,7 @@ export default function ParentChildren() {
                     <View className="flex-row items-center gap-2 pt-0.5">
                       <CheckSquare size={16} color={PP.muted} strokeWidth={1.8} />
                       <Text className="font-sans-semibold text-xs text-pp-ink">
-                        {t("completedClasses", { label: `${c.attended} / ${c.heldSessions}` })}
+                        {t("completedClasses", { count: c.attended })}
                       </Text>
                     </View>
                     <View className="gap-1 pt-0.5">
