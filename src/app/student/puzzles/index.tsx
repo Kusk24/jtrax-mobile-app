@@ -1,9 +1,10 @@
 /**
- * Today's puzzles.
+ * Today's puzzles, and Free Play under them.
  *
  * The set comes from the academy's bank, matched to this pupil's rating, and
  * is never repeated — so an empty list means something and is explained rather
- * than left blank.
+ * than left blank. Free Play is a puzzle at a time at a chosen difficulty, for
+ * a pupil who wants to keep going; it opens on the same board screen.
  */
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
@@ -11,13 +12,20 @@ import { Link, useFocusEffect } from "expo-router";
 import { useTranslations } from "use-intl";
 import { Check, Puzzle as PuzzleIcon, Star } from "lucide-react-native";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
-import { getDailyPuzzles, solvedCount, type DailyPuzzle } from "@/lib/puzzles";
+import { FREE_TIERS, getDailyPuzzles, solvedCount, type DailyPuzzle } from "@/lib/puzzles";
 import { C } from "@/lib/colors";
 
 /** One per puzzle in a set of three, so a child can tell them apart at a
     glance before they have opened any of them. */
 const TOKENS = ["♟", "♞", "♜"];
 const TINTS = ["bg-highlight", "bg-olive-soft", "bg-brick-soft"];
+
+/** Free Play's three levels, with how many stars each shows. */
+const TIER_TITLE = {
+  beginner: "beginnerPuzzles",
+  intermediate: "intermediatePuzzles",
+  advanced: "advancedPuzzles",
+} as const;
 
 export default function PuzzlesScreen() {
   const t = useTranslations("sv2");
@@ -115,6 +123,32 @@ export default function PuzzlesScreen() {
             ))}
           </View>
         )}
+      </Panel>
+
+      <Panel>
+        <View className="mb-3">
+          <Text className="font-sans-bold text-sm text-ink">{t("freePlay")}</Text>
+          <Text className="mt-0.5 font-sans text-[10px] text-muted">{t("freePlayHint")}</Text>
+        </View>
+        <View className="gap-2.5">
+          {FREE_TIERS.map((tier, i) => (
+            <Link key={tier} href={`/student/puzzles/free?tier=${tier}`} asChild>
+              <Pressable className="flex-row items-center gap-3 rounded-2xl border-2 border-line bg-card px-3 py-2.5 active:opacity-80">
+                <View className="size-10 items-center justify-center rounded-xl bg-highlight">
+                  <Text className="text-[22px] leading-7 text-ink">♞</Text>
+                </View>
+                <Text className="min-w-0 flex-1 font-sans-bold text-[13px] text-ink">
+                  {t(TIER_TITLE[tier])}
+                </Text>
+                <View className="flex-row gap-0.5">
+                  {Array.from({ length: i + 1 }, (_, n) => (
+                    <Star key={n} size={16} color={C.highlightInk} fill={C.highlightInk} />
+                  ))}
+                </View>
+              </Pressable>
+            </Link>
+          ))}
+        </View>
       </Panel>
     </PlayShell>
   );

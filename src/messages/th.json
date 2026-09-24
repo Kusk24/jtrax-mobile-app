@@ -260,7 +260,9 @@
     "toMoveGoalMate": "{side}เดิน — รุกจนใน {count} ตา",
     "toMoveGoalBest": "{side}เดิน — หาตาเดินที่ดีที่สุด",
     "sideWhite": "ฝ่ายขาว",
-    "sideBlack": "ฝ่ายดำ"
+    "sideBlack": "ฝ่ายดำ",
+    "freePlayHint": "เลือกระดับแล้วฝึกต่อได้เลย",
+    "tierExhausted": "ระดับนี้ยังไม่มีปริศนาเพิ่มในตอนนี้"
   },
   "challenge": {
     "title": "ท้าประลอง",
