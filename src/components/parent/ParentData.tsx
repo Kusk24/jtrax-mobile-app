@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api, ApiError } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import {
-  CERT_SESSIONS, recentMonths, todayISO,
+  CERT_SESSIONS, recentMonths, streakFrom, todayISO,
   type AnnouncementV2, type ChildKey, type ChildV2, type HistRow, type MonthDef,
   type InboxNotif, NOTIF_DEFAULTS, type NotifType, type SenderKind,
   type TournamentEntryV2, type TournamentV2,
@@ -229,7 +229,11 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
         expiresAhead: daysRaw >= 0,
         attended,
         heldSessions: held,
-        streak: n(st, "streak_count"),
+        /* Counted from the days actually practised, by the same rule as the
+           backend's `currentStreak`. `student.streak_count` is a number
+           nothing recomputes, so a child who stopped in May still showed
+           twelve days. */
+        streak: streakFrom(acts.map((a) => s(a, "activity_date")), today),
         practiceWeek: week,
       };
     });
