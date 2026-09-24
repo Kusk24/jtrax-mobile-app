@@ -198,7 +198,7 @@ export default function ParentChildren() {
                 </Text>
                 <View className="w-[68px] flex-row items-center justify-end gap-1">
                   <Text className="font-sans-bold text-[13px] text-pp-blue">
-                    +{Math.max(1, Math.round(r.mins / 10))}
+                    {r.puzzles}
                   </Text>
                   <Star size={15} color={PP.amber} fill={PP.amber} strokeWidth={1.8} />
                 </View>
