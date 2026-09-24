@@ -15,6 +15,7 @@ import {
 } from "@expo-google-fonts/nunito";
 import { I18nProvider } from "@/i18n";
 import { SessionProvider } from "@/lib/session";
+import { PushResponder } from "@/components/PushResponder";
 import { C } from "@/lib/colors";
 
 export default function RootLayout() {
@@ -32,6 +33,7 @@ export default function RootLayout() {
     <I18nProvider>
       <SessionProvider>
         <StatusBar style="dark" />
+        <PushResponder />
         <Stack
           screenOptions={{
             headerShown: false,

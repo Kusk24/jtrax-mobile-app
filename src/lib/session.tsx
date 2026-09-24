@@ -7,6 +7,7 @@
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ApiError, login as apiLogin, logout as apiLogout, me, setAuthToken, type Identity } from "./api";
+import { registerForPush, unregisterPush } from "./push";
 import { clearsSession } from "./session-recovery";
 import { clearToken, readToken, writeToken } from "./token-store";
 
@@ -55,6 +56,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const identity = await me();
       setUser(identity);
       setOffline(false);
+      // Re-registered on every launch: a token can change, and the backend
+      // updates the row it already has rather than adding another.
+      void registerForPush();
     } catch (e) {
       if (clearsSession(e)) {
         setAuthToken(null);
@@ -83,6 +87,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       setAuthToken(token);
       setUser(identity);
       setOffline(false);
+      // After signing in, not before: the prompt makes sense once the app is
+      // somebody's, and the token is registered to that account.
+      void registerForPush();
       return "";
     } catch (e) {
       if (e instanceof ApiError && e.status === 0) return "offline";
@@ -93,6 +100,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    // This phone stops getting the account's notifications — done first, while
+    // the session that owns the registration still exists.
+    await unregisterPush();
     // Tell the server first so the session is actually revoked; drop the local
     // copy either way, or a failed call would leave the user stuck signed in.
     await apiLogout().catch(() => {});
