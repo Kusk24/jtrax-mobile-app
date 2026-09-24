@@ -6,10 +6,10 @@
  * same blocks stack in the same order.
  */
 import { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslations } from "use-intl";
-import { CheckSquare, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { CheckSquare, ChevronLeft, ChevronRight, Star } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
 import { CURRENT, type ChildKey, type HistRow } from "@/lib/parent-v2-data";
 import { ChildBanner, ChildFace } from "@/components/parent/ChildFace";
@@ -17,7 +17,6 @@ import { useParentData } from "@/components/parent/ParentData";
 import { PP } from "@/lib/colors";
 
 const WD_KEYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
-const FISH = require("../../../assets/images/shared/fish.png");
 
 function SectionLabel({ children }: { children: string }) {
   return (
@@ -139,7 +138,7 @@ export default function ParentChildren() {
       {/* Today's activity */}
       <View className="gap-3.5">
         <View className="flex-row items-center gap-2">
-          <Image source={FISH} style={{ width: 16, height: 16 }} />
+          <Star size={16} color={PP.amber} fill={PP.amber} strokeWidth={1.8} />
           <SectionLabel>{t("todaysActivity")}</SectionLabel>
         </View>
         <View>
@@ -189,7 +188,7 @@ export default function ParentChildren() {
                           />
                         </Svg>
                       </View>
-                      <Image source={FISH} style={{ width: 9, height: 9 }} />
+                      <Star size={9} color={PP.amber} fill={PP.amber} strokeWidth={2} />
                     </>
                   )}
                 </View>
@@ -201,7 +200,7 @@ export default function ParentChildren() {
                   <Text className="font-sans-bold text-[13px] text-pp-blue">
                     +{Math.max(1, Math.round(r.mins / 10))}
                   </Text>
-                  <Image source={FISH} style={{ width: 15, height: 15 }} />
+                  <Star size={15} color={PP.amber} fill={PP.amber} strokeWidth={1.8} />
                 </View>
               </View>
             );
