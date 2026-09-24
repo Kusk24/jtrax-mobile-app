@@ -85,7 +85,7 @@ export default function AiScreen() {
   const captured = capturedIn(game);
 
   return (
-    <PlayShell title={t("vsComputer")} back="/student/play">
+    <PlayShell title={t("vsComputer")} back="/student/play" sound>
       <StockfishWebView
         ref={stockfish}
         onReady={() => setStockfishReady(true)}

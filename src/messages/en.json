@@ -42,7 +42,9 @@
     "loadFailed": "We couldn't load this just now. Please try again.",
     "serverDownTitle": "Cannot reach the server",
     "serverDownBody": "JTrax cannot reach the academy's server right now. Check your connection and try again — you are still signed in.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "soundOn": "Turn sound on",
+    "soundOff": "Turn sound off"
   },
   "days": {
     "MON": "MON",

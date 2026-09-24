@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useTranslations } from "use-intl";
 import { ArrowLeft } from "lucide-react-native";
 import { C } from "@/lib/colors";
+import { SoundToggle } from "./SoundToggle";
 
 /** Header + scroll body the play screens share. Mirrors the web app's
     PlayShell, minus the phone frame — this *is* the phone. */
@@ -10,6 +11,7 @@ export function PlayShell({
   title,
   back,
   nav = false,
+  sound = false,
   children,
 }: {
   title: string;
@@ -22,6 +24,8 @@ export function PlayShell({
       leave it. Anything pushed does the opposite: it takes the arrow and the
       bar goes away, because a board wants the whole phone. */
   nav?: boolean;
+  /** A board screen: shows the sound switch at the right of the header. */
+  sound?: boolean;
   children: React.ReactNode;
 }) {
   const tCommon = useTranslations("common");
@@ -43,7 +47,8 @@ export function PlayShell({
             <ArrowLeft size={18} color={C.ink} />
           </Pressable>
         )}
-        <Text className="font-display-semibold text-2xl text-navy">{title}</Text>
+        <Text className="min-w-0 flex-1 font-display-semibold text-2xl text-navy">{title}</Text>
+        {sound && <SoundToggle />}
       </View>
       <ScrollView
         className="flex-1"

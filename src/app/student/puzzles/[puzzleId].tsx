@@ -29,6 +29,7 @@ import {
   type FreeTier,
 } from "@/lib/puzzles";
 import { C } from "@/lib/colors";
+import { moveBetween, moveFrom, playSound, preloadSounds, soundForMove } from "@/lib/sound";
 
 /** How long a wrong move stays on the board before it is taken back. Long
     enough to see what happened, short enough not to feel like a punishment. */
@@ -106,6 +107,10 @@ export default function PuzzleScreen() {
   );
 
   useEffect(() => {
+    preloadSounds();
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     if (freeTier) {
       loadFree(freeTier, () => cancelled);
@@ -154,9 +159,15 @@ export default function PuzzleScreen() {
     const next = gameAt(verdict.fen);
     if (next) setGame(next);
 
+    /* Sound follows what the pupil sees: their move lands with the new
+       position, and any reply a beat later, like an opponent answering. */
+    const mine = moveFrom(game.fen(), uci);
+    if (mine) playSound(soundForMove(mine));
+
     if (!verdict.correct) {
       setWrong(true);
       setMessage(t("wrongMsg"));
+      setTimeout(() => playSound("wrong"), 180);
       setTimeout(() => {
         setGame(gameAt(puzzle.fen));
         setPlayed([]);
@@ -172,9 +183,12 @@ export default function PuzzleScreen() {
     if (!verdict.solved) {
       // A longer puzzle: the opponent has replied and it is their move again.
       setMessage(t("keepGoingMsg"));
+      const reply = mine ? moveBetween(mine.after, verdict.fen) : null;
+      if (reply) setTimeout(() => playSound(soundForMove(reply)), 350);
       return;
     }
 
+    setTimeout(() => playSound("game-end"), 300);
     setSolved(true);
     setMessage(t("checkmateMsg"));
 
@@ -229,7 +243,7 @@ export default function PuzzleScreen() {
   const goal = puzzleGoal(puzzle);
 
   return (
-    <PlayShell title={title} back="/student/puzzles">
+    <PlayShell title={title} back="/student/puzzles" sound>
       {/* Whose move and what to look for, from this puzzle — not the one line
           "White to move — mate in 1" that used to sit above every position. */}
       <Text className="-mt-1 text-center font-sans-bold text-xs text-muted">
