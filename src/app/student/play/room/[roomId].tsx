@@ -38,14 +38,14 @@ export default function RoomScreen() {
 
   if (error) {
     return (
-      <PlayShell title={t("classGame")} back="/student/play">
+      <PlayShell title={t("classGame")} back="/student/play" sound>
         <Panel><Text className="font-sans-bold text-sm text-ink">{t(`error.${error}`)}</Text></Panel>
       </PlayShell>
     );
   }
   if (!room || !game) {
     return (
-      <PlayShell title={t("classGame")} back="/student/play">
+      <PlayShell title={t("classGame")} back="/student/play" sound>
         <Panel className="flex-row items-center justify-center gap-2">
           <ActivityIndicator color={C.navy} />
           <Text className="font-sans-bold text-sm text-ink">{t("loading")}</Text>
@@ -68,7 +68,7 @@ export default function RoomScreen() {
   }
 
   return (
-    <PlayShell title={t("classGame")} back="/student/play">
+    <PlayShell title={t("classGame")} back="/student/play" sound>
       <Panel className="!flex-row !items-center !justify-between !p-3">
         <View>
           <Text className="font-sans-bold text-sm text-ink">

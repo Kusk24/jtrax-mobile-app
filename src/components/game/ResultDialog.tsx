@@ -9,8 +9,10 @@
  * Deliberately not a review or a share; neither exists here, and a dialog full
  * of buttons that do nothing is worse than the line it replaced.
  */
+import { useEffect } from "react";
 import { Modal, Pressable, Text } from "react-native";
 import { useTranslations } from "use-intl";
+import { playSound } from "@/lib/sound";
 
 export function ResultDialog({
   visible,
@@ -33,6 +35,14 @@ export function ResultDialog({
   onClose: () => void;
 }) {
   const t = useTranslations("play");
+  /* The game-over chime, once, when the result appears. A beat after the
+     final move's own sound rather than on top of it, which is the order a
+     player expects: the move lands, then the game ends. */
+  useEffect(() => {
+    if (!visible) return;
+    const later = setTimeout(() => playSound("game-end"), 250);
+    return () => clearTimeout(later);
+  }, [visible]);
   return (
     <Modal
       visible={visible}

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useTranslations } from "use-intl";
 import type { Chess } from "chess.js";
 import { isPromotion, movesFrom, squareName, squareToRC, toGrid } from "@/lib/chess-core";
 import { pieceArt } from "@/lib/piece-art";
+import { lastMoveOf, playSound, preloadSounds, soundForMove } from "@/lib/sound";
 import { C } from "@/lib/colors";
 
 /**
@@ -67,6 +68,26 @@ export function ChessBoard({
      is the identity and the piece sits where it belongs. Keeping this in state
      meant setting it from inside the effect for no gain. */
   const slidingTo = lastMove && lastMove.length >= 4 ? lastMove.slice(2, 4) : null;
+  /* The sound of the move that just arrived — yours or your opponent's. Keyed
+     on `lastMove`, the same signal that slides the piece, so sound and motion
+     start together. The first run is skipped: a board opened onto a game
+     already in progress should be quiet, not replay the last move at you. */
+  const heard = useRef(false);
+  useEffect(() => {
+    preloadSounds();
+  }, []);
+  useEffect(() => {
+    if (!heard.current) {
+      heard.current = true;
+      return;
+    }
+    const move = lastMove ? lastMoveOf(game) : undefined;
+    if (move) playSound(soundForMove(move));
+    // `game` is read, not watched: it changes with every move, and lastMove
+    // is what says a *new* move happened.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMove]);
+
   useEffect(() => {
     if (!lastMove || lastMove.length < 4) return;
     const [fr, fc] = squareToRC(lastMove.slice(0, 2));
