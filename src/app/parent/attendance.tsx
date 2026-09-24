@@ -12,6 +12,7 @@ import { useTranslations } from "use-intl";
 import { CheckSquare, ChevronLeft, ChevronRight } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
 import { CURRENT, type ChildKey, type HistRow } from "@/lib/parent-v2-data";
+import { creditsUsed } from "@/lib/credits-used";
 import { ChildBanner, ChildFace } from "@/components/parent/ChildFace";
 import { useParentData } from "@/components/parent/ParentData";
 import { PP } from "@/lib/colors";
@@ -80,8 +81,9 @@ export default function ParentChildren() {
           {childList.map((c) => {
             const low = c.credits <= 2;
             const isBeg = c.level === "Beginner";
+            const used = creditsUsed(c.credits, c.creditsBought);
             const pct = c.creditsBought > 0
-              ? Math.min(100, Math.round((c.credits / c.creditsBought) * 100))
+              ? Math.min(100, Math.round((used / c.creditsBought) * 100))
               : 0;
             return (
               <Link key={c.key} href={`/parent/child/${c.key}` as never} asChild>
@@ -125,7 +127,7 @@ export default function ParentChildren() {
                         />
                       </View>
                       <Text className="font-sans text-[10.5px] text-pp-muted">
-                        {t("creditsLeftLabel", { count: c.credits })}
+                        {t("creditsUsedLabel", { used, total: c.creditsBought })}
                       </Text>
                     </View>
                   </View>
