@@ -76,7 +76,9 @@ export const api = {
   post: <T,>(path: string, body?: unknown) => request<T>("POST", path, body),
   put: <T,>(path: string, body: unknown) => request<T>("PUT", path, body),
   patch: <T,>(path: string, body: unknown) => request<T>("PATCH", path, body),
-  del: <T,>(path: string) => request<T>("DELETE", path),
+  /** A body is rare on a delete, but unregistering a push token names the
+      token in one — it is not something to put in a URL. */
+  del: <T,>(path: string, body?: unknown) => request<T>("DELETE", path, body),
 };
 
 export const login = (email: string, password: string) =>
