@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "jtrax-mobile-app",
+    "name": "JTrax",
     "slug": "jtrax-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,8 @@
     "scheme": "jtraxmobileapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "th.ac.jcachess.jtrax"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "th.ac.jcachess.jtrax"
     },
     "web": {
       "output": "static",
