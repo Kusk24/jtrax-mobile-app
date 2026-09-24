@@ -1,5 +1,6 @@
 /**
- * One puzzle.
+ * One puzzle — from today's set, or from Free Play when opened as
+ * `/student/puzzles/free?tier=…`.
  *
  * Nothing here knows the answer. A tap produces a move, the move goes to the
  * server, and the server says whether it was right and what the position is
@@ -19,10 +20,13 @@ import {
   attemptMove,
   gameAt,
   getDailyPuzzles,
+  getFreePuzzle,
+  isFreeTier,
   nextUnsolved,
   openPuzzle,
   puzzleGoal,
   type DailyPuzzle,
+  type FreeTier,
 } from "@/lib/puzzles";
 import { C } from "@/lib/colors";
 
@@ -32,8 +36,18 @@ const WRONG_MS = 1200;
 /** The pause after the last move of a puzzle, before moving on. */
 const SOLVED_MS = 1400;
 
+/** The heading for each Free Play level. */
+const TIER_TITLE: Record<FreeTier, "beginnerPuzzles" | "intermediatePuzzles" | "advancedPuzzles"> = {
+  beginner: "beginnerPuzzles",
+  intermediate: "intermediatePuzzles",
+  advanced: "advancedPuzzles",
+};
+
 export default function PuzzleScreen() {
-  const { puzzleId } = useLocalSearchParams<{ puzzleId: string }>();
+  const { puzzleId, tier } = useLocalSearchParams<{ puzzleId: string; tier?: string }>();
+  /* Free Play shares this screen: the same board, the same grader. What
+     differs is where the puzzle comes from and what happens after it. */
+  const freeTier = puzzleId === "free" && isFreeTier(tier) ? tier : null;
   const t = useTranslations("sv2");
   const tp = useTranslations("play");
 
@@ -47,6 +61,8 @@ export default function PuzzleScreen() {
   const [wrong, setWrong] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  /* Free Play only: the pupil has seen every puzzle at this level. */
+  const [exhausted, setExhausted] = useState(false);
 
   const puzzle = index >= 0 ? puzzles[index] : undefined;
 
@@ -64,8 +80,42 @@ export default function PuzzleScreen() {
     if (p && !p.solved) void openPuzzle(p.puzzleId);
   }, []);
 
+  /* One puzzle at the chosen level. Each call is a fresh request: the server
+     may top the bank up from Lichess, so there is nothing to pre-load. The
+     solved board stays up while the next one is fetched, rather than
+     flashing a spinner between puzzles. */
+  const loadFree = useCallback(
+    (level: FreeTier, isCancelled: () => boolean = () => false) => {
+      getFreePuzzle(level)
+        .then((res) => {
+          if (isCancelled()) return;
+          if (!res.puzzle) {
+            setExhausted(true);
+            setPuzzles([]);
+            setIndex(-1);
+            return;
+          }
+          setExhausted(false);
+          setPuzzles([res.puzzle]);
+          load([res.puzzle], 0);
+        })
+        .catch(() => {})
+        .finally(() => !isCancelled() && setLoading(false));
+    },
+    [load],
+  );
+
   useEffect(() => {
     let cancelled = false;
+    if (freeTier) {
+      loadFree(freeTier, () => cancelled);
+      return () => {
+        cancelled = true;
+      };
+    }
+    // A Free Play link with no level it recognises has nothing to open; the
+    // render below says so without waiting on anything.
+    if (puzzleId === "free") return;
     getDailyPuzzles()
       .then((set) => {
         if (cancelled) return;
@@ -78,7 +128,7 @@ export default function PuzzleScreen() {
     return () => {
       cancelled = true;
     };
-  }, [puzzleId, load]);
+  }, [puzzleId, freeTier, load, loadFree]);
 
   function reset() {
     if (!puzzle) return;
@@ -127,6 +177,15 @@ export default function PuzzleScreen() {
 
     setSolved(true);
     setMessage(t("checkmateMsg"));
+
+    /* A free puzzle is not part of today's set, so it marks nothing solved
+       there. The pupil chose to keep going, so the next one at the same level
+       comes instead. */
+    if (freeTier) {
+      setTimeout(() => loadFree(freeTier), SOLVED_MS);
+      return;
+    }
+
     const after = puzzles.map((row, i) => (i === index ? { ...row, solved: true } : row));
     setPuzzles(after);
     const onward = nextUnsolved(after, index);
@@ -140,7 +199,9 @@ export default function PuzzleScreen() {
     }, SOLVED_MS);
   }
 
-  if (loading) {
+  const badFreeLink = puzzleId === "free" && !freeTier;
+
+  if (loading && !badFreeLink) {
     return (
       <PlayShell title={t("puzzles")} back="/student/puzzles">
         <Panel className="flex-row items-center justify-center gap-2">
@@ -151,11 +212,15 @@ export default function PuzzleScreen() {
     );
   }
 
+  const title = freeTier ? t(TIER_TITLE[freeTier]) : t("puzzleN", { n: index + 1 });
+
   if (!puzzle || !game) {
     return (
-      <PlayShell title={t("puzzles")} back="/student/puzzles">
+      <PlayShell title={freeTier ? title : t("puzzles")} back="/student/puzzles">
         <Panel>
-          <Text className="font-sans-bold text-sm text-ink">{t("puzzlesUnavailable")}</Text>
+          <Text className="font-sans-bold text-sm text-ink">
+            {exhausted ? t("tierExhausted") : t("puzzlesUnavailable")}
+          </Text>
         </Panel>
       </PlayShell>
     );
@@ -164,7 +229,7 @@ export default function PuzzleScreen() {
   const goal = puzzleGoal(puzzle);
 
   return (
-    <PlayShell title={t("puzzleN", { n: index + 1 })} back="/student/puzzles">
+    <PlayShell title={title} back="/student/puzzles">
       {/* Whose move and what to look for, from this puzzle — not the one line
           "White to move — mate in 1" that used to sit above every position. */}
       <Text className="-mt-1 text-center font-sans-bold text-xs text-muted">

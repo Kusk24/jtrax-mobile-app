@@ -260,7 +260,9 @@
     "toMoveGoalMate": "{side} to move — mate in {count}",
     "toMoveGoalBest": "{side} to move — find the best move",
     "sideWhite": "White",
-    "sideBlack": "Black"
+    "sideBlack": "Black",
+    "freePlayHint": "Pick a level and keep practising",
+    "tierExhausted": "Nothing left at this level right now"
   },
   "challenge": {
     "title": "Challenge",
