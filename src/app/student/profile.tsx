@@ -23,6 +23,7 @@ import { useSession } from "@/lib/session";
 import { getDailyPuzzles, getPracticeSummary, solvedCount, type PracticeDay } from "@/lib/puzzles";
 import { getMyLichess } from "@/lib/lichess";
 import { api } from "@/lib/api";
+import { classesAttended } from "@/lib/classes-attended";
 import { C } from "@/lib/colors";
 
 /** The pupil's own row. The scope on `students` means this list is only ever
@@ -31,7 +32,6 @@ type StudentRow = {
   student_id: string;
   name?: string;
   current_level?: string;
-  last_attended_date?: string;
 };
 
 export default function StudentProfileScreen() {
@@ -43,6 +43,9 @@ export default function StudentProfileScreen() {
   const [streak, setStreak] = useState(0);
   const [solved, setSolved] = useState(0);
   const [rating, setRating] = useState<number | null>(null);
+  /* Classes the pupil has been checked in to — the same count their parent
+     sees. Null until it loads, so the tile does not claim "0" meanwhile. */
+  const [classes, setClasses] = useState<number | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -70,6 +73,16 @@ export default function StudentProfileScreen() {
           .then((rows) => {
             const self = rows.find((r) => r.student_id === user.studentId);
             if (!cancelled && self) setRecord(self);
+          })
+          .catch(() => {});
+        // `attendance` is scoped to the pupil's own rows; the sessions are
+        // what the count checks each row against.
+        Promise.all([
+          api.get<{ session_id: string; check_in_time?: string }[]>("attendance"),
+          api.get<{ session_id: string }[]>("class-sessions"),
+        ])
+          .then(([attendance, sessions]) => {
+            if (!cancelled) setClasses(classesAttended(attendance, new Set(sessions.map((x) => x.session_id))));
           })
           .catch(() => {});
       }
@@ -134,7 +147,7 @@ export default function StudentProfileScreen() {
         />
         <Tile
           icon={<GraduationCap size={20} color={C.olive} />}
-          value={record?.last_attended_date ? "1+" : "0"}
+          value={classes === null ? "—" : String(classes)}
           label={t("classesLabel")}
         />
       </View>
