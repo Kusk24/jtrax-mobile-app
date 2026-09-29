@@ -3,10 +3,13 @@ import { Link } from "expo-router";
 import { useTranslations } from "use-intl";
 import { Bot, Users } from "lucide-react-native";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
+import { MyGames } from "@/components/game/MyGames";
+import { useSession } from "@/lib/session";
 import { C } from "@/lib/colors";
 
 export default function PlayIndexScreen() {
   const t = useTranslations("play");
+  const { user } = useSession();
   const modes = [
     { href: "/student/play/ai", Icon: Bot, title: t("vsComputer"), body: t("vsComputerBody") },
     { href: "/student/play/friend", Icon: Users, title: t("vsFriend"), body: t("vsFriendBody") },
@@ -14,6 +17,7 @@ export default function PlayIndexScreen() {
 
   return (
     <PlayShell title={t("title")} nav>
+      {user?.userAccountId && <MyGames myAccountId={user.userAccountId} />}
       <Text className="mb-1 font-sans text-xs text-muted">{t("chooseMode")}</Text>
       {modes.map(({ href, Icon, title, body }) => (
         <Link key={href} href={href} asChild>

@@ -17,6 +17,7 @@ import { useFocusEffect } from "expo-router";
 import { useTranslations } from "use-intl";
 import { Check, Flame, Gamepad2, GraduationCap, Trophy } from "lucide-react-native";
 import { SignOutButton } from "@/components/SignOutButton";
+import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { LichessCard } from "@/components/student/LichessCard";
 import { useSession } from "@/lib/session";
@@ -192,6 +193,8 @@ export default function StudentProfileScreen() {
       </View>
 
       <LichessCard />
+
+      <ChangePasswordForm tone="student" />
 
       <View className="flex-row items-center justify-between gap-3 rounded-card border-2 border-line bg-card px-4 py-3 shadow-clay">
         <LanguageToggle className="!border-0 !shadow-none" />

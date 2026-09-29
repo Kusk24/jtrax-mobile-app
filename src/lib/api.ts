@@ -90,3 +90,7 @@ export const logout = () => api.post<{ status: string }>("auth/logout");
 
 export const forgotPassword = (email: string) =>
   api.post<{ status: string }>("auth/forgot-password", { email });
+
+/** Replaces the signed-in person's password; other devices are signed out. */
+export const changePassword = (currentPassword: string, newPassword: string) =>
+  api.post<{ status: string }>("auth/change-password", { currentPassword, newPassword });

@@ -132,7 +132,7 @@
     "resign": "Resign",
     "resignConfirm": "Yes, resign",
     "keepPlaying": "Keep playing",
-    "cancelled": "This game was stopped by a teacher.",
+    "cancelled": "Your teacher ended this game.",
     "promote": "Choose a piece",
     "seat": {
       "White": "You are White",
@@ -159,7 +159,11 @@
       "FiftyMoveRule": "the fifty-move rule",
       "InsufficientMaterial": "not enough pieces to mate",
       "FivefoldRepetition": "fivefold repetition",
-      "SeventyFiveMoveRule": "the seventy-five-move rule"
+      "SeventyFiveMoveRule": "the seventy-five-move rule",
+      "Agreement": "agreement",
+      "TimeOut": "time running out",
+      "Abandoned": "the other player leaving",
+      "Aborted": "the game being called off"
     },
     "piece": {
       "q": "Queen",
@@ -171,7 +175,7 @@
       "badCode": "No room has that code. Check it with your teacher.",
       "roomFull": "That room already has two players.",
       "notAllowed": "Your account cannot take a seat in a game.",
-      "notFound": "That game is not yours to watch.",
+      "notFound": "This game has ended.",
       "illegal": "That move isn't allowed here.",
       "outOfTurn": "It isn't your turn — the board has been refreshed.",
       "unreachable": "Can't reach the server. Check your connection.",
@@ -192,7 +196,49 @@
     "modelFailed": "That opponent could not be loaded. Try another one.",
     "computer": "Computer",
     "you": "You",
-    "emptySeat": "Empty seat"
+    "emptySeat": "Empty seat",
+    "draw": {
+      "offer": "Offer a draw",
+      "offered": "You offered a draw. Waiting for {name}…",
+      "incoming": "{name} offers a draw",
+      "accept": "Accept draw",
+      "decline": "No, keep playing"
+    },
+    "clock": "{name}'s clock",
+    "timeControl": "Time control {tc}",
+    "myGames": {
+      "title": "Your games",
+      "vs": "vs {name}",
+      "youPlay": "You play {side}",
+      "yourTurn": "Your move",
+      "theirTurn": "Their move",
+      "waiting": "Waiting for your opponent",
+      "open": "Open",
+      "invited": "Enter the game room",
+      "competing": "You are competing with {name}",
+      "rated": "Rated on Lichess",
+      "enter": "Enter",
+      "entering": "Entering…",
+      "waitingFor": "Waiting for {name} to enter",
+      "onHold": "Paused",
+      "onHoldBody": "Your teacher paused this game. You'll finish it another time.",
+      "continueTitle": "Continue your game"
+    },
+    "side": {
+      "White": "White",
+      "Black": "Black"
+    },
+    "room": {
+      "enterTitle": "You are competing with {name}",
+      "enterBody": "The game starts when you both press Enter.",
+      "enter": "Enter the game",
+      "waitingFor": "You're in. Waiting for {name} to enter…",
+      "onHoldTitle": "This game is paused",
+      "onHoldBody": "Your teacher paused it. You'll finish it another time. You can look at the board, but you can't move yet.",
+      "continueTitle": "Continue your game with {name}",
+      "continueBody": "It carries on from where you stopped when you both press Enter."
+    },
+    "onHold": "Paused"
   },
   "sv2": {
     "brand": "JTrax — Student",
@@ -370,12 +416,12 @@
     "password": "Password",
     "submit": "Sign in",
     "forgot": "Forgot your password?",
-    "resetSent": "If that address has an account, a reset link is on its way.",
+    "resetSent": "If that email or login ID has an account, a reset link is on its way. A student's link goes to their parent's email.",
     "accountHint": "Your account decides what you see — a student signs in to the student app, a parent to the parent app.",
     "staffUseConsole": "Admin accounts use the JTrax console, not this app.",
     "error": {
       "badCredentials": "That doesn't match an account. Students sign in with the ID on their card, not an email address.",
-      "needEmail": "Enter your email address first. A student ID cannot be sent a reset link — ask the academy.",
+      "needEmail": "Enter your email or student ID first. A student's reset link goes to their parent's email.",
       "tooMany": "Too many attempts. Try again in a minute.",
       "offline": "Can't reach the server. Check your connection.",
       "failed": "Something went wrong. Try again."
@@ -568,6 +614,25 @@
     "prefPayment": "Payment Receipts",
     "prefPaymentSub": "When a payment is recorded — also sent by email",
     "prefCancelled": "Class Cancellations",
-    "prefCancelledSub": "When the office cancels an upcoming class"
+    "prefCancelledSub": "When the office cancels an upcoming class",
+    "security": "Security"
+  },
+  "changePassword": {
+    "title": "Change password",
+    "open": "Change",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "rule": "At least 8 characters, with a letter and a number.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "done": "Password changed. Other devices have been signed out.",
+    "errorShort": "Use at least 8 characters.",
+    "errorWeak": "Use at least one letter and one number.",
+    "errorMismatch": "The two new passwords don't match.",
+    "errorCurrent": "Your current password isn't right.",
+    "errorTooMany": "Too many tries. Wait a minute and try again.",
+    "errorOffline": "Can't reach the server. Check your connection.",
+    "errorFailed": "Couldn't change the password. Please try again."
   }
 }

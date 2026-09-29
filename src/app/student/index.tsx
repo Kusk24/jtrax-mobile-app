@@ -15,6 +15,7 @@ import { useTranslations } from "use-intl";
 import { BarChart3, Bot, ChevronRight, Flame, GraduationCap, Puzzle, Swords, Trophy } from "lucide-react-native";
 import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
 import { HomeAction, StatTile } from "@/components/student/HomeTiles";
+import { MyGames } from "@/components/game/MyGames";
 import { useSession } from "@/lib/session";
 import { getDailyPuzzles, getPracticeSummary, solvedCount } from "@/lib/puzzles";
 import { getMyLichess } from "@/lib/lichess";
@@ -115,6 +116,9 @@ export default function StudentHome() {
           </Pressable>
         </Link>
       </View>
+
+      {/* A game the teacher set up is the first thing to act on. */}
+      {user?.userAccountId && <MyGames myAccountId={user.userAccountId} />}
 
       <View className="flex-row gap-2.5">
         <StatTile
