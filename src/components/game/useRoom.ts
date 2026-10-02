@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError, getAuthToken } from "@/lib/api";
-import { getRoom, postMove, resignRoom, type Move, type Room } from "@/lib/games";
+import { drawRoom, enterRoom, getRoom, postMove, resignRoom, type Move, type Room } from "@/lib/games";
 import { openEventStream } from "@/lib/sse";
 
 /**
@@ -46,7 +46,9 @@ export function useRoom(roomId: string) {
       onEvent: (name, data) => {
         if (name !== "room") return;
         setConnection("live");
-        const snapshot = JSON.parse(data);
+        /* An answered draw offer is simply absent from the event, so it is
+           cleared here rather than left standing from the one before. */
+        const snapshot = { drawOffer: undefined, ...JSON.parse(data) };
         setRoom((r) => (r ? { ...r, ...snapshot } : r));
         // The event carries the position but not the move list, so a change in
         // ply is what triggers the authorized read.
@@ -82,5 +84,21 @@ export function useRoom(roomId: string) {
     await refetch();
   }, [roomId, refetch]);
 
-  return { room, moves, seat, connection, error, play, resign, refetch };
+  /** Offer a draw, or answer the opponent's. A refused one — the offer was
+      withdrawn by a move — just resyncs. */
+  const draw = useCallback(
+    async (action: "offer" | "accept" | "decline") => {
+      await drawRoom(roomId, action).catch(() => {});
+      await refetch();
+    },
+    [roomId, refetch],
+  );
+
+  /** Sit down at a game the office set up. It starts once both have. */
+  const enter = useCallback(async () => {
+    await enterRoom(roomId).catch(() => {});
+    await refetch();
+  }, [roomId, refetch]);
+
+  return { room, moves, seat, connection, error, play, resign, draw, enter, refetch };
 }

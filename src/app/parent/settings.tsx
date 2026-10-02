@@ -14,6 +14,7 @@ import { useParentData } from "@/components/parent/ParentData";
 import { useSession } from "@/lib/session";
 import { useLocaleSwitch } from "@/i18n";
 import { PP } from "@/lib/colors";
+import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 
 /** The academy's front desk, as the portal's Contact row dials. */
 const SCHOOL_PHONE = "+66123456789";
@@ -101,6 +102,11 @@ export default function ParentSettings() {
             </Text>
           )}
         </View>
+      </View>
+
+      <View className="gap-3">
+        <SectionLabel>{t("security")}</SectionLabel>
+        <ChangePasswordForm tone="parent" />
       </View>
 
       <View className="gap-3">
