@@ -21,7 +21,7 @@ const WD_KEYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+    <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
       {children}
     </Text>
   );
@@ -67,10 +67,10 @@ export default function ParentChildren() {
       showsVerticalScrollIndicator={false}
     >
       <View className="gap-1">
-        <Text className="font-display-semibold text-2xl leading-tight text-pp-ink">
+        <Text className="font-pp-display-semibold text-2xl leading-tight text-pp-ink">
           {t("navChildren")}
         </Text>
-        <Text className="font-sans text-[12.5px] text-pp-muted">{t("childrenSub")}</Text>
+        <Text className="font-pp text-[12.5px] text-pp-muted">{t("childrenSub")}</Text>
       </View>
 
       {/* The children */}
@@ -94,7 +94,7 @@ export default function ParentChildren() {
                   <ChildBanner name={c.name} tint={c.avBg} />
                   <View className="gap-2 px-3.5 pb-3.5 pt-3">
                     <View className="flex-row flex-wrap items-center gap-1.5">
-                      <Text className="font-sans-bold text-[15px] text-pp-ink">{c.name}</Text>
+                      <Text className="font-pp-bold text-[15px] text-pp-ink">{c.name}</Text>
                       {!!c.level && (
                         <View
                           style={{ backgroundColor: isBeg ? PP.greenSoft : PP.amberSoft }}
@@ -102,7 +102,7 @@ export default function ParentChildren() {
                         >
                           <Text
                             style={{ color: isBeg ? PP.green : PP.amber }}
-                            className="font-sans-bold text-[9.5px]"
+                            className="font-pp-bold text-[9.5px]"
                           >
                             {c.level}
                           </Text>
@@ -111,7 +111,7 @@ export default function ParentChildren() {
                     </View>
                     <View className="flex-row items-center gap-2 pt-0.5">
                       <CheckSquare size={16} color={PP.muted} strokeWidth={1.8} />
-                      <Text className="font-sans-semibold text-xs text-pp-ink">
+                      <Text className="font-pp-semibold text-xs text-pp-ink">
                         {t("completedClasses", { count: c.attended })}
                       </Text>
                     </View>
@@ -125,7 +125,7 @@ export default function ParentChildren() {
                           className="h-full rounded-full"
                         />
                       </View>
-                      <Text className="font-sans text-[10.5px] text-pp-muted">
+                      <Text className="font-pp text-[10.5px] text-pp-muted">
                         {t("creditsUsedLabel", { used, total: c.creditsBought })}
                       </Text>
                     </View>
@@ -146,15 +146,15 @@ export default function ParentChildren() {
         <View>
           <View className="flex-row items-center gap-2.5 px-0.5 pb-2">
             <View className="flex-1" />
-            <Text className="w-[68px] text-right font-sans-bold text-[10px] uppercase text-pp-faint">
+            <Text className="w-[68px] text-right font-pp-bold text-[10px] uppercase text-pp-faint">
               {t("practice")}
             </Text>
-            <Text className="w-[68px] text-right font-sans-bold text-[10px] uppercase text-pp-faint">
+            <Text className="w-[68px] text-right font-pp-bold text-[10px] uppercase text-pp-faint">
               {t("challenge")}
             </Text>
           </View>
           {todayActivity.length === 0 && (
-            <Text className="px-0.5 py-3 font-sans text-[12.5px] text-pp-muted">
+            <Text className="px-0.5 py-3 font-pp text-[12.5px] text-pp-muted">
               {t("noPracticeToday")}
             </Text>
           )}
@@ -171,7 +171,7 @@ export default function ParentChildren() {
                 <View className="size-5 items-center justify-center">
                   {r.done ? (
                     <View className="size-5 items-center justify-center rounded-full bg-pp-green">
-                      <Text className="font-sans-bold text-[11px] text-white">✓</Text>
+                      <Text className="font-pp-bold text-[11px] text-white">✓</Text>
                     </View>
                   ) : (
                     <>
@@ -194,12 +194,12 @@ export default function ParentChildren() {
                     </>
                   )}
                 </View>
-                <Text className="flex-1 font-sans text-[13.5px] text-pp-ink">{r.child}</Text>
-                <Text className="w-[68px] text-right font-sans-semibold text-[13px] text-pp-muted">
+                <Text className="flex-1 font-pp text-[13.5px] text-pp-ink">{r.child}</Text>
+                <Text className="w-[68px] text-right font-pp-semibold text-[13px] text-pp-muted">
                   {t("minShort", { count: r.mins })}
                 </Text>
                 <View className="w-[68px] flex-row items-center justify-end gap-1">
-                  <Text className="font-sans-bold text-[13px] text-pp-blue">
+                  <Text className="font-pp-bold text-[13px] text-pp-blue">
                     {r.puzzles}
                   </Text>
                   <Star size={15} color={PP.amber} fill={PP.amber} strokeWidth={1.8} />
@@ -224,7 +224,7 @@ export default function ParentChildren() {
           >
             <ChevronLeft size={16} color={month === 0 ? PP.line : PP.blue} />
           </Pressable>
-          <Text className="font-display-semibold text-[17px] text-pp-ink">{M.name}</Text>
+          <Text className="font-pp-display-semibold text-[17px] text-pp-ink">{M.name}</Text>
           <Pressable
             onPress={() => setMonth((m) => Math.min(months.length - 1, m + 1))}
             accessibilityRole="button"
@@ -238,7 +238,7 @@ export default function ParentChildren() {
         <View className="flex-row flex-wrap">
           {WD_KEYS.map((d) => (
             <View key={d} className="w-[14.28%] py-1">
-              <Text className="text-center font-sans-bold text-[10px] text-pp-faint">{d}</Text>
+              <Text className="text-center font-pp-bold text-[10px] text-pp-faint">{d}</Text>
             </View>
           ))}
           {cells.map((c, i) => (
@@ -254,7 +254,7 @@ export default function ParentChildren() {
                 <Text
                   style={{ color: c.present ? "#fbfff1" : PP.ink }}
                   className={`text-[12.5px] ${
-                    c.present || c.today ? "font-sans-bold" : "font-sans"
+                    c.present || c.today ? "font-pp-bold" : "font-pp"
                   }`}
                 >
                   {c.label}
@@ -266,11 +266,11 @@ export default function ParentChildren() {
         <View className="flex-row justify-center gap-3.5 pt-0.5">
           <View className="flex-row items-center gap-1.5">
             <View className="size-[9px] rounded-full bg-pp-green-dot" />
-            <Text className="font-sans text-[10.5px] text-pp-muted">{t("present")}</Text>
+            <Text className="font-pp text-[10.5px] text-pp-muted">{t("present")}</Text>
           </View>
           <View className="flex-row items-center gap-1.5">
             <View className="size-[9px] rounded-full border-[1.5px] border-pp-blue" />
-            <Text className="font-sans text-[10.5px] text-pp-muted">{t("today")}</Text>
+            <Text className="font-pp text-[10.5px] text-pp-muted">{t("today")}</Text>
           </View>
         </View>
       </View>
@@ -292,7 +292,7 @@ export default function ParentChildren() {
             >
               <Text
                 style={{ color: filter === f.k ? "#fbfff1" : PP.muted }}
-                className="font-sans-bold text-xs"
+                className="font-pp-bold text-xs"
               >
                 {f.label}
               </Text>
@@ -302,7 +302,7 @@ export default function ParentChildren() {
 
         {groups.length === 0 && (
           <View className="rounded-card border-[1.5px] border-dashed border-pp-dash p-6">
-            <Text className="text-center font-sans text-[12.5px] text-pp-muted">
+            <Text className="text-center font-pp text-[12.5px] text-pp-muted">
               {t("noAttendanceYet")}
             </Text>
           </View>
@@ -319,11 +319,11 @@ export default function ParentChildren() {
                   <Pressable className="flex-row items-center gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-4">
                     <ChildFace name={c.name} tint={c.avBg} size={42} />
                     <View className="min-w-0 flex-1 gap-0.5">
-                      <Text className="font-sans-bold text-[13.5px] text-pp-ink">
+                      <Text className="font-pp-bold text-[13.5px] text-pp-ink">
                         {c.name} · ♟ {h.cls}
                       </Text>
                       <View className="flex-row flex-wrap items-center gap-x-3 gap-y-1">
-                        <Text className="font-sans text-[11.5px] text-pp-muted">◷ {h.time}</Text>
+                        <Text className="font-pp text-[11.5px] text-pp-muted">◷ {h.time}</Text>
                         {/* This slot used to show a branch name the backend
                             does not record; whether the child was there is
                             what the row actually knows. */}
@@ -336,7 +336,7 @@ export default function ParentChildren() {
                         >
                           <Text
                             style={{ color: h.status === "Present" ? PP.green : PP.danger }}
-                            className="font-sans-bold text-[10px] uppercase"
+                            className="font-pp-bold text-[10px] uppercase"
                           >
                             {h.status === "Present" ? t("present") : t("absent")}
                           </Text>

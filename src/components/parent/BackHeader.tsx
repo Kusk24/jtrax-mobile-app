@@ -33,9 +33,9 @@ export function BackHeader({
         <ArrowLeft size={18} color={PP.ink} strokeWidth={2} />
       </Pressable>
       <View className="min-w-0 flex-1">
-        <Text className="font-display-semibold text-2xl leading-tight text-pp-ink">{title}</Text>
+        <Text className="font-pp-display-semibold text-2xl leading-tight text-pp-ink">{title}</Text>
         {!!subtitle && (
-          <Text className="font-sans text-[12.5px] text-pp-muted">{subtitle}</Text>
+          <Text className="font-pp text-[12.5px] text-pp-muted">{subtitle}</Text>
         )}
       </View>
       {right}

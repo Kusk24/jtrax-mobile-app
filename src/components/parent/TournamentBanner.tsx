@@ -47,11 +47,11 @@ export function TournamentBanner({ height, rounded = 0 }: { height: number; roun
       </View>
       <View className="items-center gap-1.5">
         <Trophy size={28} color="#ffffff" strokeWidth={1.6} opacity={0.9} />
-        <Text className="font-display-semibold text-[15px] uppercase tracking-[3.3px] text-white">
+        <Text className="font-pp-display-semibold text-[15px] uppercase tracking-[3.3px] text-white">
           Chess Championship
         </Text>
         <View className="rounded-full border border-white/40 px-3 py-0.5">
-          <Text className="font-sans-bold text-[10.5px] tracking-[3px] text-white">2026</Text>
+          <Text className="font-pp-bold text-[10.5px] tracking-[3px] text-white">2026</Text>
         </View>
       </View>
     </View>

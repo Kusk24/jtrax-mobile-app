@@ -31,7 +31,7 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
         >
           <ScrollView contentContainerClassName="gap-3" showsVerticalScrollIndicator={false}>
             <View className="flex-row items-center justify-between gap-2.5">
-              <Text className="min-w-0 flex-1 font-display-semibold text-xl leading-snug text-pp-ink">
+              <Text className="min-w-0 flex-1 font-pp-display-semibold text-xl leading-snug text-pp-ink">
                 {a.title}
               </Text>
               <Pressable
@@ -44,7 +44,7 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
               </Pressable>
             </View>
 
-            <Text className="font-sans text-[13.5px] leading-relaxed text-pp-sub">{a.msg}</Text>
+            <Text className="font-pp text-[13.5px] leading-relaxed text-pp-sub">{a.msg}</Text>
 
             <View className="flex-row items-center gap-2 border-t border-pp-line pt-2">
               <View
@@ -54,8 +54,8 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
                 <UserRound size={15} color={ss.c} strokeWidth={2} />
               </View>
               <View className="min-w-0 flex-1">
-                <Text className="font-sans-bold text-[13px] text-pp-ink">{a.senderName}</Text>
-                <Text className="font-sans text-[11px] text-pp-muted">
+                <Text className="font-pp-bold text-[13px] text-pp-ink">{a.senderName}</Text>
+                <Text className="font-pp text-[11px] text-pp-muted">
                   {t(ss.labelKey)}
                   {a.cls ? ` · ${a.cls}` : ""}
                 </Text>
@@ -65,7 +65,7 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
             {a.child && (
               <View className="flex-row items-center gap-1.5">
                 <UserRound size={13} color={PP.muted} strokeWidth={2} />
-                <Text className="font-sans text-xs text-pp-muted">
+                <Text className="font-pp text-xs text-pp-muted">
                   {t("forChild", { name: a.child })}
                 </Text>
               </View>
@@ -74,12 +74,12 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
             <View className="flex-row items-center justify-between gap-2">
               <View className="flex-row items-center gap-1.5">
                 <Clock3 size={12} color={PP.faint} strokeWidth={2} />
-                <Text className="font-sans text-[11px] text-pp-faint">{a.time}</Text>
+                <Text className="font-pp text-[11px] text-pp-faint">{a.time}</Text>
               </View>
               {a.attachment && (
                 <View className="flex-row items-center gap-1.5">
                   <Paperclip size={12} color={PP.blue} strokeWidth={2} />
-                  <Text className="font-sans text-[11px] text-pp-blue">{t("oneAttachment")}</Text>
+                  <Text className="font-pp text-[11px] text-pp-blue">{t("oneAttachment")}</Text>
                 </View>
               )}
             </View>

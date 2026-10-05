@@ -57,7 +57,7 @@ export function ChildBanner({
 
 function Initial({ name, textClass }: { name: string; textClass: string }) {
   return (
-    <Text className={`font-sans-extrabold text-navy-deep ${textClass}`}>
+    <Text className={`font-pp-extrabold text-navy-deep ${textClass}`}>
       {(name.trim()[0] ?? "?").toUpperCase()}
     </Text>
   );
