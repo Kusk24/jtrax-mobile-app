@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import { useTranslations } from "use-intl";
 import { Chess } from "chess.js";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
@@ -26,7 +27,11 @@ export default function AiScreen() {
   const stockfish = useRef<StockfishHandle>(null);
   const onnx = useRef<OnnxHandle>(null);
 
-  const [opponent, setOpponent] = useState<Opponent>("novice");
+  /* The Games tab links here with the robot already chosen. */
+  const { opponent: wanted } = useLocalSearchParams<{ opponent?: string }>();
+  const [opponent, setOpponent] = useState<Opponent>(
+    (OPPONENTS as readonly string[]).includes(wanted ?? "") ? (wanted as Opponent) : "novice",
+  );
   const [stockfishReady, setStockfishReady] = useState(false);
   const [stockfishFailed, setStockfishFailed] = useState(false);
   const [onnxReady, setOnnxReady] = useState(false);

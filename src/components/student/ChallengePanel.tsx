@@ -1,54 +1,62 @@
 /**
- * Finding a friend and asking them for a game.
+ * Finding a friend and asking them for a game — inside the Games tab, which is
+ * where every way of playing a person now lives (the web's ChallengePanel).
  *
- * Two halves on one screen, in the order a child uses them: what is waiting for
- * you, then the search box for starting something new. Invitations come first
- * because somebody is on the other end of them.
+ * What is waiting comes first, because somebody is on the other end of it:
+ * games ready to open, invitations to answer, a "no" to one this pupil sent,
+ * and the invitations still out. Then the search box for starting something
+ * new.
  *
  * The rated toggle carries a warning rather than being hidden when it cannot
  * work. A pupil who cannot see the option cannot find out why — "you both need
- * a Lichess account" is a thing they can go and fix, and a disabled-looking row
- * that says so teaches more than a row that is not there.
+ * a Lichess account" is a thing they can go and fix, and a row that says so
+ * teaches more than a row that is not there.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { useTranslations } from "use-intl";
-import { Check, Search, Swords, X } from "lucide-react-native";
+import { Check, Search, Swords, Timer, X } from "lucide-react-native";
+import { usePalette } from "@/components/ThemeProvider";
 import { Panel } from "@/components/game/PlayShell";
+import { PrimaryPill, SecondaryPill } from "@/components/student/kit";
 import {
   CLOCKS,
   acceptChallenge,
   cancelChallenge,
   declineChallenge,
+  dismissDecline,
   listChallenges,
   searchPlayers,
   sendChallenge,
   type Challenge,
   type PlayerResult,
 } from "@/lib/challenges";
-import { C } from "@/lib/colors";
 
-/** Somebody else may answer while this screen is open, and a child staring at
+/** Somebody else may answer while this is open, and a child staring at
     "waiting…" should not have to know to pull down to refresh. */
 const POLL_MS = 5000;
 /** This endpoint names other children, so it is not hit on every keystroke. */
 const DEBOUNCE_MS = 350;
 const MIN_QUERY = 2;
 
+/** "5+0", "10+5" — the clock the challenger picked, as the picker shows it. */
+const clockLabel = (c: Challenge) => `${Math.round(c.clockLimit / 60)}+${c.clockIncrement}`;
+
+/** A board opened from here leads back to the Games tab. */
+const openBoard = (gameRoomId: string) => router.push(`/student/play/room/${gameRoomId}` as never);
+
 export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
   const t = useTranslations("challenge");
   const tCommon = useTranslations("common");
+  const { pp } = usePalette();
 
   const [query, setQuery] = useState("");
   /* The players found *and the query they were found for*, together in one
      piece of state. Keeping them apart meant a third flag for "searching" and
      a window where the list on screen answered a query the box no longer
      held — someone typed "Ur", saw Uri, typed "Urx", and Uri stayed put. */
-  const [found, setFound] = useState<{ q: string; players: PlayerResult[] }>({
-    q: "",
-    players: [],
-  });
+  const [found, setFound] = useState<{ q: string; players: PlayerResult[] }>({ q: "", players: [] });
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [rated, setRated] = useState(false);
   const [clock, setClock] = useState(2); // 15+10, the academy's usual
@@ -65,7 +73,7 @@ export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
     } catch {
       /* Not "no invitations" — we do not know. A child told nobody wants to
          play them, while a classmate's invitation sits on the other side of a
-         failed request, is the one thing this screen must not say. */
+         failed request, is the one thing this must not say. */
       setLoadFailed(true);
     }
   }, []);
@@ -85,7 +93,7 @@ export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
       try {
         setFound({ q, players: await searchPlayers(q) });
       } catch {
-        // An answer of "none" for this query, so the screen stops waiting.
+        // An answer of "none" for this query, so the panel stops waiting.
         setFound({ q, players: [] });
       }
     }, DEBOUNCE_MS);
@@ -107,6 +115,13 @@ export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
   }
 
   const pending = challenges.filter((c) => c.status === "Pending");
+  /* Split by who has to act: an invitation is theirs to answer, so it gets
+     full Accept / Decline buttons; one they sent only needs a Cancel. */
+  const incoming = pending.filter((c) => c.direction === "in");
+  const sent = pending.filter((c) => c.direction === "out");
+  /* The backend returns a decline only to the one who asked, until they
+     dismiss it — so their invitation is answered, not just gone. */
+  const declined = challenges.filter((c) => c.status === "Declined" && c.direction === "out");
   const accepted = challenges.filter((c) => c.status === "Accepted" && c.gameRoomId);
   /* Both derived from one fact: whether what we found matches what is in the
      box. Deleting two letters hides the list without waiting for a round trip
@@ -117,232 +132,271 @@ export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
   const searching = longEnough && !answered;
   const shown = longEnough && answered ? found.players : [];
 
-  return (
-    <>
-      {loadFailed && error === "" && (
-        <Panel className="!border-brick-soft !bg-brick-soft">
-          <Text accessibilityRole="alert" className="font-sans-bold text-xs text-maroon">
-            {tCommon("loadFailed")}
-          </Text>
-        </Panel>
-      )}
+  const alert = (text: string) => (
+    <View className="rounded-2xl bg-pp-red-soft px-3.5 py-2.5">
+      <Text accessibilityRole="alert" className="font-pp-semibold text-[12.5px] text-pp-red">
+        {text}
+      </Text>
+    </View>
+  );
 
-      {error !== "" && (
-        <Panel className="!border-brick-soft !bg-brick-soft">
-          <Text accessibilityRole="alert" className="font-sans-bold text-xs text-maroon">
-            {error}
-          </Text>
-        </Panel>
-      )}
+  return (
+    <View className="gap-3.5">
+      {loadFailed && error === "" && alert(tCommon("loadFailed"))}
+      {error !== "" && alert(error)}
 
       {/* ---- games that are ready to play ---- */}
       {accepted.map((c) => (
-        <Panel key={c.challengeId} className="!flex-row !items-center !justify-between gap-3">
+        <Panel key={c.challengeId} className="flex-row items-center justify-between gap-3">
           <View className="min-w-0 flex-1">
-            <Text className="font-sans-bold text-sm text-ink">
-              {t("gameReady", { name: c.opponentName })}
-            </Text>
-            <Text className="font-sans text-xs text-muted">
-              {c.rated ? t("rated") : t("friendly")}
-            </Text>
+            <Text className="font-pp-bold text-[14.5px] text-pp-ink">{t("gameReady", { name: c.opponentName })}</Text>
+            <Text className="font-pp text-[12px] text-pp-muted">{c.rated ? t("rated") : t("friendly")}</Text>
           </View>
-          <Pressable
-            onPress={() => router.push(`/student/play/room/${c.gameRoomId}?from=challenge` as never)}
-            className="shrink-0 rounded-full bg-navy px-4 py-3 active:opacity-80"
-          >
-            <Text className="font-sans-bold text-xs text-white">{t("openBoard")}</Text>
-          </Pressable>
+          <PrimaryPill label={t("openBoard")} onPress={() => openBoard(c.gameRoomId!)} className="px-4" />
         </Panel>
       ))}
 
-      {/* ---- invitations ---- */}
-      {pending.length > 0 && (
-        <>
-          <Text className="px-1 font-sans-bold text-xs text-muted">{t("waiting")}</Text>
-          {pending.map((c) => (
-            <Panel key={c.challengeId} className="!flex-row !items-center !justify-between gap-3">
-              <View className="min-w-0 flex-1">
-                <Text numberOfLines={1} className="font-sans-bold text-sm text-ink">
-                  {c.opponentName}
-                </Text>
-                <Text className="font-sans text-xs text-muted">
-                  {c.direction === "in" ? t("wantsToPlay") : t("waitingOnThem")}
-                  {c.rated ? ` · ${t("rated")}` : ""}
-                </Text>
-                {/* Said before they accept, not after the game turns out
-                    unrated. */}
-                {c.rated && !c.bothCanPlayRated && (
-                  <Text className="mt-1 font-sans-bold text-[11px] text-gold">
-                    {t("ratedNotPossible")}
+      {/* ---- invitations to answer ---- */}
+      {incoming.length > 0 && (
+        <View className="gap-2.5">
+          <View className="flex-row items-center justify-between gap-2 px-1">
+            <View className="flex-row items-center gap-2">
+              <View className="size-2.5 rounded-full bg-pp-blue" />
+              <Text accessibilityRole="header" className="font-pp-display-semibold text-[16px] text-pp-ink">
+                {t("incoming")}
+              </Text>
+            </View>
+            <View className="rounded-full bg-pp-blue px-2.5 py-[3px]">
+              <Text className="font-pp-semibold text-[12.5px] text-white">{t("newCount", { n: incoming.length })}</Text>
+            </View>
+          </View>
+          {incoming.map((c) => (
+            <Panel key={c.challengeId} className="gap-3.5">
+              <View className="flex-row items-center gap-3">
+                <View className="size-12 items-center justify-center rounded-full bg-pp-soft">
+                  <Text className="font-pp-display-bold text-[18px] text-pp-blue">
+                    {c.opponentName.trim().charAt(0).toUpperCase() || "?"}
                   </Text>
-                )}
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text numberOfLines={1} className="font-pp-display-semibold text-[16px] text-pp-ink">
+                    {c.opponentName}
+                  </Text>
+                  <Text className="font-pp text-[13px] text-pp-muted">
+                    {clockLabel(c)} · {c.rated ? t("rated") : t("friendly")}
+                  </Text>
+                </View>
+                <View className="flex-row items-center gap-1 rounded-full bg-pp-green-soft px-2.5 py-1">
+                  <Timer size={14} color={pp.green} strokeWidth={2.4} />
+                  <Text className="font-pp-semibold text-[12.5px] text-pp-green">
+                    {t("minutes", { n: Math.round(c.clockLimit / 60) })}
+                  </Text>
+                </View>
               </View>
-              <View className="shrink-0 flex-row gap-2">
-                {c.direction === "in" ? (
-                  <>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t("accept")}
-                      disabled={busy === c.challengeId}
-                      onPress={() =>
-                        void run(c.challengeId, async () => {
-                          const out = await acceptChallenge(c.challengeId);
-                          router.push(`/student/play/room/${out.gameRoomId}?from=challenge` as never);
-                        })
-                      }
-                      className="size-11 items-center justify-center rounded-full border-2 border-olive bg-olive-soft active:opacity-80 disabled:opacity-60"
-                    >
-                      <Check size={20} color={C.olive} strokeWidth={3} />
-                    </Pressable>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t("decline")}
-                      disabled={busy === c.challengeId}
-                      onPress={() =>
-                        void run(c.challengeId, async () => {
-                          await declineChallenge(c.challengeId);
-                          await reload();
-                        })
-                      }
-                      className="size-11 items-center justify-center rounded-full border-2 border-line bg-paper active:opacity-80 disabled:opacity-60"
-                    >
-                      <X size={20} color={C.ink} strokeWidth={3} />
-                    </Pressable>
-                  </>
-                ) : (
-                  <Pressable
-                    disabled={busy === c.challengeId}
-                    onPress={() =>
-                      void run(c.challengeId, async () => {
-                        await cancelChallenge(c.challengeId);
-                        await reload();
-                      })
-                    }
-                    className="min-h-11 justify-center rounded-2xl border-2 border-line bg-paper px-3.5 active:opacity-80 disabled:opacity-60"
-                  >
-                    <Text className="font-sans-bold text-xs text-muted">{t("cancel")}</Text>
-                  </Pressable>
-                )}
+              {/* Said before they accept, not after the game turns out unrated. */}
+              {c.rated && !c.bothCanPlayRated && (
+                <Text className="font-pp-semibold text-[12.5px] text-pp-amber">{t("ratedNotPossible")}</Text>
+              )}
+              <View className="flex-row gap-2.5">
+                <PrimaryPill
+                  label={t("accept")}
+                  icon={<Check size={16} color="#ffffff" strokeWidth={2.6} />}
+                  disabled={busy === c.challengeId}
+                  onPress={() =>
+                    void run(c.challengeId, async () => {
+                      const out = await acceptChallenge(c.challengeId);
+                      openBoard(out.gameRoomId);
+                    })
+                  }
+                  className="flex-1 px-4"
+                />
+                <SecondaryPill
+                  label={t("decline")}
+                  icon={<X size={16} color={pp.ink} strokeWidth={2.6} />}
+                  disabled={busy === c.challengeId}
+                  onPress={() =>
+                    void run(c.challengeId, async () => {
+                      await declineChallenge(c.challengeId);
+                      await reload();
+                    })
+                  }
+                  className="flex-1 px-4"
+                />
               </View>
             </Panel>
           ))}
-        </>
+        </View>
+      )}
+
+      {/* ---- a "no" to one they sent ---- */}
+      {declined.map((c) => (
+        <Panel key={c.challengeId} className="flex-row items-center justify-between gap-3 border-pp-danger-line bg-pp-red-soft">
+          <View accessibilityRole="summary" className="min-w-0 flex-1 flex-row items-center gap-3">
+            <View className="size-10 items-center justify-center rounded-full bg-pp-card">
+              <X size={20} color={pp.red} strokeWidth={2.6} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="font-pp-bold text-[14.5px] text-pp-ink">{t("declinedTitle", { name: c.opponentName })}</Text>
+              <Text className="font-pp text-[12.5px] text-pp-muted">
+                {clockLabel(c)} · {c.rated ? t("rated") : t("friendly")}
+              </Text>
+            </View>
+          </View>
+          <SecondaryPill
+            label={t("ok")}
+            disabled={busy === c.challengeId}
+            onPress={() =>
+              void run(c.challengeId, async () => {
+                await dismissDecline(c.challengeId);
+                await reload();
+              })
+            }
+            className="px-4"
+          />
+        </Panel>
+      ))}
+
+      {/* ---- invitations they sent, waiting on the other player ---- */}
+      {sent.length > 0 && (
+        <View className="gap-2.5">
+          <Text accessibilityRole="header" className="px-1 font-pp-display-semibold text-[16px] text-pp-ink">
+            {t("sent")}
+          </Text>
+          {sent.map((c) => (
+            <Panel key={c.challengeId} className="flex-row items-center justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text numberOfLines={1} className="font-pp-bold text-[14.5px] text-pp-ink">
+                  {c.opponentName}
+                </Text>
+                <Text className="font-pp text-[12px] text-pp-muted">
+                  {t("waitingOnThem")} · {clockLabel(c)}
+                  {c.rated ? ` · ${t("rated")}` : ""}
+                </Text>
+                {c.rated && !c.bothCanPlayRated && (
+                  <Text className="mt-1 font-pp-bold text-[11.5px] text-pp-amber">{t("ratedNotPossible")}</Text>
+                )}
+              </View>
+              <SecondaryPill
+                label={t("cancel")}
+                disabled={busy === c.challengeId}
+                onPress={() =>
+                  void run(c.challengeId, async () => {
+                    await cancelChallenge(c.challengeId);
+                    await reload();
+                  })
+                }
+                className="px-4"
+              />
+            </Panel>
+          ))}
+        </View>
       )}
 
       {/* ---- find somebody ---- */}
-      <Text className="px-1 font-sans-bold text-xs text-muted">{t("findSomeone")}</Text>
-
-      <View className="flex-row items-center gap-2.5 rounded-2xl border-2 border-line bg-card px-3.5">
-        <Search size={18} color={C.muted} />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder={t("searchPlaceholder")}
-          placeholderTextColor={C.muted}
-          accessibilityLabel={t("searchLabel")}
-          autoCapitalize="none"
-          autoCorrect={false}
-          className="min-h-12 flex-1 font-sans-bold text-sm text-ink"
-        />
-      </View>
-
-      {/* Their own id, so it can be read out to a friend in another class —
-          the exact-id search exists precisely so that works. */}
-      {myStudentId !== "" && (
-        <Text className="px-1 font-sans text-[11px] text-muted">
-          {t("yourId", { id: myStudentId })}
+      <View className="gap-2.5">
+        <Text accessibilityRole="header" className="px-1 font-pp-semibold text-[14px] text-pp-ink">
+          {t("findSomeone")}
         </Text>
-      )}
 
-      {/* ---- what kind of game ---- */}
-      <Panel className="gap-2.5">
-        <View className="flex-row flex-wrap gap-1.5">
-          {CLOCKS.map((c, i) => (
-            <Pressable
-              key={c.label}
-              onPress={() => setClock(i)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: clock === i }}
-              className={`min-h-9 justify-center rounded-2xl border-2 px-3 ${
-                clock === i ? "border-navy bg-highlight" : "border-line bg-card"
+        <View className="min-h-11 flex-row items-center gap-2.5 rounded-[9px] border border-pp-line bg-pp-card px-3.5">
+          <Search size={18} color={pp.muted} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder={t("searchPlaceholder")}
+            placeholderTextColor={pp.faint}
+            accessibilityLabel={t("searchLabel")}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="min-h-11 flex-1 font-pp text-[14.5px] text-pp-ink"
+          />
+        </View>
+
+        {/* Their own id, so it can be read out to a friend in another class —
+            the exact-id search exists precisely so that works. */}
+        {myStudentId !== "" && (
+          <Text className="px-1 font-pp text-[11.5px] text-pp-muted">{t("yourId", { id: myStudentId })}</Text>
+        )}
+
+        {/* ---- what kind of game ---- */}
+        <Panel className="gap-2.5">
+          <View className="flex-row flex-wrap gap-1.5">
+            {CLOCKS.map((c, i) => {
+              const on = clock === i;
+              return (
+                <Pressable
+                  key={c.label}
+                  onPress={() => setClock(i)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  className={`min-h-9 justify-center rounded-full border px-3.5 ${on ? "border-pp-blue bg-pp-blue" : "border-pp-line bg-pp-card"}`}
+                >
+                  <Text className={`font-pp-semibold text-[13px] ${on ? "text-white" : "text-pp-ink"}`}>{c.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Pressable
+            onPress={() => setRated(!rated)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: rated }}
+            className="flex-row items-start gap-2.5"
+          >
+            <View
+              className={`mt-0.5 size-5 items-center justify-center rounded-md border-2 ${
+                rated ? "border-pp-blue bg-pp-blue" : "border-pp-line bg-pp-card"
               }`}
             >
-              <Text
-                className={`font-sans-bold text-xs ${clock === i ? "text-navy" : "text-muted"}`}
-              >
-                {c.label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-        <Pressable
-          onPress={() => setRated(!rated)}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: rated }}
-          className="flex-row items-start gap-2.5"
-        >
-          <View
-            className={`mt-0.5 size-5 shrink-0 items-center justify-center rounded-md border-2 ${
-              rated ? "border-navy bg-navy" : "border-line bg-card"
-            }`}
-          >
-            {rated && <Check size={13} color={C.white} strokeWidth={3.5} />}
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text className="font-sans-bold text-[13px] text-ink">{t("ratedLabel")}</Text>
-            <Text className="font-sans text-[11px] leading-4 text-muted">{t("ratedHint")}</Text>
-          </View>
-        </Pressable>
-      </Panel>
-
-      {searching && (
-        <View className="flex-row items-center gap-2 px-1">
-          <ActivityIndicator color={C.navy} size="small" />
-          <Text className="font-sans text-xs text-muted">{t("searching")}</Text>
-        </View>
-      )}
-
-      {!searching && longEnough && shown.length === 0 && (
-        <Text className="px-1 font-sans text-xs text-muted">{t("noneFound")}</Text>
-      )}
-
-      {shown.map((p) => {
-        const ratedImpossible = rated && !p.canPlayRated;
-        return (
-          <Panel key={p.studentId} className="!flex-row !items-center !justify-between gap-3">
-            <View className="min-w-0 flex-1">
-              <Text numberOfLines={1} className="font-sans-bold text-sm text-ink">
-                {p.name}
-              </Text>
-              <Text className="font-sans text-[11px] text-muted">{p.studentId}</Text>
-              {ratedImpossible && (
-                <Text className="mt-1 font-sans-bold text-[11px] text-gold">
-                  {t("theyHaveNoLichess")}
-                </Text>
-              )}
+              {rated && <Check size={13} color="#ffffff" strokeWidth={3.5} />}
             </View>
-            <Pressable
-              disabled={busy === p.studentId}
-              onPress={() =>
-                void run(p.studentId, async () => {
-                  await sendChallenge(
-                    p.studentId,
-                    rated,
-                    CLOCKS[clock].limit,
-                    CLOCKS[clock].increment,
-                  );
-                  setQuery("");
-                  await reload();
-                })
-              }
-              className="min-h-11 shrink-0 flex-row items-center gap-1.5 rounded-full bg-navy px-3.5 active:opacity-80 disabled:opacity-60"
-            >
-              <Swords size={16} color={C.white} strokeWidth={2.5} />
-              <Text className="font-sans-bold text-xs text-white">{t("challenge")}</Text>
-            </Pressable>
-          </Panel>
-        );
-      })}
-    </>
+            <View className="min-w-0 flex-1">
+              <Text className="font-pp-bold text-[13.5px] text-pp-ink">{t("ratedLabel")}</Text>
+              <Text className="font-pp text-[11.5px] leading-4 text-pp-muted">{t("ratedHint")}</Text>
+            </View>
+          </Pressable>
+        </Panel>
+
+        {searching && (
+          <View className="flex-row items-center gap-2 px-1">
+            <ActivityIndicator color={pp.muted} size="small" />
+            <Text className="font-pp text-[12.5px] text-pp-muted">{t("searching")}</Text>
+          </View>
+        )}
+
+        {!searching && longEnough && shown.length === 0 && (
+          <Text className="px-1 font-pp text-[12.5px] text-pp-muted">{t("noneFound")}</Text>
+        )}
+
+        {shown.map((p) => {
+          const ratedImpossible = rated && !p.canPlayRated;
+          return (
+            <Panel key={p.studentId} className="flex-row items-center justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text numberOfLines={1} className="font-pp-bold text-[14.5px] text-pp-ink">
+                  {p.name}
+                </Text>
+                <Text className="font-pp text-[11px] text-pp-muted">{p.studentId}</Text>
+                {ratedImpossible && (
+                  <Text className="mt-1 font-pp-bold text-[11.5px] text-pp-amber">{t("theyHaveNoLichess")}</Text>
+                )}
+              </View>
+              <PrimaryPill
+                label={t("challenge")}
+                icon={<Swords size={16} color="#ffffff" strokeWidth={2.5} />}
+                disabled={busy === p.studentId}
+                onPress={() =>
+                  void run(p.studentId, async () => {
+                    await sendChallenge(p.studentId, rated, CLOCKS[clock].limit, CLOCKS[clock].increment);
+                    setQuery("");
+                    await reload();
+                  })
+                }
+                className="px-3.5"
+              />
+            </Panel>
+          );
+        })}
+      </View>
+    </View>
   );
 }

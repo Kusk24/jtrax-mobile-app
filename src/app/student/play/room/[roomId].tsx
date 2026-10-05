@@ -16,11 +16,10 @@ import { C } from "@/lib/colors";
     LiveGame. The board is drawn from the moves the server confirmed, never
     from local optimism, so a rejected move never has to be taken back. */
 export default function RoomScreen() {
-  const { roomId, from } = useLocalSearchParams<{ roomId: string; from?: string }>();
-  /* A board is reached from Play (a class game, by code) or from Challenge (a
-     game with a friend), and both ways out lead back to where the pupil came
-     from. The Challenge screen says so in the link. */
-  const home = from === "challenge" ? "/student/challenge" : "/student/play";
+  const { roomId } = useLocalSearchParams<{ roomId: string }>();
+  /* Every way to a board — a class game, a code, a friend's challenge — now
+     starts on the Games tab, so every way out leads back there. */
+  const home = "/student/play";
   const t = useTranslations("play");
   const { room, moves, seat, connection, error, play, resign, draw, enter } = useRoom(roomId);
   const [moveError, setMoveError] = useState("");
@@ -208,12 +207,11 @@ export default function RoomScreen() {
             : t(`result.${room.result === "1/2-1/2" ? "draw" : room.result === "1-0" ? "whiteWon" : "blackWon"}`)
         }
         detail={room.status === "Finished" && reason ? t("byReason", { reason }) : undefined}
-        /* Nothing to restart here, so the way on is back to the screen the
-           board was opened from: Play for a class game, Challenge for a game
-           with a friend, where the next invitation is. Named for where it
-           goes: two buttons both reading "Back" is a dialog with two doors and
-           one name. */
-        primaryLabel={t(from === "challenge" ? "backToChallenge" : "backToPlay")}
+        /* Nothing to restart here, so the way on is back to the Games tab the
+           board was opened from — as the web's does from its Games tab. Named
+           for where it goes: two buttons both reading "Back" is a dialog with
+           two doors and one name. */
+        primaryLabel={t("backToPlay")}
         onPrimary={() => router.replace(home)}
         onClose={() => setShowResult(false)}
       />

@@ -10,15 +10,15 @@
 import { describe, expect, it } from "vitest";
 import { isActive, isRoot, type TabPath } from "./portal-tabs";
 
-/** The student portal's bar, paths only — the same five the phone shows. */
+/** The student portal's bar, paths only — the same four the phone shows
+    (StudentNav.tsx): Home, Puzzles, Games, Profile. */
 const tabs: TabPath[] = [
   { href: "/student", exact: true },
   { href: "/student/puzzles" },
-  { href: "/student/challenge" },
   { href: "/student/play" },
   { href: "/student/profile" },
 ];
-const PLAY = 3;
+const PLAY = 2;
 
 /** A bar that takes aliases, to pin the alias rule down on its own. The parent
     portal still uses them; the student one no longer needs any. */
@@ -30,7 +30,6 @@ describe("isRoot — does this screen keep the bar", () => {
   it.each([
     "/student",
     "/student/puzzles",
-    "/student/challenge",
     "/student/play",
     "/student/profile",
   ])("%s is a tab, so it keeps the bar and takes no arrow", (path) => {
@@ -42,6 +41,7 @@ describe("isRoot — does this screen keep the bar", () => {
     "/student/play/friend",
     "/student/play/room/grm_abc123",
     "/student/puzzles/001gi",
+    "/student/puzzles/daily",
   ])("%s was pushed, so the bar goes and the arrow comes", (path) => {
     expect(isRoot(path, tabs)).toBe(false);
   });
