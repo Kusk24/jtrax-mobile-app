@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useTranslations } from "use-intl";
@@ -56,13 +56,23 @@ export function ChessBoard({
 
   /* The arriving piece starts at the square it came from and is animated to
      zero. Native has no CSS transition to lean on, so the offset is a value we
-     drive ourselves — which is also why it is a ref: re-creating it on a
-     re-render would restart the animation mid-flight. */
-  /* Lazy `useState`, not `useRef().current`: the transform below reads this
-     during render, and reading a ref while rendering is the thing React warns
-     about. The initialiser runs once, so the value is still never re-created
-     mid-animation. */
-  const [slide] = useState(() => new Animated.ValueXY({ x: 0, y: 0 }));
+     drive ourselves.
+
+     One value per move, created already at the move's starting offset, and
+     a new view for each slide (the key below). With one shared value, the
+     piece that had just slid kept its view but lost its animated transform
+     when the reply came, and React Native's transform check read a null —
+     "Cannot read property 'forEach' of null" on the first reply of every
+     game. It also showed the arriving piece at its destination for a frame
+     before the effect moved it back. */
+  const slide = useMemo(() => {
+    if (!lastMove || lastMove.length < 4) return new Animated.ValueXY({ x: 0, y: 0 });
+    const [fr, fc] = squareToRC(lastMove.slice(0, 2));
+    const [tr, tc] = squareToRC(lastMove.slice(2, 4));
+    // A board turned round for Black moves pieces the other way on screen.
+    const facing = orientation === "w" ? 1 : -1;
+    return new Animated.ValueXY({ x: (fc - tc) * cell * facing, y: (fr - tr) * cell * facing });
+  }, [lastMove, cell, orientation]);
   /* Derived, not stored. The square being animated is always the one the last
      move landed on, and between moves `slide` rests at zero — so the transform
      is the identity and the piece sits where it belongs. Keeping this in state
@@ -90,11 +100,6 @@ export function ChessBoard({
 
   useEffect(() => {
     if (!lastMove || lastMove.length < 4) return;
-    const [fr, fc] = squareToRC(lastMove.slice(0, 2));
-    const [tr, tc] = squareToRC(lastMove.slice(2, 4));
-    // A board turned round for Black moves pieces the other way on screen.
-    const facing = orientation === "w" ? 1 : -1;
-    slide.setValue({ x: (fc - tc) * cell * facing, y: (fr - tr) * cell * facing });
     const run = Animated.timing(slide, {
       toValue: { x: 0, y: 0 },
       duration: SLIDE_MS,
@@ -103,7 +108,7 @@ export function ChessBoard({
     });
     run.start();
     return () => run.stop();
-  }, [lastMove, cell, orientation, slide]);
+  }, [lastMove, slide]);
 
   const grid = toGrid(game);
   const legal = from ? movesFrom(game, from) : [];
@@ -174,6 +179,10 @@ export function ChessBoard({
                 >
                   {piece && (
                     <Animated.View
+                      /* A new view whenever a piece starts or stops being the
+                         one that slides, so a running animation is never
+                         detached from a view that stays mounted. */
+                      key={slidingTo === name ? `slide-${lastMove}` : "still"}
                       style={{
                         transform:
                           slidingTo === name
