@@ -123,6 +123,20 @@ export function gameAt(fen: string): Chess | null {
 export const solvedCount = (puzzles: DailyPuzzle[]) => puzzles.filter((p) => p.solved).length;
 
 /**
+ * Home's one button for today's set: start, carry on, or — once every one is
+ * solved — keep practising. `next` is the first puzzle still to solve, so the
+ * button opens it straight away instead of a list to choose from.
+ */
+export function dailyStep(puzzles: DailyPuzzle[]): {
+  label: "startChallenge" | "continueChallenge" | "keepPractising";
+  next: string;
+} {
+  const next = puzzles.find((p) => !p.solved)?.puzzleId ?? "";
+  if (puzzles.length > 0 && !next) return { label: "keepPractising", next };
+  return { label: solvedCount(puzzles) > 0 ? "continueChallenge" : "startChallenge", next };
+}
+
+/**
  * Where to send a pupil after they solve one: the first still unsolved,
  * skipping the one they have just finished, or -1 when the set is done.
  *

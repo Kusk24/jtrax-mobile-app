@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   attemptListMove,
   attemptMove,
+  dailyStep,
   gameAt,
   getDailyPuzzles,
   getPuzzleList,
@@ -93,6 +94,30 @@ describe("where a solved puzzle sends you next", () => {
   it("counts what is done", () => {
     expect(solvedCount(set(true, false, true))).toBe(2);
     expect(solvedCount([])).toBe(0);
+  });
+});
+
+describe("Home's button for today's set", () => {
+  const set = (...solved: boolean[]) =>
+    solved.map((s, i) => puzzle({ puzzleId: `p${i}`, solved: s }));
+
+  it("starts on the first puzzle when none is done", () => {
+    expect(dailyStep(set(false, false, false))).toEqual({ label: "startChallenge", next: "p0" });
+  });
+
+  it("carries on from the first one left, not from the top", () => {
+    expect(dailyStep(set(true, false, false))).toEqual({ label: "continueChallenge", next: "p1" });
+    expect(dailyStep(set(false, true, false))).toEqual({ label: "continueChallenge", next: "p0" });
+  });
+
+  it("offers practice once every one is solved", () => {
+    expect(dailyStep(set(true, true, true))).toEqual({ label: "keepPractising", next: "" });
+  });
+
+  it("does not call an empty set finished", () => {
+    // The server had nothing for today: the button still says start and the
+    // screen falls back to the daily list, which explains.
+    expect(dailyStep([])).toEqual({ label: "startChallenge", next: "" });
   });
 });
 

@@ -783,6 +783,21 @@
     "seeAllGames": "See all",
     "noGamesYet": "No finished games yet.",
     "playWith": "Play with",
-    "view": "View"
+    "view": "View",
+    "completedOf": "{n} of {total} completed",
+    "vsAi": "vs Robot",
+    "vsAiSub": "3 robots",
+    "withFriend": "with Friend",
+    "withFriendSub": "Challenge",
+    "gameRoom": "Game Room",
+    "gameRoomSub": "Enter a code",
+    "practice": "Practice",
+    "puzzlesCard": "Puzzles",
+    "puzzlesCardSub": "Let's practice more!",
+    "dayStreak": "{n, plural, one {# day streak} other {# day streak}}",
+    "resumeGame": "Continue your game",
+    "resume": "Resume",
+    "moveN": "move {n}",
+    "dismissGame": "Drop this game"
   }
 }
