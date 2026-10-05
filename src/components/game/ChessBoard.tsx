@@ -137,7 +137,16 @@ export function ChessBoard({
     <View className="self-center rounded-[20px] border-2 border-highlight bg-highlight p-2.5">
       <View style={{ width: cell * 8, height: cell * 8 }} className="overflow-hidden rounded-lg">
         {rows.map((r) => (
-          <View key={r} className="flex-row">
+          /* On a phone zIndex only orders siblings, so the sliding piece's
+             row and square are lifted too — otherwise every row and square
+             drawn after them covers the piece as it crosses them, and a move
+             up the board was mostly invisible. The web build never showed it:
+             there the piece's own zIndex reaches past its row. */
+          <View
+            key={r}
+            style={slidingTo && squareToRC(slidingTo)[0] === r ? { zIndex: 2 } : undefined}
+            className="flex-row"
+          >
             {cols.map((c) => {
               const name = squareName(r, c);
               const piece = grid[r][c];
@@ -160,7 +169,7 @@ export function ChessBoard({
                   onPress={() => tap(name)}
                   disabled={!canMove}
                   accessibilityLabel={name}
-                  style={{ width: cell, height: cell, backgroundColor: bg }}
+                  style={{ width: cell, height: cell, backgroundColor: bg, zIndex: slidingTo === name ? 2 : 0 }}
                   className="items-center justify-center"
                 >
                   {piece && (
