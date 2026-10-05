@@ -596,7 +596,7 @@
     "notifCreditsBody": "เครดิตจะหมดอายุวันที่ {date} — เหลืออีก {days} วัน",
     "expired": "หมดอายุแล้ว",
     "classesAttended": "จำนวนคลาสที่เรียนแล้ว",
-    "certNote": "เรียนครบ {count} คลาสจะได้รับประกาศนียบัตร",
+    "certNote": "จะได้รับใบประกาศเมื่อเรียนครบ {count} ชั่วโมง",
     "navSettings": "ตั้งค่า",
     "settingsTitle": "ตั้งค่า",
     "navChildren": "บุตรหลาน",

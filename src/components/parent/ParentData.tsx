@@ -18,14 +18,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api, ApiError } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import {
-  CERT_SESSIONS, recentMonths, streakFrom, todayISO,
+  CERT_HOURS, LOW_CREDIT_AT, recentMonths, streakFrom, todayISO,
   type AnnouncementV2, type ChildKey, type ChildV2, type HistRow, type MonthDef,
   type InboxNotif, NOTIF_DEFAULTS, type NotifType, type SenderKind,
-  type TournamentEntryV2, type TournamentV2,
+  type TournamentEntryV2, type TournamentV2, mapUrlOf, regulationUrlOf,
 } from "@/lib/parent-v2-data";
 import { classesAttended } from "@/lib/classes-attended";
+import { hoursAttended } from "@/lib/hours-attended";
+import { registrationState } from "@/lib/registration-open";
 import { money } from "@/lib/money";
 import { todayActivityOf, type TodayActivity } from "@/lib/today-activity";
+import { toPaymentHistory, visitCredits, type PaymentRecord } from "@/lib/payment-history";
+import { creditsSinceTopUp } from "@/lib/credit-total";
+import { courseCredits } from "@/lib/course-credits";
+import { creditLifetime } from "@/lib/credit-lifetime";
 
 type Row = Record<string, unknown>;
 const s = (r: Row, k: string) => (r[k] as string | null) ?? "";
@@ -79,11 +85,19 @@ type ParentDataValue = {
   months: MonthDef[];
   att: Record<ChildKey, Record<number, { present: number[]; absent: number[] }>>;
   hist: HistRow[];
+  /** Every payment for the family's children, newest first. */
+  payments: PaymentRecord[];
   todayActivity: TodayActivity[];
-  /** Classes attended before a certificate is awarded — the academy's own
+  /** Hours of class before a certificate is awarded — the academy's own
       figure from system_configuration, or the 50 default until it saves one. */
-  certSessions: number;
+  certHours: number;
+  /** The academy's low-credit line from Settings: at or below it is low. */
+  lowCreditAt: number;
   prefs: Prefs;
+  /** The school's switch per type: whether JTrax sends it at all. A type the
+      school has off is not offered to the parent — their own choice is kept,
+      and applies again once the school turns it back on. */
+  schoolAllows: Prefs;
   parentId: string;
   savePref: (type: NotifType, enabled: boolean) => Promise<void>;
   /** Signs a child up and answers with the new registration's id, which is
@@ -135,9 +149,12 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
   const [months] = useState<MonthDef[]>(() => recentMonths());
   const [att, setAtt] = useState<ParentDataValue["att"]>({});
   const [hist, setHist] = useState<HistRow[]>([]);
+  const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([]);
   const [todayActivity, setTodayActivity] = useState<ParentDataValue["todayActivity"]>([]);
-  const [certSessions, setCertSessions] = useState(CERT_SESSIONS);
+  const [certHours, setCertHours] = useState(CERT_HOURS);
+  const [lowCreditAt, setLowCreditAt] = useState(LOW_CREDIT_AT);
   const [prefs, setPrefs] = useState<Prefs>(NOTIF_DEFAULTS);
+  const [schoolAllows, setSchoolAllows] = useState<Prefs>(NOTIF_DEFAULTS);
   const [parentId, setParentId] = useState("");
   const [annRead, setAnnRead] = useState<Set<string>>(new Set());
 
@@ -161,10 +178,14 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
 
     /* The academy's certificate milestone, or the default until it saves one. */
     const certRaw = Number(s(
-      config.find((r) => s(r, "config_key") === "certificate_sessions") ?? {},
+      config.find((r) => s(r, "config_key") === "certificate_hours") ?? {},
       "config_value",
     ));
-    setCertSessions(Number.isFinite(certRaw) && certRaw > 0 ? certRaw : CERT_SESSIONS);
+    setCertHours(Number.isFinite(certRaw) && certRaw > 0 ? certRaw : CERT_HOURS);
+    /* The same low-credit line the console's Settings edits, 3 until saved. */
+    const lowRaw = config.find((r) => s(r, "config_key") === "credit_rule_low_credit");
+    const low = lowRaw ? Number(s(lowRaw, "config_value")) : NaN;
+    setLowCreditAt(Number.isFinite(low) && low >= 0 ? low : LOW_CREDIT_AT);
     setAnnRead(await loadAnnRead(pid));
 
     /* Who is signed in — the greeting, the nav, the profile screen and the
@@ -197,6 +218,7 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
       const daysLeft = Math.max(0, daysRaw);
 
       const attended = classesAttended(attendance.filter((a) => s(a, "student_id") === sid), sessionIds);
+      const hours = hoursAttended(attendance.filter((a) => s(a, "student_id") === sid), sessions);
       const acts = activities.filter((a) => s(a, "student_id") === sid);
       const week = Array.from({ length: 7 }, (_, d) => {
         const day = todayISO(new Date(today.getFullYear(), today.getMonth(), today.getDate() - (6 - d)));
@@ -218,10 +240,14 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
         enrolledSince: enr ? fmtDate(s(enr, "enrolled_date")) : "",
         credits,
         creditsBought: bought,
+        creditsOf: creditsSinceTopUp(myTx),
+        courses: courseCredits(sid, { enrollments, classes, creditTransactions: txs }, today),
+        lifetime: creditLifetime(sid, txs, enrollments),
         valid: fmtDate(expiry),
         daysLeft,
         expiresAhead: daysRaw >= 0,
         attended,
+        hoursAttended: hours,
         /* Counted from the days actually practised, by the same rule as the
            backend's `currentStreak`. `student.streak_count` is a number
            nothing recomputes, so a child who stopped in May still showed
@@ -231,6 +257,7 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
       };
     });
     setChildList(mapped);
+    setPaymentHistory(toPaymentHistory(payments, { students, enrollments, classes, creditTransactions: txs }));
 
     /* Attendance dots for the three calendar months. */
     const nextAtt: ParentDataValue["att"] = {};
@@ -269,6 +296,8 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
           /* The session's own class. Printing the child's current class here
              relabelled every old row the day they moved. */
           cls: sesCls ? s(sesCls, "name") : "—",
+          /* What the visit cost: its consumption entries, as a positive number. */
+          credits: visitCredits(txs, s(a, "attendance_id")),
         };
       })
       .filter((r): r is HistRow => r !== null)
@@ -317,6 +346,7 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
           cls: null,
           attachment: n(a, "has_attachment") === 1,
           time: fmtDate(s(a, "posted_at")),
+          postedAt: s(a, "posted_at"),
         };
       }));
 
@@ -339,6 +369,11 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
         closesInDays: deadline
           ? Math.max(0, Math.ceil((new Date(deadline).getTime() - today.getTime()) / 86400_000))
           : 0,
+        hasBanner: Boolean(trn.has_banner),
+        registration: registrationState(trn, todayISO(today)),
+        regulationUrl: regulationUrlOf(s(trn, "tournament_id"), Boolean(trn.has_regulation), s(trn, "regulations_document_url")),
+        mapUrl: mapUrlOf(s(trn, "venue_map_url"), s(trn, "venue_name"), s(trn, "venue_address")),
+        startDate: s(trn, "start_date"),
       });
       /* Which of this family's children already have a place, and whether the
          fee behind each has settled. Both lists arrive scoped to the family by
@@ -371,16 +406,25 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
     /* The per-type toggles: the backend stores only overrides, so start from
        the defaults and lay the saved choices over them. The in-app channel is
        the master switch for a type. */
-    const saved = await api
-      .get<{ settings?: Row[] }>("notification-settings")
-      .then((r) => (r.settings ?? []).filter((row) => s(row, "channel") === "inapp"))
-      .catch(() => [] as Row[]);
-    const next = { ...NOTIF_DEFAULTS };
-    for (const row of saved) {
-      const typ = s(row, "type") as NotifType;
-      if (typ in next) next[typ] = Boolean(row.enabled);
+    const body = await api
+      .get<{ settings?: Row[]; schoolEnabled?: Record<string, boolean> }>("notification-settings")
+      .catch(() => null);
+    if (body) {
+      const saved = (body.settings ?? []).filter((row) => s(row, "channel") === "inapp");
+      /* An older backend sends no school switches; everything is then
+         offered, as it always was. */
+      const allowed = { ...NOTIF_DEFAULTS };
+      for (const typ of Object.keys(allowed) as NotifType[]) {
+        if (body.schoolEnabled && typ in body.schoolEnabled) allowed[typ] = body.schoolEnabled[typ] !== false;
+      }
+      setSchoolAllows(allowed);
+      const next = { ...NOTIF_DEFAULTS };
+      for (const row of saved) {
+        const typ = s(row, "type") as NotifType;
+        if (typ in next) next[typ] = Boolean(row.enabled);
+      }
+      setPrefs(next);
     }
-    setPrefs(next);
     setStatus("live");
   }, [months, user]);
 
@@ -467,11 +511,11 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
     },
     isAnnRead: (id) => annRead.has(id),
     markAnnRead,
-    tournament: tour, tournamentEntries: entries, months, att, hist, todayActivity, certSessions,
-    prefs, parentId, savePref, register, payCardFee,
+    tournament: tour, tournamentEntries: entries, months, att, hist, payments: paymentHistory, todayActivity,
+    certHours, lowCreditAt, prefs, schoolAllows, parentId, savePref, register, payCardFee,
   }), [childList, parent, anns, allNotifs, annRead, markNotifRead, markAnnRead,
-    tour, entries, months, att, hist, todayActivity, certSessions, prefs, parentId, savePref,
-    register, payCardFee]);
+    tour, entries, months, att, hist, paymentHistory, todayActivity, certHours, lowCreditAt, prefs,
+    schoolAllows, parentId, savePref, register, payCardFee]);
 
   /* No screen renders until the data is real. The old behaviour — sample
      children whenever the server was down — looked exactly like working
