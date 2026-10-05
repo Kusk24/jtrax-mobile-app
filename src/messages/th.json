@@ -649,7 +649,79 @@
     "challengeDone": "ทำภารกิจสำเร็จ",
     "challengeDoneDialog": "คุณแก้โจทย์ทั้งสามข้อของวันนี้และได้รับโบนัสทำครบ",
     "backToHome": "กลับหน้าแรก",
-    "keepPractising": "ฝึกต่อ"
+    "keepPractising": "ฝึกต่อ",
+    "history": "ประวัติ",
+    "historySub": "เกมและภารกิจประจำวันของคุณ",
+    "tabGames": "เกม",
+    "tabChallenges": "ภารกิจ",
+    "filterResults": "กรองตามผล",
+    "all": "ทั้งหมด",
+    "outcome": {
+      "win": "ชนะ",
+      "loss": "แพ้",
+      "draw": "เสมอ"
+    },
+    "resultTitle": {
+      "win": "คุณชนะ!",
+      "loss": "คุณแพ้",
+      "draw": "เสมอกัน"
+    },
+    "side": {
+      "white": "ฝ่ายขาว",
+      "black": "ฝ่ายดำ"
+    },
+    "reasonLabel": {
+      "Checkmate": "รุกจน",
+      "Resignation": "ยอมแพ้",
+      "TimeOut": "หมดเวลา",
+      "Stalemate": "อับ",
+      "Agreement": "ตกลงเสมอ",
+      "ThreefoldRepetition": "เสมออัตโนมัติ",
+      "FivefoldRepetition": "เสมออัตโนมัติ",
+      "FiftyMoveRule": "เสมออัตโนมัติ",
+      "SeventyFiveMoveRule": "เสมออัตโนมัติ",
+      "InsufficientMaterial": "เสมออัตโนมัติ",
+      "Abandoned": "คู่แข่งออกจากเกม",
+      "Aborted": "ยกเลิกเกม"
+    },
+    "vs": "พบ {them}",
+    "viewGame": "ดูเกม",
+    "noGames": "ยังไม่มีเกม",
+    "noGamesBody": "เล่นกับคอมพิวเตอร์ ท้าเพื่อน หรือเข้าร่วมเกมในชั้นเรียน เกมที่เล่นจบจะแสดงที่นี่",
+    "goPlay": "ไปที่หน้าเล่น",
+    "dailyChallengeOn": "ภารกิจประจำวัน · {date}",
+    "challengeStatus": {
+      "complete": "สำเร็จ",
+      "inProgress": "กำลังทำ",
+      "missed": "ไม่ครบ"
+    },
+    "viewChallenge": "ดูภารกิจ",
+    "puzzleN": "โจทย์ที่ {n}",
+    "rated": "เรตติ้ง {n}",
+    "solved": "แก้ได้",
+    "notSolved": "ยังไม่ได้แก้",
+    "noPuzzleDetail": "ไม่มีรายการโจทย์ของวันนี้แล้ว",
+    "noChallenges": "ยังไม่มีภารกิจประจำวัน",
+    "noChallengesBody": "ทุกวันจะมีโจทย์สามข้อ แก้ครบทั้งสามข้อเพื่อทำภารกิจให้สำเร็จ",
+    "backToHistory": "กลับไปหน้าประวัติ",
+    "gameNotFound": "ไม่พบเกมนี้",
+    "replayControls": "ปุ่มควบคุมการดูย้อนหลัง",
+    "firstMove": "ตาแรก",
+    "prevMove": "ตาก่อนหน้า",
+    "nextMove": "ตาถัดไป",
+    "lastMove": "ตาสุดท้าย",
+    "result": "ผลการแข่งขัน",
+    "youPlayed": "คุณเล่นฝ่าย",
+    "reason": "จบเกมด้วย",
+    "timeControl": "เวลา",
+    "untimed": "ไม่จับเวลา",
+    "noMoves": "ไม่มีการเดินหมาก",
+    "opponent": "คู่แข่ง",
+    "moves": "จำนวนตา",
+    "when": "เวลา",
+    "loading": "กำลังโหลด…",
+    "startChallenge": "เริ่มภารกิจ",
+    "continueChallenge": "ทำต่อ"
   },
   "sv3": {
     "filterAll": "ทั้งหมด",
@@ -701,6 +773,16 @@
     "games": "เกม",
     "playVsAi": "เล่นกับหุ่นยนต์",
     "playWithFriend": "เล่นกับเพื่อน",
-    "joinRoom": "เข้าห้องเกม"
+    "joinRoom": "เข้าห้องเกม",
+    "robotName": {
+      "novice": "หุ่นยนต์ระดับเริ่มต้น",
+      "strong": "หุ่นยนต์ระดับกลาง",
+      "expert": "หุ่นยนต์ระดับสูง"
+    },
+    "recentGames": "ล่าสุด",
+    "seeAllGames": "ดูทั้งหมด",
+    "noGamesYet": "ยังไม่มีเกมที่เล่นจบ",
+    "playWith": "เล่นกับ",
+    "view": "ดู"
   }
 }

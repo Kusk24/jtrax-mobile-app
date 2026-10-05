@@ -649,7 +649,79 @@
     "challengeDone": "Challenge complete",
     "challengeDoneDialog": "You solved today's three puzzles and earned the completion bonus.",
     "backToHome": "Back to Home",
-    "keepPractising": "Keep practising"
+    "keepPractising": "Keep practising",
+    "history": "History",
+    "historySub": "Your games and daily challenges.",
+    "tabGames": "Games",
+    "tabChallenges": "Challenges",
+    "filterResults": "Filter by result",
+    "all": "All",
+    "outcome": {
+      "win": "Win",
+      "loss": "Loss",
+      "draw": "Draw"
+    },
+    "resultTitle": {
+      "win": "You win!",
+      "loss": "You lost",
+      "draw": "It's a draw"
+    },
+    "side": {
+      "white": "White",
+      "black": "Black"
+    },
+    "reasonLabel": {
+      "Checkmate": "Checkmate",
+      "Resignation": "Resignation",
+      "TimeOut": "Time out",
+      "Stalemate": "Stalemate",
+      "Agreement": "Draw by agreement",
+      "ThreefoldRepetition": "Automatic draw",
+      "FivefoldRepetition": "Automatic draw",
+      "FiftyMoveRule": "Automatic draw",
+      "SeventyFiveMoveRule": "Automatic draw",
+      "InsufficientMaterial": "Automatic draw",
+      "Abandoned": "Opponent left",
+      "Aborted": "Called off"
+    },
+    "vs": "vs {them}",
+    "viewGame": "View game",
+    "noGames": "No games yet",
+    "noGamesBody": "Play the computer, challenge a classmate or join a class game — finished games appear here.",
+    "goPlay": "Go to Play",
+    "dailyChallengeOn": "Daily Challenge · {date}",
+    "challengeStatus": {
+      "complete": "Complete",
+      "inProgress": "In progress",
+      "missed": "Not finished"
+    },
+    "viewChallenge": "View challenge",
+    "puzzleN": "Puzzle {n}",
+    "rated": "Rated {n}",
+    "solved": "Solved",
+    "notSolved": "Not solved",
+    "noPuzzleDetail": "The puzzles for this day are no longer listed.",
+    "noChallenges": "No daily challenges yet",
+    "noChallengesBody": "Three puzzles are set every day. Finish all three to complete a challenge.",
+    "backToHistory": "Back to History",
+    "gameNotFound": "This game could not be found.",
+    "replayControls": "Replay controls",
+    "firstMove": "First move",
+    "prevMove": "Previous move",
+    "nextMove": "Next move",
+    "lastMove": "Last move",
+    "result": "Result",
+    "youPlayed": "You played",
+    "reason": "How it ended",
+    "timeControl": "Time control",
+    "untimed": "No clock",
+    "noMoves": "No moves were played.",
+    "opponent": "Opponent",
+    "moves": "Moves",
+    "when": "When",
+    "loading": "Loading…",
+    "startChallenge": "Start Challenge",
+    "continueChallenge": "Continue"
   },
   "sv3": {
     "filterAll": "All",
@@ -701,6 +773,16 @@
     "games": "Games",
     "playVsAi": "Play with Robot",
     "playWithFriend": "Play with Friend",
-    "joinRoom": "Join Game Room"
+    "joinRoom": "Join Game Room",
+    "robotName": {
+      "novice": "Beginner Robot",
+      "strong": "Intermediate Robot",
+      "expert": "Advanced Robot"
+    },
+    "recentGames": "Recent",
+    "seeAllGames": "See all",
+    "noGamesYet": "No finished games yet.",
+    "playWith": "Play with",
+    "view": "View"
   }
 }
