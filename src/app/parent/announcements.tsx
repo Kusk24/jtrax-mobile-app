@@ -7,9 +7,10 @@ import { GraduationCap, Paperclip, UserRound } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
 import { AnnouncementModal, SENDER_STYLE } from "@/components/parent/AnnouncementModal";
 import { BackHeader } from "@/components/parent/BackHeader";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 export default function ParentAnnouncements() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { announcements, isAnnRead, markAnnRead } = useParentData();
   const [modalId, setModalId] = useState<string | null>(null);
@@ -44,8 +45,8 @@ export default function ParentAnnouncements() {
                 setModalId(a.id);
               }}
               style={{
-                backgroundColor: isUnread ? PP.mist : PP.card,
-                borderColor: isUnread ? PP.soft : PP.line,
+                backgroundColor: isUnread ? pp.mist : pp.card,
+                borderColor: isUnread ? pp.soft : pp.line,
               }}
               className="gap-2 rounded-card border-[1.5px] p-4"
             >
@@ -67,19 +68,19 @@ export default function ParentAnnouncements() {
               <View className="flex-row flex-wrap items-center gap-x-3 gap-y-1">
                 {!!a.child && (
                   <View className="flex-row items-center gap-1">
-                    <UserRound size={12} color={PP.faint} strokeWidth={2} />
+                    <UserRound size={12} color={pp.faint} strokeWidth={2} />
                     <Text className="font-pp text-[10.5px] text-pp-faint">{a.child}</Text>
                   </View>
                 )}
                 {!!a.cls && (
                   <View className="flex-row items-center gap-1">
-                    <GraduationCap size={12} color={PP.faint} strokeWidth={2} />
+                    <GraduationCap size={12} color={pp.faint} strokeWidth={2} />
                     <Text className="font-pp text-[10.5px] text-pp-faint">{a.cls}</Text>
                   </View>
                 )}
                 {a.attachment && (
                   <View className="flex-row items-center gap-1">
-                    <Paperclip size={12} color={PP.faint} strokeWidth={2} />
+                    <Paperclip size={12} color={pp.faint} strokeWidth={2} />
                     <Text className="font-pp text-[10.5px] text-pp-faint">
                       {t("attachmentWord")}
                     </Text>
@@ -88,9 +89,9 @@ export default function ParentAnnouncements() {
               </View>
               <View className="flex-row items-center justify-between gap-2">
                 <Text className="font-pp text-[10.5px] text-pp-faint">{a.time}</Text>
-                <View style={{ backgroundColor: ss.bg }} className="rounded-full px-2 py-0.5">
+                <View style={{ backgroundColor: pp[ss.bg] }} className="rounded-full px-2 py-0.5">
                   <Text
-                    style={{ color: ss.c }}
+                    style={{ color: pp[ss.c] }}
                     className="font-pp-bold text-[9px] uppercase"
                   >
                     {t(ss.labelKey)}

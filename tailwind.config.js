@@ -1,4 +1,29 @@
 /** @type {import('tailwindcss').Config} */
+
+/* Every token in src/lib/theme.ts, by name. A test (src/lib/theme.test.ts)
+   fails when the two lists drift apart. */
+const PP_TOKENS = [
+  "ink", "blue", "deep", "navy", "line", "soft", "mist", "bg", "card", "panel",
+  "muted", "faint", "sub", "green", "green-soft", "green-dot", "red", "red-soft",
+  "amber", "amber-soft", "danger", "danger-soft", "danger-line", "danger-hover",
+  "plum-soft", "track", "bar-track", "neutral", "dash",
+];
+const ST_TOKENS = [
+  "hero", "orange", "orange-soft", "orange-line", "gold", "gold-soft",
+  "brand", "brand-deep", "brand-ink", "brand-soft", "brand-line",
+  "hero-a", "hero-b", "hero-c", "hero-line", "ring",
+  "indigo", "indigo-soft", "indigo-line", "amber", "amber-soft", "amber-line",
+  "emerald", "emerald-soft", "emerald-line",
+];
+
+/** `pp-ink` → `rgb(var(--pp-ink) / <alpha-value>)`, so opacity modifiers
+    such as `bg-pp-blue/40` keep working. */
+function themed(prefix, names) {
+  return Object.fromEntries(
+    names.map((n) => [`${prefix}-${n}`, `rgb(var(--${prefix}-${n}) / <alpha-value>)`]),
+  );
+}
+
 // Palette copied from jtrax-web-app main (app/globals.css @theme). Keep the
 // names identical to the web tokens — web screens port here near-verbatim, so
 // a divergent name here costs a translation pass on every copy.
@@ -26,44 +51,12 @@ module.exports = {
         accent: "#3a5da5",
         gold: "#8a5a1e",
 
-        /* Parent portal — copied from the web app's @theme block, same names.
-           A separate family from the student tokens above on purpose: the two
-           portals were designed apart and the parent screens port across
-           verbatim only while the token names match.
-
-           Light values only. The web shell switches these per the account's
-           theme_preference; this app has no dark theme yet, so pinning the
-           light set is honest — half a dark theme is worse than none. */
-        "pp-ink": "#1a2b4a",
-        "pp-blue": "#2e5cb8",
-        "pp-deep": "#234a9f",
-        "pp-navy": "#1e3a70",
-        "pp-line": "#e7ebf3",
-        "pp-soft": "#e8eefa",
-        "pp-mist": "#f0f4fc",
-        "pp-bg": "#fafbfd",
-        "pp-card": "#ffffff",
-        "pp-panel": "#e8edf8",
-        /* De-emphasis and status inks are checked against the tinted panels
-           they sit on, not against white — see the web app's note. */
-        "pp-muted": "#525d78",
-        "pp-faint": "#5a6b8c",
-        "pp-sub": "#4a5578",
-        "pp-green": "#2e7350",
-        "pp-green-soft": "#e6f4ec",
-        "pp-green-dot": "#33734d",
-        "pp-red": "#b83f3a",
-        "pp-red-soft": "#fbeaea",
-        "pp-amber": "#8f5410",
-        "pp-amber-soft": "#fbeedf",
-        "pp-danger": "#a83b3b",
-        "pp-danger-soft": "#fdece0",
-        "pp-danger-line": "#e7c9c9",
-        "pp-plum-soft": "#efeefa",
-        "pp-track": "#f3e6d8",
-        "pp-bar-track": "#dbe6f7",
-        "pp-neutral": "#eef1f7",
-        "pp-dash": "#d5cdbd",
+        /* The portals' palette — names identical to the web's pp-* and st-*
+           tokens, values from CSS variables so Appearance can switch them.
+           The hexes, light and dark, live in src/lib/theme.ts; ThemeProvider
+           sets the variables. */
+        ...themed("pp", PP_TOKENS),
+        ...themed("st", ST_TOKENS),
       },
       borderRadius: {
         card: "1.25rem",

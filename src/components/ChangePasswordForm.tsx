@@ -13,7 +13,9 @@ import { useTranslations } from "use-intl";
 import { KeyRound } from "lucide-react-native";
 import { ApiError, changePassword } from "@/lib/api";
 import { checkNewPassword } from "@/lib/password-rules";
-import { C, PP } from "@/lib/colors";
+import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
+import type { PPKey } from "@/lib/theme";
 
 type Tone = "parent" | "student";
 
@@ -21,13 +23,14 @@ type Tone = "parent" | "student";
    inherit a font from the screen around it, so the form carries them. */
 const LOOK: Record<
   Tone,
-  { box: string; label: string; input: string; accent: string; text: string; bold: string; semibold: string }
+  { box: string; label: string; input: string; accent: string | { pp: PPKey }; text: string; bold: string; semibold: string }
 > = {
   parent: {
     box: "rounded-card border-[1.5px] border-pp-line bg-pp-card p-4",
     label: "font-pp-semibold text-[12.5px] text-pp-sub",
     input: "rounded-lg border-[1.5px] border-pp-line bg-pp-card px-3 py-2.5 font-pp text-sm text-pp-ink",
-    accent: PP.blue,
+    /* A palette key: resolved in the current scheme when drawn. */
+    accent: { pp: "blue" },
     text: "text-pp-ink",
     bold: "font-pp-bold",
     semibold: "font-pp-semibold",
@@ -45,7 +48,9 @@ const LOOK: Record<
 
 export function ChangePasswordForm({ tone }: { tone: Tone }) {
   const t = useTranslations("changePassword");
+  const { pp } = usePalette();
   const look = LOOK[tone];
+  const accent = typeof look.accent === "string" ? look.accent : pp[look.accent.pp];
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
@@ -101,7 +106,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
           className="flex-row items-center justify-between"
         >
           <View className="flex-row items-center gap-2">
-            <KeyRound size={16} color={look.accent} />
+            <KeyRound size={16} color={accent} />
             <Text className={`${look.bold} text-sm ${look.text}`}>{t("title")}</Text>
           </View>
           <Text className={look.label}>{t("open")}</Text>
@@ -135,7 +140,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
   return (
     <View className={`${look.box} gap-3`}>
       <View className="flex-row items-center gap-2">
-        <KeyRound size={16} color={look.accent} />
+        <KeyRound size={16} color={accent} />
         <Text className={`${look.bold} text-sm ${look.text}`}>{t("title")}</Text>
       </View>
       {field(t("current"), current, setCurrent, "password")}
@@ -152,7 +157,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
           onPress={save}
           disabled={busy}
           accessibilityRole="button"
-          style={{ backgroundColor: look.accent, opacity: busy ? 0.6 : 1 }}
+          style={{ backgroundColor: accent, opacity: busy ? 0.6 : 1 }}
           className="items-center justify-center rounded-lg px-4 py-2.5"
         >
           {busy ? (
@@ -169,7 +174,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
           accessibilityRole="button"
           className="items-center justify-center rounded-lg px-4 py-2.5"
         >
-          <Text style={{ color: look.accent }} className={`${look.bold} text-sm`}>
+          <Text style={{ color: accent }} className={`${look.bold} text-sm`}>
             {t("cancel")}
           </Text>
         </Pressable>

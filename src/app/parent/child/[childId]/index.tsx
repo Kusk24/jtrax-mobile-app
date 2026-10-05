@@ -17,7 +17,7 @@ import { ChildFace } from "@/components/parent/ChildFace";
 import { ChildLichess } from "@/components/parent/ChildLichess";
 import { BackHeader } from "@/components/parent/BackHeader";
 import { useParentData } from "@/components/parent/ParentData";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const GOAL = 30;
@@ -32,6 +32,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function ChildProfile() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const router = useRouter();
   const { childId } = useLocalSearchParams<{ childId: string }>();
@@ -112,19 +113,19 @@ export default function ChildProfile() {
         </View>
         <View
           style={{
-            backgroundColor: expSoon || expired ? "#fdece0" : "rgba(251,255,241,0.12)",
+            backgroundColor: expSoon || expired ? pp.dangerSoft : "rgba(251,255,241,0.12)",
           }}
           className="flex-row items-center justify-between gap-2.5 rounded-[13px] px-3.5 py-2.5"
         >
           <View className="gap-0.5">
             <Text
-              style={{ color: expSoon || expired ? PP.danger : "#fbfff1" }}
+              style={{ color: expSoon || expired ? pp.danger : "#fbfff1" }}
               className="font-pp-bold text-[12.5px]"
             >
               {expired ? t("expired") : expSoon ? t("expiresSoon") : t("validUntil")}
             </Text>
             <Text
-              style={{ color: expSoon || expired ? PP.amber : "#b4c5e4" }}
+              style={{ color: expSoon || expired ? pp.amber : "#b4c5e4" }}
               className="font-pp text-[11px]"
             >
               {ch.valid}
@@ -132,7 +133,7 @@ export default function ChildProfile() {
           </View>
           {hasExpiry && ch.expiresAhead && (
             <Text
-              style={{ color: expSoon ? PP.danger : "#fbfff1" }}
+              style={{ color: expSoon ? pp.danger : "#fbfff1" }}
               className="font-pp-display-semibold text-[19px]"
             >
               {t("daysLeftShort", { count: ch.daysLeft })}
@@ -151,7 +152,7 @@ export default function ChildProfile() {
         <View className="flex-row items-center justify-between">
           <SectionLabel>{t("practiceProgress")}</SectionLabel>
           <View className="flex-row items-center gap-1">
-            <Flame size={14} color={PP.amber} fill={PP.amber} />
+            <Flame size={14} color={pp.amber} fill={pp.amber} />
             <Text className="font-pp-bold text-[12.5px] text-pp-amber">
               {t("dayStreak", { count: ch.streak })}
             </Text>
@@ -165,15 +166,15 @@ export default function ChildProfile() {
             <Svg width="100%" height={64} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
               <Defs>
                 <LinearGradient id="chGrad" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0" stopColor={PP.blue} stopOpacity="0.22" />
-                  <Stop offset="1" stopColor={PP.blue} stopOpacity="0" />
+                  <Stop offset="0" stopColor={pp.blue} stopOpacity="0.22" />
+                  <Stop offset="1" stopColor={pp.blue} stopOpacity="0" />
                 </LinearGradient>
               </Defs>
               <Path d={area} fill="url(#chGrad)" />
               <Path
                 d={line}
                 fill="none"
-                stroke={PP.blue}
+                stroke={pp.blue}
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -220,13 +221,13 @@ export default function ChildProfile() {
                 <View className="size-[22px] items-center justify-center">
                   <View style={{ position: "absolute", transform: [{ rotate: "-90deg" }] }}>
                     <Svg width={22} height={22} viewBox="0 0 22 22">
-                      <Circle cx="11" cy="11" r="9" fill="none" stroke="#f3e6d8" strokeWidth="3" />
+                      <Circle cx="11" cy="11" r="9" fill="none" stroke={pp.track} strokeWidth="3" />
                       <Circle
                         cx="11"
                         cy="11"
                         r="9"
                         fill="none"
-                        stroke={PP.amber}
+                        stroke={pp.amber}
                         strokeWidth="3"
                         strokeLinecap="round"
                         strokeDasharray={`${(
@@ -235,7 +236,7 @@ export default function ChildProfile() {
                       />
                     </Svg>
                   </View>
-                  <Star size={10} color={PP.amber} fill={PP.amber} strokeWidth={2} />
+                  <Star size={10} color={pp.amber} fill={pp.amber} strokeWidth={2} />
                 </View>
               )}
             </View>
@@ -260,7 +261,7 @@ export default function ChildProfile() {
         <View className="gap-4 rounded-card bg-pp-card p-4 shadow-clay">
           <View className="flex-row items-center gap-3">
             <View className="size-10 items-center justify-center rounded-card bg-pp-mist">
-              <PawnIcon size={17} color={PP.ink} />
+              <PawnIcon size={17} color={pp.ink} />
             </View>
             <Text className="flex-1 font-pp-bold text-sm text-pp-ink">{ch.clsTitle}</Text>
           </View>
@@ -359,12 +360,12 @@ export default function ChildProfile() {
               </View>
               <View
                 style={{
-                  backgroundColor: h.status === "Present" ? PP.greenSoft : "#fdece0",
+                  backgroundColor: h.status === "Present" ? pp.greenSoft : pp.dangerSoft,
                 }}
                 className="rounded-full px-2.5 py-1"
               >
                 <Text
-                  style={{ color: h.status === "Present" ? PP.green : PP.danger }}
+                  style={{ color: h.status === "Present" ? pp.green : pp.danger }}
                   className="font-pp-bold text-[10.5px] uppercase"
                 >
                   {h.status === "Present" ? t("present") : t("absent")}

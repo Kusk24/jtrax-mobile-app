@@ -21,30 +21,5 @@ export const C = {
   white: "#ffffff",
 } as const;
 
-/** The parent portal's own palette, same names as the web app's pp-* tokens.
- *  Mirrors tailwind.config.js exactly — change both together. */
-export const PP = {
-  ink: "#1a2b4a",
-  blue: "#2e5cb8",
-  deep: "#234a9f",
-  navy: "#1e3a70",
-  line: "#e7ebf3",
-  soft: "#e8eefa",
-  mist: "#f0f4fc",
-  bg: "#fafbfd",
-  card: "#ffffff",
-  panel: "#e8edf8",
-  muted: "#525d78",
-  faint: "#5a6b8c",
-  sub: "#4a5578",
-  green: "#2e7350",
-  greenSoft: "#e6f4ec",
-  greenDot: "#33734d",
-  red: "#b83f3a",
-  redSoft: "#fbeaea",
-  amber: "#8f5410",
-  amberSoft: "#fbeedf",
-  danger: "#a83b3b",
-  barTrack: "#dbe6f7",
-  neutral: "#eef1f7",
-} as const;
+/* The portals' palette (pp-* and st-*) lives in theme.ts, light and dark;
+   icons read it through usePalette(). */

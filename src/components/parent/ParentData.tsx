@@ -13,6 +13,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
+import { usePalette } from "@/components/ThemeProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api, ApiError } from "@/lib/api";
 import { useSession } from "@/lib/session";
@@ -121,6 +122,7 @@ function storeAnnRead(parentId: string, ids: Set<string>) {
 }
 
 export function ParentDataProvider({ children: kids }: { children: ReactNode }) {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { user } = useSession();
   const [status, setStatus] = useState<Status>("loading");
@@ -476,22 +478,22 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
      software, which is the worst kind of broken. */
   if (status === "loading") {
     return (
-      <View className="flex-1 items-center justify-center gap-3 bg-paper">
-        <ActivityIndicator color="#4e5f7b" />
-        <Text className="font-pp-bold text-[13.5px] text-muted">{t("loading")}</Text>
+      <View className="flex-1 items-center justify-center gap-3 bg-pp-bg">
+        <ActivityIndicator color={pp.muted} />
+        <Text className="font-pp-bold text-[13.5px] text-pp-muted">{t("loading")}</Text>
       </View>
     );
   }
   if (status === "error") {
     return (
-      <View className="flex-1 items-center justify-center bg-paper px-5">
-        <View className="w-full max-w-[380px] items-center gap-3 rounded-card border-[1.5px] border-line bg-card p-6">
-          <Text className="text-center font-pp-extrabold text-lg text-ink">{t("serverDownTitle")}</Text>
-          <Text className="text-center font-pp text-xs leading-relaxed text-muted">{t("serverDownBody")}</Text>
+      <View className="flex-1 items-center justify-center bg-pp-bg px-5">
+        <View className="w-full max-w-[380px] items-center gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-6">
+          <Text className="text-center font-pp-extrabold text-lg text-pp-ink">{t("serverDownTitle")}</Text>
+          <Text className="text-center font-pp text-xs leading-relaxed text-pp-muted">{t("serverDownBody")}</Text>
           <Pressable
             onPress={retry}
             accessibilityRole="button"
-            className="mt-1 rounded-card bg-navy px-6 py-2.5"
+            className="mt-1 rounded-card bg-pp-blue px-6 py-2.5"
           >
             <Text className="font-pp-bold text-sm text-white">{t("retry")}</Text>
           </Pressable>

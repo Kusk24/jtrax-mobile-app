@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslations } from "use-intl";
 import { ArrowLeft } from "lucide-react-native";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 export function BackHeader({
   title,
@@ -20,6 +20,7 @@ export function BackHeader({
       through its own stages rather than leaving the screen. */
   onBack?: () => void;
 }) {
+  const { pp } = usePalette();
   const router = useRouter();
   const t = useTranslations("pv2");
   return (
@@ -30,7 +31,7 @@ export function BackHeader({
         accessibilityLabel={t("back")}
         className="size-[38px] items-center justify-center rounded-card border-[1.5px] border-pp-line bg-pp-card"
       >
-        <ArrowLeft size={18} color={PP.ink} strokeWidth={2} />
+        <ArrowLeft size={18} color={pp.ink} strokeWidth={2} />
       </Pressable>
       <View className="min-w-0 flex-1">
         <Text className="font-pp-display-semibold text-2xl leading-tight text-pp-ink">{title}</Text>
