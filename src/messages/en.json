@@ -721,7 +721,11 @@
     "when": "When",
     "loading": "Loading…",
     "startChallenge": "Start Challenge",
-    "continueChallenge": "Continue"
+    "continueChallenge": "Continue",
+    "dailyStreak": "Daily streak",
+    "daysN": "{n, plural, one {# day} other {# days}}",
+    "streakHint": "Solve a puzzle or play a game each day to keep your streak going.",
+    "longestStreak": "Longest streak"
   },
   "sv3": {
     "filterAll": "All",
@@ -798,6 +802,22 @@
     "resumeGame": "Continue your game",
     "resume": "Resume",
     "moveN": "move {n}",
-    "dismissGame": "Drop this game"
+    "dismissGame": "Drop this game",
+    "editProfile": "Edit profile",
+    "avatarLabel": "Avatar",
+    "ownEmoji": "Or type your own emoji",
+    "ownEmojiHint": "Tap + to type your own emoji",
+    "nameLabel": "Name",
+    "studentIdLabel": "Student ID",
+    "copy": "Copy",
+    "copied": "Copied",
+    "saveFailed": "Couldn't save. Try again.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "account": "Account",
+    "notRated": "Not rated",
+    "ratingPill": "Rating",
+    "gamesPill": "Games",
+    "puzzlesPill": "Puzzles"
   }
 }

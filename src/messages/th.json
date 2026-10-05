@@ -721,7 +721,11 @@
     "when": "เวลา",
     "loading": "กำลังโหลด…",
     "startChallenge": "เริ่มภารกิจ",
-    "continueChallenge": "ทำต่อ"
+    "continueChallenge": "ทำต่อ",
+    "dailyStreak": "ความต่อเนื่องรายวัน",
+    "daysN": "{n} วัน",
+    "streakHint": "แก้โจทย์หรือเล่นเกมทุกวันเพื่อรักษาความต่อเนื่อง",
+    "longestStreak": "ต่อเนื่องนานที่สุด"
   },
   "sv3": {
     "filterAll": "ทั้งหมด",
@@ -798,6 +802,22 @@
     "resumeGame": "เล่นเกมต่อ",
     "resume": "เล่นต่อ",
     "moveN": "ตาที่ {n}",
-    "dismissGame": "ทิ้งเกมนี้"
+    "dismissGame": "ทิ้งเกมนี้",
+    "editProfile": "แก้ไขโปรไฟล์",
+    "avatarLabel": "รูปประจำตัว",
+    "ownEmoji": "หรือพิมพ์อีโมจิของคุณเอง",
+    "ownEmojiHint": "แตะ + เพื่อพิมพ์อีโมจิของคุณเอง",
+    "nameLabel": "ชื่อ",
+    "studentIdLabel": "รหัสนักเรียน",
+    "copy": "คัดลอก",
+    "copied": "คัดลอกแล้ว",
+    "saveFailed": "บันทึกไม่สำเร็จ ลองอีกครั้ง",
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "account": "บัญชี",
+    "notRated": "ยังไม่มีเรตติ้ง",
+    "ratingPill": "เรตติ้ง",
+    "gamesPill": "เกม",
+    "puzzlesPill": "โจทย์"
   }
 }
