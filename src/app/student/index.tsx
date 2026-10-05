@@ -35,6 +35,7 @@ const PERF_PREFERENCE = ["rapid", "blitz", "classical", "bullet", "puzzle"];
 
 export default function StudentHome() {
   const t = useTranslations("sv2");
+  const ts = useTranslations("st");
   const tp = useTranslations("play");
   const tl = useTranslations("lichess");
   const { user } = useSession();
@@ -164,10 +165,12 @@ export default function StudentHome() {
           />
         </View>
 
-        <Link href="/student/puzzles" asChild>
+        {/* The day's three when there are some left; the practice list after —
+            Free Play, which this used to open, is gone from the server. */}
+        <Link href={done ? "/student/puzzles" : "/student/puzzles/daily"} asChild>
           <Pressable className="mt-3 min-h-10 flex-row items-center justify-center gap-2 rounded-xl bg-navy active:opacity-80">
             <Text className="font-sans-bold text-xs text-white">
-              {done ? t("freePlay") : t("startChallenge")}
+              {done ? ts("keepPractising") : t("startChallenge")}
             </Text>
             <ChevronRight size={16} color={C.white} strokeWidth={2.4} />
           </Pressable>

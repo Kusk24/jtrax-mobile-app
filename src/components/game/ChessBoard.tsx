@@ -24,6 +24,13 @@ const DARK = "#a3b6d2";
 const SELECTED = "#f2d98c";
 const LAST = "#e4d7b0";
 const PROMOTION_CHOICES = ["q", "r", "b", "n"] as const;
+/* The puzzle board's ring, coordinates and move hints (the web's puzzle board
+   in app/student/StudentGame.tsx): the console's navy rather than the game
+   board's warm gold. */
+const RING = "#46608c";
+const COORD = "rgba(70,96,140,0.7)";
+const HINT_DOT = "rgba(30,58,112,0.35)";
+const HINT_RING = "rgba(46,92,184,0.75)";
 
 /** Long enough to read as a move rather than a repaint, short enough that a
     child waiting for their turn is not waiting on an animation. */
@@ -35,6 +42,7 @@ export function ChessBoard({
   canMove,
   onMove,
   lastMove,
+  look = "game",
 }: {
   game: Chess;
   orientation: "w" | "b";
@@ -44,14 +52,20 @@ export function ChessBoard({
       highlighted and the arriving piece slides in from the first — a move that
       simply appeared can now be seen happening. */
   lastMove?: string;
+  /** "card" is the puzzle board: the portal's card around it, a navy ring,
+      and the coordinates on the edge squares. "game" is the wooden board the
+      games are played on. */
+  look?: "game" | "card";
 }) {
   const t = useTranslations("play");
   const { width } = useWindowDimensions();
   const [from, setFrom] = useState<string | null>(null);
   const [pending, setPending] = useState<{ from: string; to: string } | null>(null);
 
-  // 32px of page padding plus the board's own 10px frame on each side.
-  const board = Math.min(width - 32 - 20, 360);
+  const card = look === "card";
+  // 32px of page padding plus the board's own frame on each side: 10px of
+  // wood, or the card's 12px, its 1.5px line and the 2px ring.
+  const board = Math.min(width - 32 - (card ? 31 : 20), 360);
   const cell = Math.floor(board / 8);
 
   /* The arriving piece starts at the square it came from and is animated to
@@ -139,9 +153,22 @@ export function ChessBoard({
   }
 
   return (
-    <View className="self-center rounded-[20px] border-2 border-highlight bg-highlight p-2.5">
-      <View style={{ width: cell * 8, height: cell * 8 }} className="overflow-hidden rounded-lg">
-        {rows.map((r) => (
+    <View
+      className={
+        card
+          ? "self-center rounded-2xl border-[1.5px] border-pp-line bg-pp-card p-3"
+          : "self-center rounded-[20px] border-2 border-highlight bg-highlight p-2.5"
+      }
+    >
+      <View
+        style={
+          card
+            ? { width: cell * 8 + 4, height: cell * 8 + 4, borderWidth: 2, borderColor: RING }
+            : { width: cell * 8, height: cell * 8 }
+        }
+        className="overflow-hidden rounded-lg"
+      >
+        {rows.map((r, vr) => (
           /* On a phone zIndex only orders siblings, so the sliding piece's
              row and square are lifted too — otherwise every row and square
              drawn after them covers the piece as it crosses them, and a move
@@ -152,7 +179,7 @@ export function ChessBoard({
             style={slidingTo && squareToRC(slidingTo)[0] === r ? { zIndex: 2 } : undefined}
             className="flex-row"
           >
-            {cols.map((c) => {
+            {cols.map((c, vc) => {
               const name = squareName(r, c);
               const piece = grid[r][c];
               const dest = legal.find((uci) => uci.slice(2, 4) === name);
@@ -177,6 +204,17 @@ export function ChessBoard({
                   style={{ width: cell, height: cell, backgroundColor: bg, zIndex: slidingTo === name ? 2 : 0 }}
                   className="items-center justify-center"
                 >
+                  {/* Coordinates on the edge squares, as on a real board. */}
+                  {card && vc === 0 && (
+                    <Text style={{ color: COORD }} className="absolute left-0.5 top-0.5 font-pp-bold text-[10px] leading-none">
+                      {name[1]}
+                    </Text>
+                  )}
+                  {card && vr === 7 && (
+                    <Text style={{ color: COORD }} className="absolute bottom-0.5 right-1 font-pp-bold text-[10px] leading-none">
+                      {name[0]}
+                    </Text>
+                  )}
                   {piece && (
                     <Animated.View
                       /* A new view whenever a piece starts or stops being the
@@ -202,8 +240,13 @@ export function ChessBoard({
                   {dest &&
                     (isCapture ? (
                       <View
-                        style={{ borderWidth: 3, borderColor: C.gold }}
+                        style={{ borderWidth: 3, borderColor: card ? HINT_RING : C.gold }}
                         className="absolute inset-0.5 rounded-md"
+                      />
+                    ) : card ? (
+                      <View
+                        style={{ width: cell / 3, height: cell / 3, backgroundColor: HINT_DOT }}
+                        className="absolute rounded-full"
                       />
                     ) : (
                       <View className="absolute size-3 rounded-full bg-navy/50" />

@@ -1,5 +1,5 @@
 /**
- * The daily puzzle set, from the academy's own bank.
+ * The daily puzzle set and the practice list, from the academy's own bank.
  *
  * The same endpoints the web portal uses, so a pupil sees one set of puzzles
  * whichever device they pick up — and the same rule holds here: the solution
@@ -39,32 +39,47 @@ export type Verdict = {
   /** The position after the move and any reply — the server's view, which is
       the one that counts. */
   fen: string;
+  /** Practice list only: this solve was the first, so it counted. A replay
+      of a ticked puzzle is graded and earns nothing. */
+  firstSolve?: boolean;
 };
 
 export const getDailyPuzzles = () => api.get<DailySet>("puzzles/daily");
 
-/** The three difficulties Free Play offers. The band each covers is the
-    server's business, not the phone's. */
+/** The three levels a puzzle can be — Beginner, Intermediate, Advanced. The
+    rating band each covers is the server's business, not the phone's. The
+    name is the web's (it began as Free Play's levels). */
 export type FreeTier = "beginner" | "intermediate" | "advanced";
 
 export const FREE_TIERS: readonly FreeTier[] = ["beginner", "intermediate", "advanced"];
 
+/** A level arrives from a link as a string; only the three may reach a filter. */
 export const isFreeTier = (v: unknown): v is FreeTier =>
   typeof v === "string" && (FREE_TIERS as readonly string[]).includes(v);
 
-export type FreePuzzle = {
-  /** Null when this pupil has seen every puzzle at this difficulty and the
-      bank could not be topped up. */
-  puzzle: DailyPuzzle | null;
-  exhausted: boolean;
-};
+/** A daily puzzle's level, from its rating — the same bands the list uses. */
+export const tierOfRating = (rating: number): FreeTier =>
+  rating < 800 ? "beginner" : rating < 1200 ? "intermediate" : "advanced";
 
-/** Asks for one puzzle at a chosen difficulty, outside today's set.
- *
- * Unlike the daily set this is a puzzle at a time: the pupil chose to keep
- * going, so there is nothing to pre-assign and nothing to be stable about
- * across a reopen. */
-export const getFreePuzzle = (tier: FreeTier) => api.get<FreePuzzle>(`puzzles/free?tier=${tier}`);
+/** A puzzle in the practice list: its level as well as its rating. */
+export type ListPuzzle = DailyPuzzle & { position: number; tier: FreeTier };
+
+/** The practice list: twenty puzzles, levels mixed — two in three from the
+    pupil's own level. A solved one is ticked for the day; the next day it is
+    replaced by a new one and the unsolved ones stay. Free Play's one puzzle
+    at a time (`puzzles/free`) is gone from the server; this replaced it. */
+export type PuzzleList = { puzzles: ListPuzzle[]; level: FreeTier };
+
+export const getPuzzleList = () => api.get<PuzzleList>("puzzles/list");
+
+export const attemptListMove = (puzzleId: string, move: string, played: string[]) =>
+  api.post<Verdict>(`puzzles/list/${encodeURIComponent(puzzleId)}/attempt`, { move, played });
+
+/** Stamps when a list puzzle was opened, for the minutes its first solve adds. */
+export const openListPuzzle = (puzzleId: string) =>
+  api
+    .post<{ started: boolean }>(`puzzles/list/${encodeURIComponent(puzzleId)}/open`)
+    .catch(() => ({ started: false }));
 
 /** Submits one move. `played` is the pupil's own moves so far; the opponent's
     replies come from the server's copy of the solution, so it rebuilds the
@@ -117,6 +132,17 @@ export const solvedCount = (puzzles: DailyPuzzle[]) => puzzles.filter((p) => p.s
  */
 export function nextUnsolved(puzzles: DailyPuzzle[], justSolved: number): number {
   return puzzles.findIndex((p, i) => i !== justSolved && !p.solved);
+}
+
+/**
+ * The practice list's next puzzle after one is solved: the next unticked one
+ * after it in the same filter, else the first unticked one before it, else -1
+ * — back to the list, everything shown is done.
+ */
+export function nextOnList(puzzles: ListPuzzle[], justSolved: number, level: FreeTier | ""): number {
+  const open = (p: ListPuzzle, i: number) => i !== justSolved && !p.solved && (!level || p.tier === level);
+  const after = puzzles.findIndex((p, i) => i > justSolved && open(p, i));
+  return after >= 0 ? after : puzzles.findIndex(open);
 }
 
 /** What to call the puzzle in one line: "Mate in 2", else the best move. */

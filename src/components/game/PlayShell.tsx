@@ -2,19 +2,23 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useTranslations } from "use-intl";
 import { ArrowLeft } from "lucide-react-native";
-import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 import { SoundToggle } from "./SoundToggle";
 
 /** Header + scroll body the play screens share. Mirrors the web app's
-    PlayShell, minus the phone frame — this *is* the phone. */
+    PlayShell — the portal's title row and the content under it — minus the
+    page around it: this *is* the phone. */
 export function PlayShell({
   title,
+  sub,
   back,
   nav = false,
   sound = false,
   children,
 }: {
   title: string;
+  /** A line under the title — a puzzle's rating. */
+  sub?: string;
   /** Where the arrow goes. Defaults to whatever pushed this screen, which is
       usually right; pass a route when a screen can be reached from more than
       one place and "wherever you came from" is not a useful answer. */
@@ -29,8 +33,9 @@ export function PlayShell({
   children: React.ReactNode;
 }) {
   const tCommon = useTranslations("common");
+  const { pp } = usePalette();
   return (
-    <View className="flex-1 bg-paper">
+    <View className="flex-1 bg-pp-bg">
       <View className="flex-row items-center gap-3 px-4 pb-2 pt-3">
         {!nav && (
           <Pressable
@@ -41,20 +46,25 @@ export function PlayShell({
             }}
             accessibilityRole="button"
             accessibilityLabel={tCommon("back")}
-            hitSlop={10}
-            className="size-9 items-center justify-center rounded-full border-2 border-line bg-card"
+            hitSlop={8}
+            className="size-[38px] items-center justify-center rounded-xl border-[1.5px] border-pp-line bg-pp-card active:bg-pp-soft"
           >
-            <ArrowLeft size={18} color={C.ink} />
+            <ArrowLeft size={18} color={pp.ink} strokeWidth={2.2} />
           </Pressable>
         )}
-        <Text className="min-w-0 flex-1 font-display-semibold text-2xl text-navy">{title}</Text>
+        <View className="min-w-0 flex-1">
+          <Text numberOfLines={1} className="font-pp-display-bold text-[23px] leading-tight text-pp-ink">
+            {title}
+          </Text>
+          {sub ? <Text className="font-pp text-[13px] text-pp-muted">{sub}</Text> : null}
+        </View>
         {sound && <SoundToggle />}
       </View>
       <ScrollView
         className="flex-1"
         /* A tab keeps the bar, so it reserves room for it; a pushed screen has
            the bottom of the phone to itself. */
-        contentContainerClassName={`px-4 pt-2 gap-3 ${nav ? "pb-32" : "pb-8"}`}
+        contentContainerClassName={`px-4 pt-2 gap-4 ${nav ? "pb-32" : "pb-8"}`}
         showsVerticalScrollIndicator={false}
       >
         {children}
@@ -63,9 +73,10 @@ export function PlayShell({
   );
 }
 
+/* A card, as the parent portal draws one — used for status, results and forms. */
 export function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <View className={`rounded-card border-2 border-line bg-card p-4 shadow-clay ${className}`}>
+    <View className={`rounded-2xl border-[1.5px] border-pp-line bg-pp-card p-[18px] ${className}`}>
       {children}
     </View>
   );
