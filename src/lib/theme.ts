@@ -40,6 +40,9 @@ export const PP_LIGHT = {
   dangerLine: "#e7c9c9",
   dangerHover: "#fdf3f3",
   plumSoft: "#efeefa",
+  /* The Advanced level's colour on a child's card. */
+  purple: "#6a3f9e",
+  purpleSoft: "#f1ebfa",
   track: "#f3e6d8",
   barTrack: "#dbe6f7",
   neutral: "#eef1f7",
@@ -75,6 +78,8 @@ export const PP_DARK: Palette<PPKey> = {
   dangerLine: "#6b4444",
   dangerHover: "#3a2626",
   plumSoft: "#383060",
+  purple: "#c3a6f0",
+  purpleSoft: "#3b2f5c",
   track: "#4e3a1b",
   barTrack: "#2a3a5c",
   neutral: "#2a3550",

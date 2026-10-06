@@ -2,15 +2,14 @@
  * The parent portal shell.
  *
  * Mirrors the web layout: the data provider wraps the chrome as well as the
- * screens, because the account chip greets the signed-in parent by name and
- * the bell counts their unread rows — both need the data too.
+ * screens, because the bell on the home counts the parent's unread rows.
  */
 import { Stack } from "expo-router";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RequireRole } from "@/components/RequireRole";
 import { ParentDataProvider } from "@/components/parent/ParentData";
-import { ParentAccountChip, ParentBottomNav2 } from "@/components/parent/ParentNav2";
+import { ParentBottomNav2, ParentTopLabel } from "@/components/parent/ParentNav2";
 import { usePalette } from "@/components/ThemeProvider";
 
 export default function ParentLayout() {
@@ -19,7 +18,7 @@ export default function ParentLayout() {
     <RequireRole role="Parent">
       <SafeAreaView className="flex-1 bg-pp-bg" edges={["top"]}>
         <ParentDataProvider>
-          <ParentAccountChip />
+          <ParentTopLabel />
           <View className="min-h-0 flex-1">
             <Stack
               screenOptions={{

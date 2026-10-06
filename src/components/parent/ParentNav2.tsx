@@ -1,5 +1,6 @@
 /**
- * The parent portal's chrome: the top account bar and the bottom tabs.
+ * The parent portal's chrome: a slim label at the top, the bottom tabs, and
+ * the bell that sits on the home greeting's row.
  *
  * Same four tabs as the portal, in the same order, so a parent who uses both
  * is not learning two apps. The sidebar the portal grows at ≥lg has no phone
@@ -25,7 +26,7 @@ const tabs: Tab[] = [
   },
   {
     href: "/parent/attendance",
-    labelKey: "navChildren",
+    labelKey: "navAttendance",
     icon: ClipboardCheck,
     activeAliases: ["/parent/child"],
   },
@@ -66,47 +67,38 @@ export function ParentBottomNav2() {
   );
 }
 
-/** The signed-in parent, top right — where the console and the portal both
-    put the account. The bell carries the unread dot. */
-export function ParentAccountChip() {
-  const { pp } = usePalette();
+/** A slim label above every parent screen — the web's phone-width shell. The
+    brand lives here; the account is a tab, so the chip that used to share
+    this row is gone. */
+export function ParentTopLabel() {
   const t = useTranslations("pv2");
-  const { parent, parentId, unreadNotifs } = useParentData();
-  const initial = (parent.name.trim()[0] ?? "?").toUpperCase();
   return (
-    <View className="flex-row items-center justify-between gap-2 bg-pp-bg px-4 pt-3">
+    <View className="items-center bg-pp-bg px-4 pt-2.5">
       <Text className="text-[10px] font-pp-bold uppercase tracking-[1.2px] text-pp-blue">
         JTrax — {t("roleParent")}
       </Text>
-      <View className="flex-row items-center gap-2">
-        <Link href="/parent/notifications" asChild>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t("notificationsTitle")}
-            className="size-[38px] items-center justify-center rounded-full border-[1.5px] border-pp-line bg-pp-card"
-          >
-            <Bell size={18} color={pp.ink} strokeWidth={1.8} />
-            {unreadNotifs > 0 && (
-              <View className="absolute right-2 top-2 size-[9px] rounded-full border-2 border-pp-card bg-pp-red" />
-            )}
-          </Pressable>
-        </Link>
-        <Link href="/parent/profile" asChild>
-          <Pressable className="max-w-[190px] flex-row items-center gap-2.5 rounded-full border-[1.5px] border-pp-line bg-pp-card py-1.5 pl-1.5 pr-3.5">
-            <View className="size-8 items-center justify-center rounded-full bg-pp-deep">
-              <Text className="font-pp-extrabold text-sm text-white">{initial}</Text>
-            </View>
-            <View className="min-w-0 shrink">
-              <Text numberOfLines={1} className="font-pp-bold text-[12.5px] text-pp-ink">
-                {parent.name}
-              </Text>
-              <Text numberOfLines={1} className="font-pp text-[10px] text-pp-muted">
-                {t("roleParent")} · {parentId}
-              </Text>
-            </View>
-          </Pressable>
-        </Link>
-      </View>
     </View>
+  );
+}
+
+/** The notification bell, on the home greeting's row. The red dot is any
+    unread row in the inbox. */
+export function ParentBell() {
+  const { pp } = usePalette();
+  const t = useTranslations("pv2");
+  const { unreadNotifs } = useParentData();
+  return (
+    <Link href="/parent/notifications" asChild>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t("notificationsTitle")}
+        className="size-[38px] items-center justify-center rounded-full border-[1.5px] border-pp-line bg-pp-card active:bg-pp-soft"
+      >
+        <Bell size={18} color={pp.ink} strokeWidth={1.8} />
+        {unreadNotifs > 0 && (
+          <View className="absolute right-2 top-2 size-[9px] rounded-full border-2 border-pp-card bg-pp-red" />
+        )}
+      </Pressable>
+    </Link>
   );
 }

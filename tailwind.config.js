@@ -6,7 +6,7 @@ const PP_TOKENS = [
   "ink", "blue", "deep", "navy", "line", "soft", "mist", "bg", "card", "panel",
   "muted", "faint", "sub", "green", "green-soft", "green-dot", "red", "red-soft",
   "amber", "amber-soft", "danger", "danger-soft", "danger-line", "danger-hover",
-  "plum-soft", "track", "bar-track", "neutral", "dash",
+  "plum-soft", "purple", "purple-soft", "track", "bar-track", "neutral", "dash",
 ];
 const ST_TOKENS = [
   "hero", "orange", "orange-soft", "orange-line", "gold", "gold-soft",
