@@ -52,7 +52,15 @@
           "enableBackgroundPlayback": false
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "JCA uses your photos only to read your child's ID card when you enter them in a tournament.",
+          "cameraPermission": "JCA uses the camera only to photograph your child's ID card when you enter them in a tournament.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

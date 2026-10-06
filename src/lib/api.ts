@@ -50,6 +50,7 @@ export function getAuthToken(): string | null {
 }
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (body instanceof FormData) return upload<T>(method, path, body);
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/api/v1/${path}`, {
@@ -71,9 +72,35 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return data as T;
 }
 
+/* A multipart upload — a photo of an ID card. Through XMLHttpRequest, not
+   fetch: the fetch Expo installs refuses React Native's file parts
+   ({ uri, name, type }), which are the only way to send a photo by its URI.
+   No Content-Type of ours either: the request writes the boundary into it. */
+function upload<T>(method: string, path: string, form: FormData): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, `${API_BASE}/api/v1/${path}`);
+    if (authToken) xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
+    xhr.onload = () => {
+      let data: unknown = {};
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch {
+        /* not JSON: the status says what happened */
+      }
+      if (xhr.status >= 200 && xhr.status < 300) resolve(data as T);
+      else reject(new ApiError(xhr.status, (data as { error?: string }).error ?? `request failed (${xhr.status})`));
+    };
+    xhr.onerror = () => reject(new ApiError(0, "offline"));
+    xhr.send(form);
+  });
+}
+
 export const api = {
   get: <T,>(path: string) => request<T>("GET", path),
   post: <T,>(path: string, body?: unknown) => request<T>("POST", path, body),
+  /** A multipart upload — a photo, as the ID card scan takes it. */
+  postForm: <T,>(path: string, form: FormData) => request<T>("POST", path, form),
   put: <T,>(path: string, body: unknown) => request<T>("PUT", path, body),
   patch: <T,>(path: string, body: unknown) => request<T>("PATCH", path, body),
   /** A body is rare on a delete, but unregistering a push token names the
