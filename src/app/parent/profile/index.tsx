@@ -1,5 +1,6 @@
 /**
- * Who the parent is: their children and their contact details.
+ * Who the parent is: their children, their contact details, and every
+ * payment the family has made, each with its receipt.
  *
  * Everything they can *change* — alerts, language — is on the Settings tab,
  * as in the portal.
@@ -9,6 +10,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { BadgeCheck, ChevronRight, Mail, Pencil, Phone } from "lucide-react-native";
 import { ChildFace } from "@/components/parent/ChildFace";
+import { PaymentHistory } from "@/components/parent/PaymentHistory";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
 
@@ -23,7 +25,7 @@ function SectionLabel({ children }: { children: string }) {
 export default function ParentProfile() {
   const { pp } = usePalette();
   const t = useTranslations("pv2");
-  const { children: childList, parent, parentId } = useParentData();
+  const { children: childList, parent, parentId, payments } = useParentData();
   const initial = (parent.name.trim()[0] ?? "?").toUpperCase();
 
   return (
@@ -129,6 +131,8 @@ export default function ParentProfile() {
           </View>
         </View>
       </View>
+
+      <PaymentHistory payments={payments} />
     </ScrollView>
   );
 }

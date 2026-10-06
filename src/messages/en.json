@@ -649,7 +649,40 @@
     "filterCourse": "Course",
     "allCourses": "All courses",
     "creditsUsedSuffix": "credits used",
-    "notifNoneFromSchool": "Your school isn't sending any notifications at the moment."
+    "notifNoneFromSchool": "Your school isn't sending any notifications at the moment.",
+    "paymentHistory": "Payment history",
+    "noPayments": "No payments yet.",
+    "payStatus": {
+      "Paid": "Paid",
+      "Pending": "Pending",
+      "Cancelled": "Cancelled"
+    },
+    "payMethodName": {
+      "Cash": "Cash",
+      "BankTransfer": "Bank transfer",
+      "PromptPay": "PromptPay",
+      "CreditCard": "Card"
+    },
+    "payDate": "Date",
+    "receivedFrom": "Received from",
+    "payChild": "Student",
+    "payMethod": "Payment method",
+    "payReference": "Reference",
+    "receiptOfficial": "Official Receipt",
+    "receiptItem": "Description",
+    "receiptAmount": "Amount",
+    "payTournament": "Tournament",
+    "payCourse": "Course",
+    "creditsCount": "{count} credits",
+    "paySubtotal": "Subtotal",
+    "payDiscount": "Discount",
+    "payAmountPaid": "Amount paid",
+    "receiptThanks": "Thank you for learning with us!",
+    "receiptFootnote": "This receipt was issued electronically and is valid without a signature.",
+    "receiptTitle": "Payment receipt",
+    "close": "Close",
+    "saveImage": "Save image",
+    "creditsPlus": "+{count} credits"
   },
   "changePassword": {
     "title": "Change password",
