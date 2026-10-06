@@ -1,220 +1,76 @@
 /**
- * The Children tab: who they are, what they did today, and the record of
- * every session the academy has written.
- *
- * The portal lays this out in two columns at ≥lg; a phone has one, so the
- * same blocks stack in the same order.
+ * The Attendance tab — the web's: a month of the classes the children came
+ * to, two filters (which child, which course) with the credits the rows they
+ * leave cost, and every session the academy wrote, by date, each with what
+ * it cost. The children themselves and today's practice are on the home.
  */
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslations } from "use-intl";
-import { CheckSquare, ChevronLeft, ChevronRight, Star } from "lucide-react-native";
-import Svg, { Circle } from "react-native-svg";
+import { ChevronLeft, ChevronRight, Users } from "lucide-react-native";
 import { CURRENT, type ChildKey, type HistRow } from "@/lib/parent-v2-data";
-import { creditsUsed } from "@/lib/credits-used";
-import { ChildBanner, ChildFace } from "@/components/parent/ChildFace";
+import { coursesOf, usedCredits } from "@/lib/course-filter";
+import { CreditLine } from "@/components/parent/AttendanceRow";
+import { ChildFace } from "@/components/parent/ChildFace";
+import { CourseFilter, CreditsUsed } from "@/components/parent/CourseFilter";
+import { FilterPicker } from "@/components/parent/FilterPicker";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
 
 const WD_KEYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
-      {children}
-    </Text>
-  );
-}
-
-export default function ParentChildren() {
+export default function ParentAttendance() {
   const { pp } = usePalette();
   const t = useTranslations("pv2");
-  const { children: childList, att: ATT, hist, months, todayActivity } = useParentData();
+  const { children: childList, att: ATT, hist, months } = useParentData();
   const [filter, setFilter] = useState<"all" | ChildKey>("all");
   const [month, setMonth] = useState(CURRENT);
+  const [course, setCourse] = useState("");
 
   const M = months[month];
+  /* The rows the child filter allows, then the course: the picker offers only
+     courses these children have been to, and the total is theirs, all time. */
+  const byChild = hist.filter((h) => filter === "all" || h.child === filter);
+  const courseList = coursesOf(byChild);
+  const activeCourse = courseList.includes(course) ? course : "";
+  const shown = byChild.filter((h) => !activeCourse || h.cls === activeCourse);
+  const prefix = `${M.year}-${String(M.month + 1).padStart(2, "0")}`;
+  const courseDays = new Set(
+    shown.filter((h) => h.status === "Present" && h.iso.startsWith(prefix)).map((h) => Number(h.iso.slice(8, 10))),
+  );
   const todayDate = new Date().getDate();
   const cells: { label: string; present: boolean; today: boolean }[] = [];
   for (let i = 0; i < M.offset; i++) cells.push({ label: "", present: false, today: false });
   for (let d = 1; d <= M.days; d++) {
     const keys: ChildKey[] = filter === "all" ? childList.map((c) => c.key) : [filter];
-    const present = keys.some((k) => (ATT[k]?.[month] ?? { present: [] }).present.includes(d));
+    const present = activeCourse
+      ? courseDays.has(d)
+      : keys.some((k) => (ATT[k]?.[month] ?? { present: [] }).present.includes(d));
     cells.push({ label: String(d), present, today: month === CURRENT && d === todayDate });
   }
 
   const groups: { date: string; items: HistRow[] }[] = [];
-  hist
-    .filter((h) => filter === "all" || h.child === filter)
-    .forEach((h) => {
-      let g = groups.find((x) => x.date === h.date);
-      if (!g) {
-        g = { date: h.date, items: [] };
-        groups.push(g);
-      }
-      g.items.push(h);
-    });
-
-  const chips: { k: "all" | ChildKey; label: string }[] = [
-    { k: "all", label: t("all") },
-    ...childList.map((c) => ({ k: c.key, label: c.name })),
-  ];
+  shown.forEach((h) => {
+    let g = groups.find((x) => x.date === h.date);
+    if (!g) {
+      g = { date: h.date, items: [] };
+      groups.push(g);
+    }
+    g.items.push(h);
+  });
 
   return (
-    <ScrollView
-      className="flex-1 bg-pp-bg"
-      contentContainerClassName="gap-5 px-4 pb-10 pt-4"
-      showsVerticalScrollIndicator={false}
-    >
-      <View className="gap-1">
-        <Text className="font-pp-display-semibold text-2xl leading-tight text-pp-ink">
-          {t("navChildren")}
+    <ScrollView className="flex-1 bg-pp-bg" contentContainerClassName="gap-5 px-4 pb-10 pt-4" showsVerticalScrollIndicator={false}>
+      <View>
+        <Text accessibilityRole="header" className="font-pp-display-bold text-[23px] leading-tight text-pp-ink">
+          {t("navAttendance")}
         </Text>
-        <Text className="font-pp text-[12.5px] text-pp-muted">{t("childrenSub")}</Text>
+        <Text className="mt-1 font-pp text-sm text-pp-muted">{t("attendanceSub")}</Text>
       </View>
-
-      {/* The children */}
-      <View className="gap-4">
-        <SectionLabel>{t("myChildren", { count: childList.length })}</SectionLabel>
-        <View className="flex-row flex-wrap gap-4">
-          {childList.map((c) => {
-            const low = c.credits <= 2;
-            const isBeg = c.level === "Beginner";
-            const used = creditsUsed(c.credits, c.creditsBought);
-            const pct = c.creditsBought > 0
-              ? Math.min(100, Math.round((used / c.creditsBought) * 100))
-              : 0;
-            return (
-              <Link key={c.key} href={`/parent/child/${c.key}` as never} asChild>
-                <Pressable
-                  style={{ backgroundColor: isBeg ? pp.greenSoft : pp.card }}
-                  /* Two to a row, with the 16px gap taken out of the width. */
-                  className="min-w-0 flex-1 basis-[45%] overflow-hidden rounded-card border-[1.5px] border-pp-line"
-                >
-                  <ChildBanner name={c.name} tint={c.avBg} />
-                  <View className="gap-2 px-3.5 pb-3.5 pt-3">
-                    <View className="flex-row flex-wrap items-center gap-1.5">
-                      <Text className="font-pp-bold text-[15px] text-pp-ink">{c.name}</Text>
-                      {!!c.level && (
-                        <View
-                          style={{ backgroundColor: isBeg ? pp.greenSoft : pp.amberSoft }}
-                          className="rounded-full px-2 py-0.5"
-                        >
-                          <Text
-                            style={{ color: isBeg ? pp.green : pp.amber }}
-                            className="font-pp-bold text-[9.5px]"
-                          >
-                            {c.level}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                    <View className="flex-row items-center gap-2 pt-0.5">
-                      <CheckSquare size={16} color={pp.muted} strokeWidth={1.8} />
-                      <Text className="font-pp-semibold text-xs text-pp-ink">
-                        {t("completedClasses", { count: c.attended })}
-                      </Text>
-                    </View>
-                    <View className="gap-1 pt-0.5">
-                      <View className="h-1.5 overflow-hidden rounded-full bg-pp-bar-track">
-                        <View
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: low ? pp.amber : pp.blue,
-                          }}
-                          className="h-full rounded-full"
-                        />
-                      </View>
-                      <Text className="font-pp text-[10.5px] text-pp-muted">
-                        {t("creditsUsedLabel", { used, total: c.creditsBought })}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-              </Link>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Today's activity */}
-      <View className="gap-3.5">
-        <View className="flex-row items-center gap-2">
-          <Star size={16} color={pp.amber} fill={pp.amber} strokeWidth={1.8} />
-          <SectionLabel>{t("todaysActivity")}</SectionLabel>
-        </View>
-        <View>
-          <View className="flex-row items-center gap-2.5 px-0.5 pb-2">
-            <View className="flex-1" />
-            <Text className="w-[68px] text-right font-pp-bold text-[10px] uppercase text-pp-faint">
-              {t("practice")}
-            </Text>
-            <Text className="w-[68px] text-right font-pp-bold text-[10px] uppercase text-pp-faint">
-              {t("challenge")}
-            </Text>
-          </View>
-          {todayActivity.length === 0 && (
-            <Text className="px-0.5 py-3 font-pp text-[12.5px] text-pp-muted">
-              {t("noPracticeToday")}
-            </Text>
-          )}
-          {todayActivity.map((r, i) => {
-            const pct = Math.max(4, Math.min(100, Math.round((r.mins / 30) * 100)));
-            const circ = 2 * Math.PI * 8.5;
-            return (
-              <View
-                key={r.child}
-                className={`flex-row items-center gap-5 px-0.5 py-3.5 ${
-                  i < todayActivity.length - 1 ? "border-b border-pp-neutral" : ""
-                }`}
-              >
-                <View className="size-5 items-center justify-center">
-                  {r.done ? (
-                    <View className="size-5 items-center justify-center rounded-full bg-pp-green">
-                      <Text className="font-pp-bold text-[11px] text-white">✓</Text>
-                    </View>
-                  ) : (
-                    <>
-                      <View style={{ position: "absolute", transform: [{ rotate: "-90deg" }] }}>
-                        <Svg width={20} height={20} viewBox="0 0 20 20">
-                          <Circle cx="10" cy="10" r="8.5" fill="none" stroke={pp.track} strokeWidth="3" />
-                          <Circle
-                            cx="10"
-                            cy="10"
-                            r="8.5"
-                            fill="none"
-                            stroke={pp.amber}
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeDasharray={`${((circ * pct) / 100).toFixed(1)} ${circ.toFixed(1)}`}
-                          />
-                        </Svg>
-                      </View>
-                      <Star size={9} color={pp.amber} fill={pp.amber} strokeWidth={2} />
-                    </>
-                  )}
-                </View>
-                <Text className="flex-1 font-pp text-[13.5px] text-pp-ink">{r.child}</Text>
-                <Text className="w-[68px] text-right font-pp-semibold text-[13px] text-pp-muted">
-                  {t("minShort", { count: r.mins })}
-                </Text>
-                <View className="w-[68px] flex-row items-center justify-end gap-1">
-                  <Text className="font-pp-bold text-[13px] text-pp-blue">
-                    {r.puzzles}
-                  </Text>
-                  <Star size={15} color={pp.amber} fill={pp.amber} strokeWidth={1.8} />
-                </View>
-              </View>
-            );
-          })}
-        </View>
-      </View>
-
-      <SectionLabel>{t("attHistory")}</SectionLabel>
 
       {/* Calendar */}
-      <View className="gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-4 shadow-clay">
+      <View className="gap-3 rounded-xl border-[1.5px] border-pp-line bg-pp-card p-4 shadow-clay">
         <View className="flex-row items-center justify-between px-0.5">
           <Pressable
             onPress={() => setMonth((m) => Math.max(0, m - 1))}
@@ -254,9 +110,7 @@ export default function ParentChildren() {
               >
                 <Text
                   style={{ color: c.present ? "#fbfff1" : pp.ink }}
-                  className={`text-[12.5px] ${
-                    c.present || c.today ? "font-pp-bold" : "font-pp"
-                  }`}
+                  className={`text-[12.5px] ${c.present || c.today ? "font-pp-bold" : "font-pp"}`}
                 >
                   {c.label}
                 </Text>
@@ -276,74 +130,58 @@ export default function ParentChildren() {
         </View>
       </View>
 
-      {/* Filter + history */}
       <View className="gap-4">
-        <View className="flex-row flex-wrap gap-2">
-          {chips.map((f) => (
-            <Pressable
-              key={f.k}
-              onPress={() => setFilter(f.k)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: filter === f.k }}
-              style={{
-                backgroundColor: filter === f.k ? pp.deep : pp.card,
-                borderColor: filter === f.k ? pp.deep : pp.line,
-              }}
-              className="rounded-full border-[1.5px] px-4 py-2"
-            >
-              <Text
-                style={{ color: filter === f.k ? "#fbfff1" : pp.muted }}
-                className="font-pp-bold text-xs"
-              >
-                {f.label}
-              </Text>
-            </Pressable>
-          ))}
+        {/* Two filters and the credits they add up to, on one row: long names
+            shorten with "…" rather than wrap. */}
+        <View className="min-w-0 flex-row items-center gap-1.5">
+          <FilterPicker
+            icon={Users}
+            label={t("filterChild")}
+            options={[{ k: "all", label: t("allChildren") }, ...childList.map((c) => ({ k: c.key, label: c.name }))]}
+            value={filter}
+            onChange={(k) => setFilter(k as "all" | ChildKey)}
+          />
+          <CourseFilter courses={courseList} value={activeCourse} onChange={setCourse} />
+          <View className="ml-auto shrink-0 pl-1">
+            <CreditsUsed used={usedCredits(shown)} />
+          </View>
         </View>
 
         {groups.length === 0 && (
-          <View className="rounded-card border-[1.5px] border-dashed border-pp-dash p-6">
-            <Text className="text-center font-pp text-[12.5px] text-pp-muted">
-              {t("noAttendanceYet")}
-            </Text>
+          <View className="rounded-xl border-[1.5px] border-dashed border-pp-dash p-6">
+            <Text className="text-center font-pp text-[12.5px] text-pp-muted">{t("noAttendanceYet")}</Text>
           </View>
         )}
 
         {groups.map((g) => (
           <View key={g.date} className="gap-2.5">
-            <SectionLabel>{g.date}</SectionLabel>
+            <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">{g.date}</Text>
             {g.items.map((h, i) => {
               const c = childList.find((x) => x.key === h.child);
               if (!c) return null;
               return (
                 <Link key={`${g.date}-${i}`} href={`/parent/child/${c.key}` as never} asChild>
-                  <Pressable className="flex-row items-center gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-4">
+                  <Pressable className="flex-row items-center gap-3 rounded-xl border-[1.5px] border-pp-line bg-pp-card p-4 active:bg-pp-mist">
                     <ChildFace name={c.name} tint={c.avBg} size={42} />
                     <View className="min-w-0 flex-1 gap-0.5">
-                      <Text className="font-pp-bold text-[13.5px] text-pp-ink">
+                      <Text numberOfLines={1} className="font-pp-semibold text-[13.5px] text-pp-ink">
                         {c.name} · ♟ {h.cls}
                       </Text>
                       <View className="flex-row flex-wrap items-center gap-x-3 gap-y-1">
                         <Text className="font-pp text-[11.5px] text-pp-muted">◷ {h.time}</Text>
-                        {/* This slot used to show a branch name the backend
-                            does not record; whether the child was there is
-                            what the row actually knows. */}
-                        <View
-                          style={{
-                            backgroundColor:
-                              h.status === "Present" ? pp.greenSoft : pp.dangerSoft,
-                          }}
-                          className="rounded-full px-2 py-0.5"
-                        >
-                          <Text
-                            style={{ color: h.status === "Present" ? pp.green : pp.danger }}
-                            className="font-pp-bold text-[10px] uppercase"
-                          >
-                            {h.status === "Present" ? t("present") : t("absent")}
-                          </Text>
-                        </View>
+                        {/* Only an absence is tagged: being there is what a
+                            record means. */}
+                        {h.status === "Absent" && (
+                          <View className="rounded-full bg-pp-danger-soft px-2 py-0.5">
+                            <Text className="font-pp-bold text-[10px] uppercase tracking-[0.6px] text-pp-danger">
+                              {t("absent")}
+                            </Text>
+                          </View>
+                        )}
                       </View>
                     </View>
+                    {/* What it cost, on the right and centred. */}
+                    <CreditLine credits={h.credits} />
                   </Pressable>
                 </Link>
               );

@@ -645,7 +645,13 @@
     "classesJoined": "{count, plural, one {# class joined} other {# classes joined}}",
     "announcementLabel": "Announcement",
     "fromSender": "From {name}",
-    "navAttendance": "Attendance"
+    "navAttendance": "Attendance",
+    "attendanceSub": "Every class your children came to, and what it cost.",
+    "filterChild": "Child",
+    "allChildren": "All children",
+    "filterCourse": "Course",
+    "allCourses": "All courses",
+    "creditsUsedSuffix": "credits used"
   },
   "changePassword": {
     "title": "Change password",

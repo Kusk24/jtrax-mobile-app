@@ -1,11 +1,15 @@
-/* One child's attendance, month by month. Tapping a day filters the list
-   below it to that day; tapping it again clears the filter. */
+/* One child's attendance, month by month — the web's history page. Tapping a
+   day filters the list below it to that day; tapping it again clears the
+   filter. A course filter narrows both, with the credits the rows used. */
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { CURRENT } from "@/lib/parent-v2-data";
+import { coursesOf, usedCredits } from "@/lib/course-filter";
+import { AttendanceRow } from "@/components/parent/AttendanceRow";
+import { CourseFilter, CreditsUsed } from "@/components/parent/CourseFilter";
 import { useParentData } from "@/components/parent/ParentData";
 import { BackHeader } from "@/components/parent/BackHeader";
 import { usePalette } from "@/components/ThemeProvider";
@@ -20,6 +24,7 @@ export default function ChildHistory() {
   const { children: kids, att: ATT, hist, months } = useParentData();
   const [month, setMonth] = useState(CURRENT);
   const [sel, setSel] = useState<{ m: number; d: number } | null>(null);
+  const [course, setCourse] = useState("");
   const ch = kids.find((c) => c.key === childId);
 
   if (!ch) {
@@ -37,9 +42,19 @@ export default function ChildHistory() {
     );
   }
 
+  /* This child's rows, then the chosen course; the total is all time. */
+  const mine = hist.filter((h) => h.child === ch.key);
+  const courseList = coursesOf(mine);
+  const activeCourse = courseList.includes(course) ? course : "";
+  const shown = mine.filter((h) => !activeCourse || h.cls === activeCourse);
+
   const M = months[month];
   const rec = ATT[ch.key]?.[month] ?? { present: [], absent: [] };
   const todayDate = new Date().getDate();
+  const prefix = `${M.year}-${String(M.month + 1).padStart(2, "0")}`;
+  const courseDays = new Set(
+    shown.filter((h) => h.status === "Present" && h.iso.startsWith(prefix)).map((h) => Number(h.iso.slice(8, 10))),
+  );
 
   const cells: { d: number | null; present: boolean; today: boolean; selected: boolean }[] = [];
   for (let i = 0; i < M.offset; i++) {
@@ -48,20 +63,14 @@ export default function ChildHistory() {
   for (let d = 1; d <= M.days; d++) {
     cells.push({
       d,
-      present: rec.present.includes(d),
+      present: activeCourse ? courseDays.has(d) : rec.present.includes(d),
       today: month === CURRENT && d === todayDate,
       selected: sel?.m === month && sel?.d === d,
     });
   }
 
   /* The month's real attendance rows, each with its session's own times. */
-  const prefix = `${M.year}-${String(M.month + 1).padStart(2, "0")}`;
-  const rows = hist.filter(
-    (h) =>
-      h.child === ch.key
-      && h.iso.startsWith(prefix)
-      && (!sel || Number(h.iso.slice(8, 10)) === sel.d),
-  );
+  const rows = shown.filter((h) => h.iso.startsWith(prefix) && (!sel || Number(h.iso.slice(8, 10)) === sel.d));
 
   return (
     <ScrollView
@@ -152,28 +161,16 @@ export default function ChildHistory() {
           </View>
         </View>
 
-        <View className="flex-row items-center gap-4 rounded-card border-[1.5px] border-pp-soft bg-pp-mist px-4 py-4">
-          <View className="min-w-[64px]">
-            <Text className="font-pp-display-semibold text-[30px] leading-none text-pp-blue">
-              {rec.present.length}
-            </Text>
-            <Text className="mt-1 font-pp-bold text-[10px] uppercase tracking-[0.8px] text-pp-blue">
-              {t("classesThisMonth")}
-            </Text>
-          </View>
-          <View className="flex-1 items-end">
-            <Text className="font-pp-display-semibold text-xl text-pp-green">
-              {rec.present.length}
-            </Text>
-            <Text className="font-pp text-[10.5px] text-pp-muted">{t("present")}</Text>
-          </View>
-        </View>
       </View>
 
       <View className="gap-3">
-        <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
-          {t("history")}
-        </Text>
+        <View className="min-w-0 flex-row items-center gap-2">
+          <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">{t("history")}</Text>
+          <View className="ml-auto min-w-0 shrink flex-row items-center justify-end gap-2">
+            <CreditsUsed used={usedCredits(shown)} />
+            <CourseFilter courses={courseList} value={activeCourse} onChange={setCourse} />
+          </View>
+        </View>
         {rows.length === 0 && (
           <View className="rounded-card border-[1.5px] border-dashed border-pp-dash p-5">
             <Text className="text-center font-pp text-[12.5px] text-pp-muted">
@@ -184,30 +181,7 @@ export default function ChildHistory() {
         {rows.length > 0 && (
           <View className="overflow-hidden rounded-card bg-pp-card shadow-clay">
             {rows.map((h, i) => (
-              <View
-                key={i}
-                className={`flex-row items-center justify-between gap-2.5 px-4 py-3.5 ${
-                  i < rows.length - 1 ? "border-b border-pp-panel" : ""
-                }`}
-              >
-                <View className="min-w-0 flex-1 gap-0.5">
-                  <Text className="font-pp-bold text-[13px] text-pp-ink">{h.cls}</Text>
-                  <Text className="font-pp text-[11.5px] text-pp-muted">
-                    {h.date} · {h.time}
-                  </Text>
-                </View>
-                <View
-                  style={{ backgroundColor: h.status === "Present" ? pp.greenSoft : pp.dangerSoft }}
-                  className="rounded-full px-2.5 py-1"
-                >
-                  <Text
-                    style={{ color: h.status === "Present" ? pp.green : pp.danger }}
-                    className="font-pp-bold text-[10.5px] uppercase"
-                  >
-                    {h.status === "Present" ? t("present") : t("absent")}
-                  </Text>
-                </View>
-              </View>
+              <AttendanceRow key={i} h={h} last={i === rows.length - 1} />
             ))}
           </View>
         )}

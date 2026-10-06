@@ -645,7 +645,13 @@
     "classesJoined": "เข้าเรียนแล้ว {count} คลาส",
     "announcementLabel": "ประกาศ",
     "fromSender": "จาก {name}",
-    "navAttendance": "การเข้าเรียน"
+    "navAttendance": "การเข้าเรียน",
+    "attendanceSub": "ทุกคลาสที่บุตรหลานเข้าเรียน และเครดิตที่ใช้",
+    "filterChild": "ลูก",
+    "allChildren": "ลูกทุกคน",
+    "filterCourse": "คอร์ส",
+    "allCourses": "ทุกคอร์ส",
+    "creditsUsedSuffix": "เครดิตที่ใช้ไป"
   },
   "changePassword": {
     "title": "เปลี่ยนรหัสผ่าน",
