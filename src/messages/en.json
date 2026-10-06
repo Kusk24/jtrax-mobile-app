@@ -533,7 +533,6 @@
     "today": "Today",
     "selected": "Selected",
     "all": "All",
-    "classesThisMonth": "Classes this month",
     "history": "History",
     "noSessions": "No sessions this month.",
     "childProfileTitle": "{name}'s Profile",
@@ -607,9 +606,7 @@
     "certNote": "A certificate is awarded after {count} hours of class.",
     "navSettings": "Settings",
     "settingsTitle": "Settings",
-    "navChildren": "Children",
     "brandSub": "Chess School",
-    "childrenSub": "Your children, what they did today, and every session on record.",
     "settingsSub": "Alerts, screen time and how the portal looks.",
     "profileSub": "Your details, and the children linked to your account.",
     "creditsShort": "{count} credits",
@@ -653,7 +650,13 @@
     "classesJoined": "{count, plural, one {# class joined} other {# classes joined}}",
     "announcementLabel": "Announcement",
     "fromSender": "From {name}",
-    "navAttendance": "Attendance"
+    "navAttendance": "Attendance",
+    "attendanceSub": "Every class your children came to, and what it cost.",
+    "filterChild": "Child",
+    "allChildren": "All children",
+    "filterCourse": "Course",
+    "allCourses": "All courses",
+    "creditsUsedSuffix": "credits used"
   },
   "changePassword": {
     "title": "Change password",
