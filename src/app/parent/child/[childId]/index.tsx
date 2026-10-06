@@ -1,6 +1,8 @@
 /**
- * One child, in full: credits, this week's practice, their class, and the
- * sessions on file.
+ * One child, in full — the web's child profile: who they are with a Student
+ * ID to copy, this week's practice, a card per enrolled course with its own
+ * credits and expiry, lifetime credits, the sessions on file, and how the
+ * child signs in.
  *
  * The portal's hover tooltip on the practice chart becomes a tap here — a
  * phone has no hover, and a chart whose numbers are only reachable with a
@@ -12,8 +14,11 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { Check, Flame, Star } from "lucide-react-native";
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from "react-native-svg";
-import { PawnIcon } from "@/components/PawnIcon";
+import { AttendanceRow } from "@/components/parent/AttendanceRow";
+import { ChildAccount } from "@/components/parent/ChildAccount";
 import { ChildFace } from "@/components/parent/ChildFace";
+import { CopyId } from "@/components/parent/CopyId";
+import { CourseCard } from "@/components/parent/CourseCard";
 import { ChildLichess } from "@/components/parent/ChildLichess";
 import { BackHeader } from "@/components/parent/BackHeader";
 import { useParentData } from "@/components/parent/ParentData";
@@ -36,7 +41,7 @@ export default function ChildProfile() {
   const t = useTranslations("pv2");
   const router = useRouter();
   const { childId } = useLocalSearchParams<{ childId: string }>();
-  const { children: kids, hist, certHours } = useParentData();
+  const { children: kids, hist } = useParentData();
   const [picked, setPicked] = useState<number | null>(null);
   const ch = kids.find((c) => c.key === childId);
 
@@ -56,15 +61,6 @@ export default function ChildProfile() {
       </View>
     );
   }
-
-  const hasExpiry = ch.valid !== "—";
-  /* Three states, not two: a date that has already passed is expired, and
-     saying "expires soon · 0 days" about it understates what happened. */
-  const expired = hasExpiry && !ch.expiresAhead;
-  const expSoon = hasExpiry && ch.expiresAhead && ch.daysLeft <= 14;
-  /* Progress toward the certificate, in hours of class as the academy counts
-     it — the milestone is its own, from Settings, not a number this app knows. */
-  const toCert = Math.max(0, Math.round((certHours - ch.hoursAttended) * 10) / 10);
 
   const vals = ch.practiceWeek;
   const max = Math.max(...vals, 1);
@@ -91,60 +87,15 @@ export default function ChildProfile() {
         <ChildFace name={ch.name} tint={ch.avBg} size={62} textClass="text-[24px]" />
         <View className="gap-0.5">
           <Text className="font-pp-display-semibold text-[22px] text-pp-ink">{ch.name}</Text>
-          <Text className="font-pp text-xs text-pp-muted">{t("idLabel", { id: ch.id })}</Text>
+          <View className="flex-row items-center gap-1.5">
+            <Text className="font-pp text-xs text-pp-muted">{t("studentIdLabel")}</Text>
+            <CopyId id={ch.id} />
+          </View>
           <Text className="font-pp-bold text-[12.5px] text-pp-ink">
             {ch.level || "—"}
             {ch.age > 0 ? ` · ${ch.age}` : ""}
           </Text>
         </View>
-      </View>
-
-      {/* Credits */}
-      <View className="gap-3 rounded-[14px] bg-pp-deep p-5">
-        <View className="flex-row items-center justify-between">
-          <Text className="font-pp-bold text-[11px] uppercase tracking-[1.3px] text-[#b4c5e4]">
-            {t("remainingCredits")}
-          </Text>
-          {/* The balance alone. A "/ total bought" used to sit beside it, and
-              it read as a quota when it is only history. */}
-          <Text className="font-pp-display-semibold text-[34px] leading-none text-[#fbfff1]">
-            {ch.credits}
-          </Text>
-        </View>
-        <View
-          style={{
-            backgroundColor: expSoon || expired ? pp.dangerSoft : "rgba(251,255,241,0.12)",
-          }}
-          className="flex-row items-center justify-between gap-2.5 rounded-[13px] px-3.5 py-2.5"
-        >
-          <View className="gap-0.5">
-            <Text
-              style={{ color: expSoon || expired ? pp.danger : "#fbfff1" }}
-              className="font-pp-bold text-[12.5px]"
-            >
-              {expired ? t("expired") : expSoon ? t("expiresSoon") : t("validUntil")}
-            </Text>
-            <Text
-              style={{ color: expSoon || expired ? pp.amber : "#b4c5e4" }}
-              className="font-pp text-[11px]"
-            >
-              {ch.valid}
-            </Text>
-          </View>
-          {hasExpiry && ch.expiresAhead && (
-            <Text
-              style={{ color: expSoon ? pp.danger : "#fbfff1" }}
-              className="font-pp-display-semibold text-[19px]"
-            >
-              {t("daysLeftShort", { count: ch.daysLeft })}
-            </Text>
-          )}
-        </View>
-        {hasExpiry && (
-          <Text className="font-pp text-[10.5px] leading-relaxed text-[#b4c5e4]">
-            {t("creditsExpireNote", { date: ch.valid })}
-          </Text>
-        )}
       </View>
 
       {/* Practice this week */}
@@ -255,78 +206,35 @@ export default function ChildProfile() {
         </View>
       </View>
 
-      {/* Enrolled class */}
-      <View className="gap-3">
-        <SectionLabel>{t("enrolledClasses")}</SectionLabel>
-        <View className="gap-4 rounded-card bg-pp-card p-4 shadow-clay">
-          <View className="flex-row items-center gap-3">
-            <View className="size-10 items-center justify-center rounded-card bg-pp-mist">
-              <PawnIcon size={17} color={pp.ink} />
-            </View>
-            <Text className="flex-1 font-pp-bold text-sm text-pp-ink">{ch.clsTitle}</Text>
+      {/* Enrolled classes: one card holding a row per course, each with its
+          own credits, expiry and start date. */}
+      <View className="gap-3 rounded-xl bg-pp-card p-4 shadow-clay">
+        <View className="flex-row items-center justify-between px-0.5">
+          <Text className="font-pp-display-bold text-[17px] text-pp-ink">{t("enrolledClasses")}</Text>
+          {ch.courses.length > 0 && (
+            <Text className="font-pp-semibold text-[12.5px] text-pp-blue">
+              {t("classesCount", { count: ch.courses.length })}
+            </Text>
+          )}
+        </View>
+        {/* All time, across every course: what was bought and what classes used. */}
+        <View className="flex-row gap-2.5">
+          <View className="flex-1 gap-0.5 rounded-xl bg-pp-soft px-3.5 py-3">
+            <Text className="font-pp-bold text-[10.5px] uppercase tracking-[0.8px] text-pp-blue">{t("creditsBoughtTotal")}</Text>
+            <Text className="font-pp-display-bold text-[20px] leading-tight text-pp-ink">{ch.lifetime.bought}</Text>
           </View>
-          {/* Branch, room, a teacher's name and an upcoming-session line all
-              used to sit here. The first three were invented on the client —
-              the backend has no room or branch column and no teacher-to-class
-              link — and the schedule went too: sessions are written one at a
-              time by the desk, so "the next class" is not a plan a parent can
-              rely on. */}
-          <View className="flex-row flex-wrap">
-            {(
-              [
-                [t("creditsExpire"), ch.valid, expSoon || expired],
-                [t("levelLabel"), ch.level || "—", false],
-                [t("enrolledSince"), ch.enrolledSince || "—", false],
-              ] as const
-            ).map(([k, v, danger]) => (
-              <View key={k} className="w-1/2 gap-0.5 pb-2.5 pr-3.5">
-                <Text className="font-pp-bold text-[10px] uppercase tracking-[1px] text-pp-faint">
-                  {k}
-                </Text>
-                <Text
-                  className={`font-pp-bold text-[12.5px] ${
-                    danger ? "text-pp-danger" : "text-pp-ink"
-                  }`}
-                >
-                  {v}
-                </Text>
-              </View>
-            ))}
-          </View>
-          {/* Progress toward the certificate — a milestone that only moves
-              forward, unlike the credit totals that used to be here. */}
-          <View className="flex-row items-center gap-3.5 rounded-[13px] border-[1.5px] border-pp-soft bg-pp-mist px-3.5 py-3">
-            <View className="min-w-[78px]">
-              <Text className="font-pp-display-semibold text-[32px] leading-none text-pp-blue">
-                {ch.attended}
-              </Text>
-              <Text className="mt-1 font-pp-bold text-[10px] uppercase tracking-[0.8px] text-pp-blue">
-                {t("classesAttended")}
-              </Text>
-            </View>
-            <View className="flex-1 gap-1.5">
-              <View className="flex-row justify-between">
-                <Text className="font-pp text-[11px] text-pp-muted">
-                  {t("attendedOf", { attended: ch.hoursAttended, total: certHours })}
-                </Text>
-                <Text className="font-pp text-[11px] text-pp-muted">
-                  {t("remainingOf", { count: toCert })}
-                </Text>
-              </View>
-              <View className="h-2 overflow-hidden rounded-full bg-pp-soft">
-                <View
-                  style={{
-                    width: `${Math.min(100, Math.round((ch.hoursAttended / certHours) * 100))}%`,
-                  }}
-                  className="h-full rounded-full bg-pp-blue"
-                />
-              </View>
-              <Text className="font-pp text-[10.5px] text-pp-faint">
-                {t("certNote", { count: certHours })}
-              </Text>
-            </View>
+          <View className="flex-1 gap-0.5 rounded-xl bg-pp-mist px-3.5 py-3">
+            <Text className="font-pp-bold text-[10.5px] uppercase tracking-[0.8px] text-pp-muted">{t("creditsUsedTotal")}</Text>
+            <Text className="font-pp-display-bold text-[20px] leading-tight text-pp-ink">{ch.lifetime.used}</Text>
           </View>
         </View>
+        {ch.courses.length > 0 ? (
+          ch.courses.map((course, i) => <CourseCard key={course.enrollmentId} course={course} index={i} />)
+        ) : (
+          <Text className="rounded-xl border-[1.5px] border-dashed border-pp-dash p-4 text-center font-pp text-[12.5px] text-pp-muted">
+            {t("noActiveCourse")}
+          </Text>
+        )}
       </View>
 
       {/* Attendance history preview */}
@@ -346,32 +254,7 @@ export default function ChildProfile() {
             </Text>
           )}
           {histRows.map((h, i) => (
-            <View
-              key={i}
-              className={`flex-row items-center justify-between gap-2.5 px-4 py-3.5 ${
-                i < histRows.length - 1 ? "border-b border-pp-panel" : ""
-              }`}
-            >
-              <View className="min-w-0 flex-1 gap-0.5">
-                <Text className="font-pp-bold text-[12.5px] text-pp-ink">{h.cls}</Text>
-                <Text className="font-pp text-[11px] text-pp-muted">
-                  {h.date} · {h.time}
-                </Text>
-              </View>
-              <View
-                style={{
-                  backgroundColor: h.status === "Present" ? pp.greenSoft : pp.dangerSoft,
-                }}
-                className="rounded-full px-2.5 py-1"
-              >
-                <Text
-                  style={{ color: h.status === "Present" ? pp.green : pp.danger }}
-                  className="font-pp-bold text-[10.5px] uppercase"
-                >
-                  {h.status === "Present" ? t("present") : t("absent")}
-                </Text>
-              </View>
-            </View>
+            <AttendanceRow key={i} h={h} last={i === histRows.length - 1} />
           ))}
         </View>
       </View>
@@ -380,6 +263,9 @@ export default function ChildProfile() {
           linked, so a family that does not use Lichess never sees an empty
           card asking them to. */}
       <ChildLichess studentId={ch.key} />
+
+      {/* How the child signs in, and a new password for one without email. */}
+      <ChildAccount studentId={ch.id} name={ch.name} />
     </ScrollView>
   );
 }
