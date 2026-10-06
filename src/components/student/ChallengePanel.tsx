@@ -16,10 +16,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { useTranslations } from "use-intl";
-import { Check, Search, Swords, Timer, X } from "lucide-react-native";
+import { Check, Search, Swords, X } from "lucide-react-native";
 import { usePalette } from "@/components/ThemeProvider";
 import { Panel } from "@/components/game/PlayShell";
 import { PrimaryPill, SecondaryPill } from "@/components/student/kit";
+import { IncomingChallengeList } from "@/components/student/IncomingChallenges";
 import {
   CLOCKS,
   acceptChallenge,
@@ -157,76 +158,22 @@ export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
       ))}
 
       {/* ---- invitations to answer ---- */}
-      {incoming.length > 0 && (
-        <View className="gap-2.5">
-          <View className="flex-row items-center justify-between gap-2 px-1">
-            <View className="flex-row items-center gap-2">
-              <View className="size-2.5 rounded-full bg-pp-blue" />
-              <Text accessibilityRole="header" className="font-pp-display-semibold text-[16px] text-pp-ink">
-                {t("incoming")}
-              </Text>
-            </View>
-            <View className="rounded-full bg-pp-blue px-2.5 py-[3px]">
-              <Text className="font-pp-semibold text-[12.5px] text-white">{t("newCount", { n: incoming.length })}</Text>
-            </View>
-          </View>
-          {incoming.map((c) => (
-            <Panel key={c.challengeId} className="gap-3.5">
-              <View className="flex-row items-center gap-3">
-                <View className="size-12 items-center justify-center rounded-full bg-pp-soft">
-                  <Text className="font-pp-display-bold text-[18px] text-pp-blue">
-                    {c.opponentName.trim().charAt(0).toUpperCase() || "?"}
-                  </Text>
-                </View>
-                <View className="min-w-0 flex-1">
-                  <Text numberOfLines={1} className="font-pp-display-semibold text-[16px] text-pp-ink">
-                    {c.opponentName}
-                  </Text>
-                  <Text className="font-pp text-[13px] text-pp-muted">
-                    {clockLabel(c)} · {c.rated ? t("rated") : t("friendly")}
-                  </Text>
-                </View>
-                <View className="flex-row items-center gap-1 rounded-full bg-pp-green-soft px-2.5 py-1">
-                  <Timer size={14} color={pp.green} strokeWidth={2.4} />
-                  <Text className="font-pp-semibold text-[12.5px] text-pp-green">
-                    {t("minutes", { n: Math.round(c.clockLimit / 60) })}
-                  </Text>
-                </View>
-              </View>
-              {/* Said before they accept, not after the game turns out unrated. */}
-              {c.rated && !c.bothCanPlayRated && (
-                <Text className="font-pp-semibold text-[12.5px] text-pp-amber">{t("ratedNotPossible")}</Text>
-              )}
-              <View className="flex-row gap-2.5">
-                <PrimaryPill
-                  label={t("accept")}
-                  icon={<Check size={16} color="#ffffff" strokeWidth={2.6} />}
-                  disabled={busy === c.challengeId}
-                  onPress={() =>
-                    void run(c.challengeId, async () => {
-                      const out = await acceptChallenge(c.challengeId);
-                      openBoard(out.gameRoomId);
-                    })
-                  }
-                  className="flex-1 px-4"
-                />
-                <SecondaryPill
-                  label={t("decline")}
-                  icon={<X size={16} color={pp.ink} strokeWidth={2.6} />}
-                  disabled={busy === c.challengeId}
-                  onPress={() =>
-                    void run(c.challengeId, async () => {
-                      await declineChallenge(c.challengeId);
-                      await reload();
-                    })
-                  }
-                  className="flex-1 px-4"
-                />
-              </View>
-            </Panel>
-          ))}
-        </View>
-      )}
+      <IncomingChallengeList
+        incoming={incoming}
+        busy={busy}
+        onAccept={(c) =>
+          void run(c.challengeId, async () => {
+            const out = await acceptChallenge(c.challengeId);
+            openBoard(out.gameRoomId);
+          })
+        }
+        onDecline={(c) =>
+          void run(c.challengeId, async () => {
+            await declineChallenge(c.challengeId);
+            await reload();
+          })
+        }
+      />
 
       {/* ---- a "no" to one they sent ---- */}
       {declined.map((c) => (
