@@ -8,9 +8,11 @@
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  attemptListMove,
   attemptMove,
   gameAt,
   getDailyPuzzles,
+  getPuzzleList,
   nextUnsolved,
   puzzleGoal,
   solvedCount,
@@ -136,5 +138,23 @@ describe("getDailyPuzzles", () => {
     const set = await getDailyPuzzles();
     expect(Object.keys(set.puzzles[0])).not.toContain("moves");
     expect(JSON.stringify(set)).not.toContain("a5c3");
+  });
+});
+
+describe("the practice list", () => {
+  it("reads the list Free Play was replaced by", async () => {
+    const spy = stubFetch({ puzzles: [], level: "beginner" });
+    const list = await getPuzzleList();
+    expect(spy.mock.calls[0][0]).toMatch(/\/api\/v1\/puzzles\/list$/);
+    expect(list.level).toBe("beginner");
+  });
+
+  it("grades a list move on the list's own endpoint, sending only the moves", async () => {
+    const spy = stubFetch({ correct: true, solved: true, reply: "", fen: "", firstSolve: true });
+    const verdict = await attemptListMove("a/b", "e2e4", ["d2d4"]);
+    const [url, init] = spy.mock.calls[0];
+    expect(url).toMatch(/\/puzzles\/list\/a%2Fb\/attempt$/);
+    expect(JSON.parse(init.body)).toEqual({ move: "e2e4", played: ["d2d4"] });
+    expect(verdict.firstSolve).toBe(true);
   });
 });

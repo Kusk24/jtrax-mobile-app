@@ -1,44 +1,57 @@
 /**
- * One puzzle — from today's set, or from Free Play when opened as
- * `/student/puzzles/free?tier=…`.
+ * One puzzle on the board — from today's set (`?set=daily`) or from the
+ * practice list (`?set=list`, with `level` when the list was filtered).
  *
  * Nothing here knows the answer. A tap produces a move, the move goes to the
  * server, and the server says whether it was right and what the position is
- * now — including the opponent's reply on a longer puzzle. The board follows
- * that, rather than replaying anything locally, because a board that can work
- * out the answer is a board a child can read the answer off.
+ * now — including the opponent's reply on a longer puzzle. The reply lands a
+ * beat after the pupil's own move, as the robot answers in a game: both at
+ * once hid what the opponent did.
+ *
+ * Solving one moves on in place: the next unsolved of the day, or the next
+ * unticked one on the list in the same level; at the end of the day's set,
+ * the dialog that says so.
  */
-import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslations } from "use-intl";
-import { Check, X } from "lucide-react-native";
+import { Check, RotateCcw, Target, X } from "lucide-react-native";
 import type { Chess } from "chess.js";
+import { usePalette } from "@/components/ThemeProvider";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
 import { ChessBoard } from "@/components/game/ChessBoard";
+import { Card, SecondaryPill } from "@/components/student/kit";
+import { DailyCompleteDialog } from "@/components/student/DailyCompleteDialog";
 import {
+  attemptListMove,
   attemptMove,
   gameAt,
   getDailyPuzzles,
-  getFreePuzzle,
+  getPuzzleList,
   isFreeTier,
+  nextOnList,
   nextUnsolved,
+  openListPuzzle,
   openPuzzle,
   puzzleGoal,
   type DailyPuzzle,
   type FreeTier,
+  type ListPuzzle,
+  type Verdict,
 } from "@/lib/puzzles";
-import { C } from "@/lib/colors";
 import { moveBetween, moveFrom, playSound, preloadSounds, soundForMove } from "@/lib/sound";
 
+/** How long the opponent "thinks" before a puzzle's reply lands — the same
+    feel as the robot's minimum think time. */
+const REPLY_PAUSE_MS = 550;
 /** How long a wrong move stays on the board before it is taken back. Long
     enough to see what happened, short enough not to feel like a punishment. */
 const WRONG_MS = 1200;
 /** The pause after the last move of a puzzle, before moving on. */
 const SOLVED_MS = 1400;
 
-/** The heading on a Free Play puzzle: one puzzle, so "Beginner puzzle" — the
-    plural is the name of the level on the list. */
+/** The heading on a list puzzle: one puzzle, so "Beginner puzzle". */
 const TIER_TITLE: Record<FreeTier, "beginnerPuzzle" | "intermediatePuzzle" | "advancedPuzzle"> = {
   beginner: "beginnerPuzzle",
   intermediate: "intermediatePuzzle",
@@ -46,14 +59,17 @@ const TIER_TITLE: Record<FreeTier, "beginnerPuzzle" | "intermediatePuzzle" | "ad
 };
 
 export default function PuzzleScreen() {
-  const { puzzleId, tier } = useLocalSearchParams<{ puzzleId: string; tier?: string }>();
-  /* Free Play shares this screen: the same board, the same grader. What
-     differs is where the puzzle comes from and what happens after it. */
-  const freeTier = puzzleId === "free" && isFreeTier(tier) ? tier : null;
+  const { puzzleId, set, level: levelParam } = useLocalSearchParams<{ puzzleId: string; set?: string; level?: string }>();
+  const onList = set === "list";
+  /* The list's filter when the puzzle was opened, so moving on stays in it. */
+  const level: FreeTier | "" = isFreeTier(levelParam) ? levelParam : "";
   const t = useTranslations("sv2");
+  const ts = useTranslations("st");
+  const t3 = useTranslations("sv3");
   const tp = useTranslations("play");
+  const { pp } = usePalette();
 
-  const [puzzles, setPuzzles] = useState<DailyPuzzle[]>([]);
+  const [puzzles, setPuzzles] = useState<(DailyPuzzle | ListPuzzle)[]>([]);
   const [index, setIndex] = useState(-1);
   const [game, setGame] = useState<Chess | null>(null);
   /* The pupil's own moves, which is what the grader wants — it replays the
@@ -61,50 +77,41 @@ export default function PuzzleScreen() {
   const [played, setPlayed] = useState<string[]>([]);
   const [solved, setSolved] = useState(false);
   const [wrong, setWrong] = useState(false);
+  /* The pupil's move is on the board and the opponent's reply is coming. */
+  const [waiting, setWaiting] = useState(false);
   const [message, setMessage] = useState("");
+  const [lastMove, setLastMove] = useState<string | undefined>();
+  /* A list puzzle solved again today: said so under the board. */
+  const [replay, setReplay] = useState(false);
   const [loading, setLoading] = useState(true);
-  /* Free Play only: the pupil has seen every puzzle at this level. */
-  const [exhausted, setExhausted] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
+  /* Bumped whenever the board is reset or changed, so a reply or a take-back
+     still on its way does not land on a board the pupil has moved away from. */
+  const boardGen = useRef(0);
 
   const puzzle = index >= 0 ? puzzles[index] : undefined;
 
   /** Puts a puzzle on the board and starts its clock server-side. Only the
-      first open counts, so coming back after a wrong answer continues the same
-      sitting rather than starting a new one. */
-  const load = useCallback((set: DailyPuzzle[], at: number) => {
-    const p = set[at];
-    setIndex(at);
-    setGame(p ? gameAt(p.fen) : null);
-    setPlayed([]);
-    setSolved(p?.solved ?? false);
-    setWrong(false);
-    setMessage("");
-    if (p && !p.solved) void openPuzzle(p.puzzleId);
-  }, []);
-
-  /* One puzzle at the chosen level. Each call is a fresh request: the server
-     may top the bank up from Lichess, so there is nothing to pre-load. The
-     solved board stays up while the next one is fetched, rather than
-     flashing a spinner between puzzles. */
-  const loadFree = useCallback(
-    (level: FreeTier, isCancelled: () => boolean = () => false) => {
-      getFreePuzzle(level)
-        .then((res) => {
-          if (isCancelled()) return;
-          if (!res.puzzle) {
-            setExhausted(true);
-            setPuzzles([]);
-            setIndex(-1);
-            return;
-          }
-          setExhausted(false);
-          setPuzzles([res.puzzle]);
-          load([res.puzzle], 0);
-        })
-        .catch(() => {})
-        .finally(() => !isCancelled() && setLoading(false));
+      first open counts, so coming back after a wrong answer continues the
+      same sitting. A list puzzle opens ready to play even when ticked:
+      playing it again is allowed, it just earns nothing. */
+  const load = useCallback(
+    (rows: (DailyPuzzle | ListPuzzle)[], at: number) => {
+      boardGen.current += 1;
+      const p = rows[at];
+      setIndex(at);
+      setGame(p ? gameAt(p.fen) : null);
+      setPlayed([]);
+      setSolved(onList ? false : (p?.solved ?? false));
+      setWrong(false);
+      setWaiting(false);
+      setMessage("");
+      setReplay(false);
+      setLastMove(undefined);
+      if (p && onList) void openListPuzzle(p.puzzleId);
+      else if (p && !p.solved) void openPuzzle(p.puzzleId);
     },
-    [load],
+    [onList],
   );
 
   useEffect(() => {
@@ -113,56 +120,72 @@ export default function PuzzleScreen() {
 
   useEffect(() => {
     let cancelled = false;
-    if (freeTier) {
-      loadFree(freeTier, () => cancelled);
-      return () => {
-        cancelled = true;
-      };
-    }
-    // A Free Play link with no level it recognises has nothing to open; the
-    // render below says so without waiting on anything.
-    if (puzzleId === "free") return;
-    getDailyPuzzles()
-      .then((set) => {
+    const rows: Promise<(DailyPuzzle | ListPuzzle)[]> = onList
+      ? getPuzzleList().then((l) => l.puzzles)
+      : getDailyPuzzles().then((s) => s.puzzles);
+    rows
+      .then((list) => {
         if (cancelled) return;
-        setPuzzles(set.puzzles);
-        const at = set.puzzles.findIndex((p) => p.puzzleId === puzzleId);
-        if (at >= 0) load(set.puzzles, at);
+        setPuzzles(list);
+        const at = list.findIndex((p) => p.puzzleId === puzzleId);
+        if (at >= 0) load(list, at);
       })
       .catch(() => {})
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
     };
-  }, [puzzleId, freeTier, load, loadFree]);
+  }, [puzzleId, onList, load]);
 
   function reset() {
-    if (!puzzle) return;
-    setGame(gameAt(puzzle.fen));
+    boardGen.current += 1;
+    setGame(puzzle ? gameAt(puzzle.fen) : null);
     setPlayed([]);
     setSolved(false);
     setWrong(false);
+    setWaiting(false);
     setMessage("");
+    setLastMove(undefined);
   }
 
   async function submit(uci: string) {
-    if (!puzzle || !game || solved) return;
-    let verdict;
+    const p = puzzle;
+    if (!p || !game || solved || waiting) return;
+    let verdict: Verdict;
     try {
-      verdict = await attemptMove(puzzle.puzzleId, uci, played);
+      verdict = onList ? await attemptListMove(p.puzzleId, uci, played) : await attemptMove(p.puzzleId, uci, played);
     } catch {
       setMessage(tp("error.unreachable"));
       return;
     }
 
-    // The server returns the position after the move and any reply, so the
-    // board follows its view rather than replaying the reply here.
+    /* The server returns the position after the move and any reply. When the
+       puzzle goes on, the pupil's own move is shown first and the reply a
+       beat later. The board still ends on the server's position. */
     const next = gameAt(verdict.fen);
-    if (next) setGame(next);
-
-    /* Sound follows what the pupil sees: their move lands with the new
-       position, and any reply a beat later, like an opponent answering. */
     const mine = moveFrom(game.fen(), uci);
+    const gen = boardGen.current;
+    if (verdict.correct && !verdict.solved && mine) {
+      const afterMine = gameAt(mine.after);
+      if (afterMine) setGame(afterMine);
+      setLastMove(uci.slice(0, 4));
+      setWaiting(true);
+      const reply = moveBetween(mine.after, verdict.fen);
+      setTimeout(() => {
+        if (gen !== boardGen.current) return;
+        if (next) setGame(next);
+        if (reply) {
+          setLastMove(reply.from + reply.to);
+          playSound(soundForMove(reply));
+        }
+        setWaiting(false);
+      }, REPLY_PAUSE_MS);
+    } else if (next) {
+      setGame(next);
+      setLastMove(uci.slice(0, 4));
+    }
+
+    /* Sound follows what the pupil sees: their move now, the reply with it. */
     if (mine) playSound(soundForMove(mine));
 
     if (!verdict.correct) {
@@ -170,10 +193,12 @@ export default function PuzzleScreen() {
       setMessage(t("wrongMsg"));
       setTimeout(() => playSound("wrong"), 180);
       setTimeout(() => {
-        setGame(gameAt(puzzle.fen));
+        if (gen !== boardGen.current) return;
+        setGame(gameAt(p.fen));
         setPlayed([]);
         setWrong(false);
         setMessage("");
+        setLastMove(undefined);
       }, WRONG_MS);
       return;
     }
@@ -182,128 +207,128 @@ export default function PuzzleScreen() {
     setWrong(false);
 
     if (!verdict.solved) {
-      // A longer puzzle: the opponent has replied and it is their move again.
+      // A longer puzzle: the opponent replies and it is the pupil's move again.
       setMessage(t("keepGoingMsg"));
-      const reply = mine ? moveBetween(mine.after, verdict.fen) : null;
-      if (reply) setTimeout(() => playSound(soundForMove(reply)), 350);
       return;
     }
 
     setTimeout(() => playSound("game-end"), 300);
     setSolved(true);
     setMessage(t("checkmateMsg"));
-
-    /* A free puzzle is not part of today's set, so it marks nothing solved
-       there. The pupil chose to keep going, so the next one at the same level
-       comes instead. */
-    if (freeTier) {
-      setTimeout(() => loadFree(freeTier), SOLVED_MS);
-      return;
-    }
+    setReplay(onList && verdict.firstSolve !== true);
 
     const after = puzzles.map((row, i) => (i === index ? { ...row, solved: true } : row));
     setPuzzles(after);
-    const onward = nextUnsolved(after, index);
+    const onward = onList ? nextOnList(after as ListPuzzle[], index, level) : nextUnsolved(after, index);
     setTimeout(() => {
-      if (onward >= 0) {
-        router.replace(`/student/puzzles/${after[onward].puzzleId}`);
-        load(after, onward);
-      } else {
-        router.replace("/student/puzzles");
-      }
+      if (gen !== boardGen.current) return;
+      if (onward >= 0) load(after, onward);
+      /* Everything shown is ticked: back to the list it came from. */
+      else if (onList) router.back();
+      else setCelebrate(true);
     }, SOLVED_MS);
   }
 
-  const badFreeLink = puzzleId === "free" && !freeTier;
-
-  if (loading && !badFreeLink) {
+  if (loading) {
     return (
-      <PlayShell title={t("puzzles")} back="/student/puzzles">
+      <PlayShell title={t("puzzles")}>
         <Panel className="flex-row items-center justify-center gap-2">
-          <ActivityIndicator color={C.navy} />
-          <Text className="font-sans-bold text-sm text-ink">{t("puzzlesLoading")}</Text>
+          <ActivityIndicator color={pp.muted} />
+          <Text className="font-pp-bold text-sm text-pp-ink">{t("puzzlesLoading")}</Text>
         </Panel>
       </PlayShell>
     );
   }
 
-  const title = freeTier ? t(TIER_TITLE[freeTier]) : t("puzzleN", { n: index + 1 });
-
   if (!puzzle || !game) {
     return (
-      <PlayShell title={freeTier ? title : t("puzzles")} back="/student/puzzles">
+      <PlayShell title={t("puzzles")}>
         <Panel>
-          <Text className="font-sans-bold text-sm text-ink">
-            {exhausted ? t("tierExhausted") : t("puzzlesUnavailable")}
-          </Text>
+          <Text className="font-pp-bold text-sm text-pp-ink">{t("puzzlesUnavailable")}</Text>
         </Panel>
       </PlayShell>
     );
   }
 
   const goal = puzzleGoal(puzzle);
+  const title = onList
+    ? `${t(TIER_TITLE[(puzzle as ListPuzzle).tier])} · ${index + 1}`
+    : t("puzzleN", { n: index + 1 });
 
   return (
-    <PlayShell title={title} back="/student/puzzles" sound>
-      {/* Whose move and what to look for, from this puzzle — not the one line
-          "White to move — mate in 1" that used to sit above every position. */}
-      <Text className="-mt-1 text-center font-sans-bold text-xs text-muted">
-        {t(goal.key === "mateIn" ? "toMoveGoalMate" : "toMoveGoalBest", {
-          side: t(puzzle.side === "White" ? "sideWhite" : "sideBlack"),
-          count: goal.count,
-        })}
-      </Text>
+    <>
+      <PlayShell title={title} sub={t("ratingLabel", { rating: puzzle.rating })} sound>
+        <ChessBoard
+          game={game}
+          orientation={puzzle.side === "Black" ? "b" : "w"}
+          canMove={!solved && !waiting && !wrong}
+          onMove={submit}
+          lastMove={lastMove}
+          look="card"
+        />
 
-      {/* One slot above the board for whatever there is to say about this
-          puzzle, and only one thing at a time: what just happened, or — on
-          reopening one already beaten — that it is finished (the board is
-          locked then, and without the card it would give no word why).
-          The slot is always here, the height of the card, and never takes a
-          tap. Showing a banner only when there was something to say moved the
-          board down by its height — so a child who had just been told "not
-          quite" tapped their next square and hit the message instead. The
-          feedback used to be a small pill; it is plain, larger text now, which
-          reads at a glance. */}
-      <View pointerEvents="none" className="h-[60px] justify-center">
-        {message !== "" ? (
-          <View className="flex-row items-center justify-center gap-2">
-            {solved && <Check size={20} color={C.olive} strokeWidth={3} />}
-            {wrong && <X size={20} color={C.maroon} strokeWidth={3} />}
-            <Text
-              className={`text-center font-sans-bold text-lg ${
-                solved ? "text-olive" : wrong ? "text-maroon" : "text-ink"
-              }`}
+        <Card>
+          <View className="flex-row items-center gap-1.5">
+            <Target size={16} color={pp.blue} strokeWidth={2.2} />
+            <Text className="font-pp-bold text-[12px] uppercase tracking-[1.4px] text-pp-muted">{t("yourGoal")}</Text>
+          </View>
+          <Text className="mt-1.5 font-pp-display-bold text-[17px] text-pp-ink">
+            {t(goal.key === "mateIn" ? "toMoveGoalMate" : "toMoveGoalBest", {
+              side: t(puzzle.side === "White" ? "sideWhite" : "sideBlack"),
+              count: goal.count,
+            })}
+          </Text>
+        </Card>
+
+        {/* One slot for what just happened, the same height whether or not
+            there is anything in it, so nothing below it jumps. */}
+        <View className="min-h-[76px] justify-center" accessibilityLiveRegion="polite">
+          {solved ? (
+            <View className="flex-row items-center gap-3 rounded-2xl border-[1.5px] border-pp-green-soft bg-pp-green-soft px-4 py-3.5">
+              <View className="size-10 items-center justify-center rounded-full bg-pp-green">
+                <Check size={20} color="#ffffff" strokeWidth={3} />
+              </View>
+              <View className="min-w-0 flex-1">
+                <Text className="font-pp-bold text-[15px] text-pp-ink">{ts("puzzleComplete")}</Text>
+                {replay && <Text className="font-pp-semibold text-[13px] text-pp-green">{t3("solvedAgain")}</Text>}
+              </View>
+            </View>
+          ) : message ? (
+            <View
+              className={`flex-row items-center gap-2.5 rounded-2xl px-4 py-3.5 ${wrong ? "bg-pp-red-soft" : "bg-pp-soft"}`}
             >
-              {message}
-            </Text>
-          </View>
-        ) : solved ? (
-          <View className="flex-row items-center gap-3 rounded-card border-2 border-olive-soft bg-olive-soft px-3.5 py-2.5">
-            <View className="size-9 shrink-0 items-center justify-center rounded-full bg-olive">
-              <Check size={20} color={C.white} strokeWidth={3} />
+              {wrong ? (
+                <X size={20} color={pp.red} strokeWidth={3} />
+              ) : (
+                <Check size={20} color={pp.green} strokeWidth={3} />
+              )}
+              <Text className={`min-w-0 flex-1 font-pp-semibold text-[15px] ${wrong ? "text-pp-red" : "text-pp-ink"}`}>
+                {message}
+              </Text>
             </View>
-            <View className="min-w-0 flex-1">
-              <Text className="font-sans-bold text-sm text-ink">{t("completedTitle")}</Text>
-              <Text className="font-sans text-[11px] text-muted">{t("completedBody")}</Text>
-            </View>
-          </View>
-        ) : null}
-      </View>
+          ) : null}
+        </View>
 
-      <ChessBoard
-        game={game}
-        orientation={puzzle.side === "Black" ? "b" : "w"}
-        canMove={!solved}
-        onMove={submit}
-      />
+        <SecondaryPill
+          label={t("reset")}
+          icon={<RotateCcw size={16} color={pp.ink} />}
+          onPress={reset}
+          className="w-full"
+        />
+      </PlayShell>
 
-      <Pressable
-        onPress={reset}
-        disabled={solved}
-        className="items-center self-center rounded-full bg-navy px-7 py-2.5 active:opacity-80 disabled:opacity-60"
-      >
-        <Text className="font-sans-bold text-sm text-white">{t("reset")}</Text>
-      </Pressable>
-    </PlayShell>
+      {celebrate && (
+        <DailyCompleteDialog
+          onHome={() => {
+            setCelebrate(false);
+            router.dismissTo("/student");
+          }}
+          onMore={() => {
+            setCelebrate(false);
+            router.dismissTo("/student/puzzles");
+          }}
+        />
+      )}
+    </>
   );
 }

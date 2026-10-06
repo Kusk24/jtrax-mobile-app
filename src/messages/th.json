@@ -317,7 +317,8 @@
     "sideWhite": "ฝ่ายขาว",
     "sideBlack": "ฝ่ายดำ",
     "freePlayHint": "เลือกระดับแล้วฝึกต่อได้เลย",
-    "tierExhausted": "ระดับนี้ยังไม่มีปริศนาเพิ่มในตอนนี้"
+    "tierExhausted": "ระดับนี้ยังไม่มีปริศนาเพิ่มในตอนนี้",
+    "yourGoal": "เป้าหมาย"
   },
   "challenge": {
     "title": "ท้าประลอง",
@@ -634,5 +635,61 @@
     "errorTooMany": "ลองหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่",
     "errorOffline": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ต",
     "errorFailed": "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่"
+  },
+  "st": {
+    "puzzlesOf": "{n} / {total} ข้อ",
+    "puzzleComplete": "แก้โจทย์สำเร็จ",
+    "challengeDone": "ทำภารกิจสำเร็จ",
+    "challengeDoneDialog": "คุณแก้โจทย์ทั้งสามข้อของวันนี้และได้รับโบนัสทำครบ",
+    "backToHome": "กลับหน้าแรก",
+    "keepPractising": "ฝึกต่อ"
+  },
+  "sv3": {
+    "filterAll": "ทั้งหมด",
+    "level": {
+      "beginner": "เริ่มต้น",
+      "intermediate": "กลาง",
+      "advanced": "สูง"
+    },
+    "tierBeginnerSub": "ง่าย • ต่ำกว่า 800",
+    "tierIntermediateSub": "ปานกลาง • 800–1199",
+    "tierAdvancedSub": "ยาก • 1200 ขึ้นไป",
+    "todaysChallenge": "โจทย์ประจำวัน",
+    "challengeCompleted": "ทำแล้ว {n} / {total}",
+    "playAgain": "เล่นอีกครั้ง",
+    "theme": {
+      "backRankMate": "รุกฆาตแถวหลัง",
+      "smotheredMate": "รุกฆาตอุดทาง",
+      "mateIn1": "รุกฆาตใน 1 ตา",
+      "mateIn2": "รุกฆาตใน 2 ตา",
+      "mateIn3": "รุกฆาตใน 3 ตา",
+      "mateIn4": "รุกฆาตใน 4 ตา",
+      "mateIn5": "รุกฆาตใน 5 ตา",
+      "doubleCheck": "รุกสองทาง",
+      "fork": "ส้อม",
+      "pin": "ตรึงหมาก",
+      "skewer": "เสียบ",
+      "discoveredAttack": "เปิดโจมตี",
+      "xRayAttack": "โจมตีทะลุ",
+      "hangingPiece": "หมากลอย",
+      "sacrifice": "สละหมาก",
+      "attraction": "ล่อหมาก",
+      "deflection": "เบี่ยงหมาก",
+      "clearance": "เปิดทาง",
+      "intermezzo": "เดินแทรก",
+      "promotion": "เลื่อนขั้น",
+      "advancedPawn": "เบี้ยรุก",
+      "quietMove": "เดินเงียบ",
+      "defensiveMove": "ตั้งรับ!",
+      "kingsideAttack": "บุกฝั่งคิง",
+      "exposedKing": "คิงเปิด",
+      "pawnEndgame": "ท้ายเกมเบี้ย",
+      "endgame": "ท้ายเกม",
+      "mate": "รุกฆาต",
+      "winMaterial": "ได้เปรียบหมาก"
+    },
+    "dailyDoneBody": "วันนี้ทำครบแล้ว เก่งมาก!",
+    "dailyBody": "โจทย์ {n} ข้อที่เลือกตามระดับของคุณ",
+    "solvedAgain": "ทำได้อีกครั้ง"
   }
 }

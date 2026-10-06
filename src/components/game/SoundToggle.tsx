@@ -5,11 +5,12 @@ import { Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 import { Volume2, VolumeX } from "lucide-react-native";
 import { setSoundOn, useSoundOn } from "@/lib/sound";
-import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 export function SoundToggle() {
   const t = useTranslations("common");
   const on = useSoundOn();
+  const { pp } = usePalette();
   return (
     <Pressable
       onPress={() => setSoundOn(!on)}
@@ -17,9 +18,9 @@ export function SoundToggle() {
       accessibilityState={{ checked: on }}
       accessibilityLabel={on ? t("soundOff") : t("soundOn")}
       hitSlop={10}
-      className="size-9 items-center justify-center rounded-full border-2 border-line bg-card active:opacity-80"
+      className="size-9 items-center justify-center rounded-full border-[1.5px] border-pp-line bg-pp-card active:bg-pp-soft"
     >
-      {on ? <Volume2 size={18} color={C.muted} strokeWidth={2.4} /> : <VolumeX size={18} color={C.muted} strokeWidth={2.4} />}
+      {on ? <Volume2 size={18} color={pp.muted} strokeWidth={2.4} /> : <VolumeX size={18} color={pp.muted} strokeWidth={2.4} />}
     </Pressable>
   );
 }

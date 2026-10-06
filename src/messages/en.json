@@ -317,7 +317,8 @@
     "sideWhite": "White",
     "sideBlack": "Black",
     "freePlayHint": "Pick a level and keep practising",
-    "tierExhausted": "Nothing left at this level right now"
+    "tierExhausted": "Nothing left at this level right now",
+    "yourGoal": "Your goal"
   },
   "challenge": {
     "title": "Challenge",
@@ -634,5 +635,61 @@
     "errorTooMany": "Too many tries. Wait a minute and try again.",
     "errorOffline": "Can't reach the server. Check your connection.",
     "errorFailed": "Couldn't change the password. Please try again."
+  },
+  "st": {
+    "puzzlesOf": "{n} / {total} puzzles",
+    "puzzleComplete": "Puzzle complete",
+    "challengeDone": "Challenge complete",
+    "challengeDoneDialog": "You solved today's three puzzles and earned the completion bonus.",
+    "backToHome": "Back to Home",
+    "keepPractising": "Keep practising"
+  },
+  "sv3": {
+    "filterAll": "All",
+    "level": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "tierBeginnerSub": "Easy • under 800",
+    "tierIntermediateSub": "Medium • 800–1199",
+    "tierAdvancedSub": "Hard • 1200+",
+    "todaysChallenge": "Daily Challenge",
+    "challengeCompleted": "{n} / {total} completed",
+    "playAgain": "Play again",
+    "theme": {
+      "backRankMate": "Back Rank Mate",
+      "smotheredMate": "Smothered Mate",
+      "mateIn1": "Mate in 1",
+      "mateIn2": "Mate in 2",
+      "mateIn3": "Mate in 3",
+      "mateIn4": "Mate in 4",
+      "mateIn5": "Mate in 5",
+      "doubleCheck": "Double Check",
+      "fork": "Fork",
+      "pin": "Pin the Piece",
+      "skewer": "Skewer",
+      "discoveredAttack": "Discovered Attack",
+      "xRayAttack": "X-Ray Attack",
+      "hangingPiece": "Hanging Piece",
+      "sacrifice": "Sacrifice",
+      "attraction": "Attraction",
+      "deflection": "Deflection",
+      "clearance": "Clearance",
+      "intermezzo": "In-Between Move",
+      "promotion": "Promotion",
+      "advancedPawn": "Advanced Pawn",
+      "quietMove": "Quiet Move",
+      "defensiveMove": "Defend!",
+      "kingsideAttack": "Kingside Attack",
+      "exposedKing": "Exposed King",
+      "pawnEndgame": "Pawn Endgame",
+      "endgame": "Endgame",
+      "mate": "Checkmate",
+      "winMaterial": "Win Material"
+    },
+    "dailyDoneBody": "All done for today — well played!",
+    "dailyBody": "{n} puzzles picked for your level",
+    "solvedAgain": "Solved again"
   }
 }
