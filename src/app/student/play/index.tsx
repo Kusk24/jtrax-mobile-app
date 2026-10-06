@@ -1,39 +1,77 @@
+/**
+ * Games: every way to play, as the web's Games tab has it.
+ *
+ * The games already under way come first, because somebody may be waiting on
+ * this pupil's move. Then the three ways to start one, each a card that opens
+ * to what it holds: against the computer (three robots, by level), against
+ * another student (the challenge panel), or at a board by its code. Recent
+ * games close the page, with the way into the full history.
+ */
 import { Pressable, Text, View } from "react-native";
-import { Link } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslations } from "use-intl";
-import { Bot, Users } from "lucide-react-native";
-import { PlayShell, Panel } from "@/components/game/PlayShell";
+import { Bot, ChessKing, ChessKnight, ChessPawn, DoorOpen, type LucideIcon } from "lucide-react-native";
+import { usePalette } from "@/components/ThemeProvider";
+import { PlayShell } from "@/components/game/PlayShell";
 import { MyGames } from "@/components/game/MyGames";
+import { JoinForm } from "@/components/game/JoinForm";
+import { ChallengePanel } from "@/components/student/ChallengePanel";
+import { FriendPawns } from "@/components/student/FriendPawns";
+import { GameModeCard } from "@/components/student/GameModeCard";
+import { RecentGames } from "@/components/student/RecentGames";
 import { useSession } from "@/lib/session";
-import { C } from "@/lib/colors";
+import type { PPKey } from "@/lib/theme";
 
-export default function PlayIndexScreen() {
-  const t = useTranslations("play");
+/* The three robots, named by level, in the puzzle list's level colours. */
+const LEVELS: { key: "novice" | "strong" | "expert"; level: "beginner" | "intermediate" | "advanced"; icon: LucideIcon; tile: string; label: string; ink: PPKey; border: string }[] = [
+  { key: "novice", level: "beginner", icon: ChessPawn, tile: "bg-pp-green-soft", label: "text-pp-green", ink: "green", border: "border-pp-green-soft" },
+  { key: "strong", level: "intermediate", icon: ChessKnight, tile: "bg-pp-soft", label: "text-pp-blue", ink: "blue", border: "border-pp-soft" },
+  { key: "expert", level: "advanced", icon: ChessKing, tile: "bg-pp-amber-soft", label: "text-pp-amber", ink: "amber", border: "border-pp-amber-soft" },
+];
+
+export default function GamesScreen() {
+  const t3 = useTranslations("sv3");
   const { user } = useSession();
-  const modes = [
-    { href: "/student/play/ai", Icon: Bot, title: t("vsComputer"), body: t("vsComputerBody") },
-    { href: "/student/play/friend", Icon: Users, title: t("vsFriend"), body: t("vsFriendBody") },
-  ] as const;
+  const { pp } = usePalette();
+  /* Which card to open on arrival — Home's tiles name one. */
+  const { open } = useLocalSearchParams<{ open?: string }>();
 
   return (
-    <PlayShell title={t("title")} nav>
+    <PlayShell title={t3("games")} nav>
+      {/* Draws nothing when there are none. */}
       {user?.userAccountId && <MyGames myAccountId={user.userAccountId} />}
-      <Text className="mb-1 font-sans text-xs text-muted">{t("chooseMode")}</Text>
-      {modes.map(({ href, Icon, title, body }) => (
-        <Link key={href} href={href} asChild>
-          <Pressable className="active:opacity-80">
-            <Panel className="flex-row items-center gap-3.5">
-              <View className="size-12 items-center justify-center rounded-xl bg-highlight">
-                <Icon size={24} color={C.highlightInk} />
-              </View>
-              <View className="min-w-0 flex-1">
-                <Text className="font-sans-bold text-base text-ink">{title}</Text>
-                <Text className="mt-1 font-sans text-xs leading-5 text-muted">{body}</Text>
-              </View>
-            </Panel>
-          </Pressable>
-        </Link>
-      ))}
+
+      <View className="gap-2">
+        <GameModeCard tone="ai" title={t3("playVsAi")} art={<Bot size={24} color={pp.blue} strokeWidth={2} />} open={open === "computer"}>
+          <View className="flex-row gap-2">
+            {LEVELS.map(({ key, level, icon: Icon, tile, label, ink, border }) => (
+              <Pressable
+                key={key}
+                onPress={() => router.push({ pathname: "/student/play/ai", params: { opponent: key } })}
+                accessibilityRole="button"
+                className={`min-w-0 flex-1 items-center gap-1.5 rounded-lg border bg-pp-card px-2 py-3 active:opacity-80 ${border}`}
+              >
+                <View className={`size-10 items-center justify-center rounded-lg ${tile}`}>
+                  <Icon size={20} color={pp[ink]} strokeWidth={1.9} />
+                </View>
+                <Text numberOfLines={1} className={`font-pp-semibold text-[13px] ${label}`}>
+                  {t3(`level.${level}`)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </GameModeCard>
+
+        <GameModeCard tone="friend" title={t3("playWithFriend")} art={<FriendPawns size={26} />} open={open === "challenge"}>
+          <ChallengePanel myStudentId={user?.studentId ?? ""} />
+        </GameModeCard>
+
+        <GameModeCard tone="room" title={t3("joinRoom")} art={<DoorOpen size={24} color={pp.green} strokeWidth={2} />} open={open === "room"}>
+          <JoinForm />
+        </GameModeCard>
+      </View>
+
+      {user?.studentId && <RecentGames studentId={user.studentId} />}
     </PlayShell>
   );
 }

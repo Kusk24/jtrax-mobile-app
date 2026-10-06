@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 import { Pause, Wifi, WifiOff } from "lucide-react-native";
 import { PlayShell, Panel } from "@/components/game/PlayShell";
 import { ResultDialog } from "@/components/game/ResultDialog";
@@ -10,18 +10,21 @@ import { CapturedTray } from "@/components/game/CapturedTray";
 import { useRoom } from "@/components/game/useRoom";
 import { capturedIn, gameFrom, pairedMoves } from "@/lib/chess-core";
 import { clockAt, fmtClock, reasonKey, timeControlLabel } from "@/lib/live-games";
-import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
+import { outcomeOf } from "@/lib/progress";
 
 /** A live game against another student — the mobile twin of the web app's
     LiveGame. The board is drawn from the moves the server confirmed, never
     from local optimism, so a rejected move never has to be taken back. */
 export default function RoomScreen() {
-  const { roomId, from } = useLocalSearchParams<{ roomId: string; from?: string }>();
-  /* A board is reached from Play (a class game, by code) or from Challenge (a
-     game with a friend), and both ways out lead back to where the pupil came
-     from. The Challenge screen says so in the link. */
-  const home = from === "challenge" ? "/student/challenge" : "/student/play";
+  const { roomId } = useLocalSearchParams<{ roomId: string }>();
+  /* Every way to a board — a class game, a code, a friend's challenge — now
+     starts on the Games tab, so every way out leads back there. */
+  const home = "/student/play";
   const t = useTranslations("play");
+  const ts = useTranslations("st");
+  const locale = useLocale();
+  const { pp, st } = usePalette();
   const { room, moves, seat, connection, error, play, resign, draw, enter } = useRoom(roomId);
   const [moveError, setMoveError] = useState("");
   const [confirmResign, setConfirmResign] = useState(false);
@@ -55,7 +58,7 @@ export default function RoomScreen() {
   if (error) {
     return (
       <PlayShell title={t("classGame")} back={home} sound>
-        <Panel><Text className="font-sans-bold text-sm text-ink">{t(`error.${error}`)}</Text></Panel>
+        <Panel><Text className="font-pp-bold text-sm text-pp-ink">{t(`error.${error}`)}</Text></Panel>
       </PlayShell>
     );
   }
@@ -63,8 +66,8 @@ export default function RoomScreen() {
     return (
       <PlayShell title={t("classGame")} back={home} sound>
         <Panel className="flex-row items-center justify-center gap-2">
-          <ActivityIndicator color={C.navy} />
-          <Text className="font-sans-bold text-sm text-ink">{t("loading")}</Text>
+          <ActivityIndicator color={pp.muted} />
+          <Text className="font-pp-bold text-sm text-pp-ink">{t("loading")}</Text>
         </Panel>
       </PlayShell>
     );
@@ -98,7 +101,7 @@ export default function RoomScreen() {
     const running = room.status === "Active" && room.turn === (side === "w" ? "White" : "Black");
     return (
       <View className="flex-row items-center justify-between gap-2 px-1">
-        <Text numberOfLines={1} className="min-w-0 flex-1 font-sans-bold text-xs text-ink">
+        <Text numberOfLines={1} className="min-w-0 flex-1 font-pp-bold text-xs text-pp-ink">
           {nameOf(side)}
         </Text>
         <CapturedTray
@@ -109,10 +112,10 @@ export default function RoomScreen() {
         {ms !== null && (
           <View
             accessibilityLabel={t("clock", { name: nameOf(side) })}
-            style={{ backgroundColor: ms < 10_000 ? C.brick : running ? C.navy : C.line }}
+            style={{ backgroundColor: ms < 10_000 ? pp.red : running ? pp.navy : pp.line }}
             className="rounded-lg px-2 py-0.5"
           >
-            <Text style={{ color: ms < 10_000 || running ? "#ffffff" : C.navy }} className="font-sans-bold text-[13px]">
+            <Text style={{ color: ms < 10_000 || running ? "#ffffff" : pp.ink }} className="font-pp-bold text-[13px]">
               {fmtClock(ms)}
             </Text>
           </View>
@@ -129,19 +132,19 @@ export default function RoomScreen() {
 
   return (
     <PlayShell title={t("classGame")} back={home} sound>
-      <Panel className="!flex-row !items-center !justify-between !p-3">
+      <Panel className="flex-row items-center justify-between p-3">
         <View>
-          <Text className="font-sans-bold text-sm text-ink">
+          <Text className="font-pp-bold text-sm text-pp-ink">
             {opponent ? opponent.displayName : t("waitingForOpponent")}
           </Text>
-          <Text className="font-sans text-xs text-muted">
+          <Text className="font-pp text-xs text-pp-muted">
             {t(`seat.${seat || "watching"}`)}
             {tc ? ` · ${t("timeControl", { tc })}` : ""}
           </Text>
         </View>
         <View className="flex-row items-center gap-1">
-          {connection === "live" ? <Wifi size={14} color={C.olive} /> : <WifiOff size={14} color={C.muted} />}
-          <Text className="font-sans-bold text-xs text-muted">{t(`connection.${connection}`)}</Text>
+          {connection === "live" ? <Wifi size={14} color={pp.green} /> : <WifiOff size={14} color={pp.muted} />}
+          <Text className="font-pp-bold text-xs text-pp-muted">{t(`connection.${connection}`)}</Text>
         </View>
       </Panel>
 
@@ -150,47 +153,47 @@ export default function RoomScreen() {
           handed to whoever takes it. */}
       {/* Paused by the teacher. The board can be looked at, not played. */}
       {room.stopped && (
-        <Panel className="items-center">
+        <Panel className="items-center border-st-gold-soft bg-st-gold-soft">
           <View className="flex-row items-center gap-1.5">
-            <Pause size={16} color={C.navy} />
-            <Text className="font-sans-bold text-base text-ink">{t("room.onHoldTitle")}</Text>
+            <Pause size={16} color={st.gold} />
+            <Text className="font-pp-bold text-base text-pp-ink">{t("room.onHoldTitle")}</Text>
           </View>
-          <Text className="mt-1 text-center font-sans text-xs leading-5 text-muted">{t("room.onHoldBody")}</Text>
+          <Text className="mt-1 text-center font-pp text-xs leading-5 text-pp-muted">{t("room.onHoldBody")}</Text>
         </Panel>
       )}
       {room.status === "Open" && !room.stopped && seat !== "" && opponent && !iEntered && (
         <Panel className="items-center">
-          <Text className="text-center font-sans-bold text-base text-ink">
+          <Text className="text-center font-pp-bold text-base text-pp-ink">
             {t(moves.length > 0 ? "room.continueTitle" : "room.enterTitle", { name: opponent.displayName })}
           </Text>
-          <Text className="mt-1 text-center font-sans text-xs text-muted">
+          <Text className="mt-1 text-center font-pp text-xs text-pp-muted">
             {t(`seat.${seat}`)}
             {tc ? ` · ${t("timeControl", { tc })}` : ""}
           </Text>
-          <Text className="mt-1 text-center font-sans text-xs text-muted">
+          <Text className="mt-1 text-center font-pp text-xs text-pp-muted">
             {t(moves.length > 0 ? "room.continueBody" : "room.enterBody")}
           </Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => void enter()}
-            className="mt-3 w-full items-center rounded-xl bg-navy py-3 active:opacity-80"
+            className="mt-3 min-h-11 w-full items-center justify-center rounded-full bg-pp-blue active:bg-pp-deep"
           >
-            <Text className="font-sans-bold text-sm text-white">{t("room.enter")}</Text>
+            <Text className="font-pp-bold text-sm text-white">{t("room.enter")}</Text>
           </Pressable>
         </Panel>
       )}
       {room.status === "Open" && !room.stopped && seat !== "" && opponent && iEntered && (
         <Panel className="flex-row items-center justify-center gap-2">
-          <ActivityIndicator color={C.navy} />
-          <Text accessibilityLiveRegion="polite" className="font-sans-bold text-sm text-ink">
+          <ActivityIndicator color={pp.muted} />
+          <Text accessibilityLiveRegion="polite" className="font-pp-bold text-sm text-pp-ink">
             {t("room.waitingFor", { name: opponent.displayName })}
           </Text>
         </Panel>
       )}
       {room.status === "Open" && !opponent && (
         <Panel className="items-center">
-          <Text className="font-sans-bold text-sm text-ink">{t("shareCode")}</Text>
-          <Text className="mt-1.5 font-sans-bold text-3xl tracking-[6px] text-navy">{room.code}</Text>
+          <Text className="font-pp-bold text-sm text-pp-ink">{t("shareCode")}</Text>
+          <Text className="mt-1.5 font-pp-bold text-3xl tracking-[6px] text-pp-ink">{room.code}</Text>
         </Panel>
       )}
 
@@ -205,21 +208,35 @@ export default function RoomScreen() {
         title={
           room.status === "Cancelled"
             ? t("cancelled")
-            : t(`result.${room.result === "1/2-1/2" ? "draw" : room.result === "1-0" ? "whiteWon" : "blackWon"}`)
+            : seat && room.result
+              ? ts(`resultTitle.${outcomeOf(room.result, seat === "White" ? "white" : "black")!}`)
+              : t(`result.${room.result === "1/2-1/2" ? "draw" : room.result === "1-0" ? "whiteWon" : "blackWon"}`)
         }
         detail={room.status === "Finished" && reason ? t("byReason", { reason }) : undefined}
-        /* Nothing to restart here, so the way on is back to the screen the
-           board was opened from: Play for a class game, Challenge for a game
-           with a friend, where the next invitation is. Named for where it
-           goes: two buttons both reading "Back" is a dialog with two doors and
-           one name. */
-        primaryLabel={t(from === "challenge" ? "backToChallenge" : "backToPlay")}
+        /* For a player, their own result and what the game was; a watcher
+           sees only who won. */
+        outcome={room.status === "Finished" && seat ? outcomeOf(room.result, seat === "White" ? "white" : "black") : null}
+        facts={
+          seat
+            ? [
+                { label: ts("opponent"), value: opponent?.displayName ?? "—" },
+                { label: ts("youPlayed"), value: ts(seat === "White" ? "side.white" : "side.black") },
+                { label: ts("timeControl"), value: tc || ts("untimed") },
+                { label: ts("when"), value: new Date().toLocaleDateString(locale, { month: "short", day: "numeric" }) },
+              ]
+            : undefined
+        }
+        /* Nothing to restart here, so the way on is back to the Games tab the
+           board was opened from — as the web's does from its Games tab. Named
+           for where it goes: two buttons both reading "Back" is a dialog with
+           two doors and one name. */
+        primaryLabel={t("backToPlay")}
         onPrimary={() => router.replace(home)}
         onClose={() => setShowResult(false)}
       />
 
-      <Panel className="!py-2.5">
-        <Text className="text-center font-sans-bold text-sm text-ink">
+      <Panel className="py-2.5">
+        <Text className="text-center font-pp-bold text-sm text-pp-ink">
           {room.status === "Finished"
             ? t(`result.${room.result === "1/2-1/2" ? "draw" : room.result === "1-0" ? "whiteWon" : "blackWon"}`) +
               (reason ? ` — ${reason}` : "")
@@ -234,17 +251,17 @@ export default function RoomScreen() {
                     : t("theirMove")}
         </Text>
         {moveError !== "" && (
-          <Text className="mt-1 text-center font-sans-bold text-xs text-brick">{t(`error.${moveError}`)}</Text>
+          <Text className="mt-1 text-center font-pp-bold text-xs text-pp-red">{t(`error.${moveError}`)}</Text>
         )}
       </Panel>
 
       {moves.length > 0 && (
-        <Panel className="!py-2.5">
+        <Panel className="py-2.5">
           {pairedMoves(moves.map((m) => m.san)).map((pair) => (
             <View key={pair.no} className="flex-row">
-              <Text className="w-8 font-sans text-xs text-muted">{pair.no}.</Text>
-              <Text className="w-16 font-sans text-xs text-ink">{pair.white}</Text>
-              <Text className="w-16 font-sans text-xs text-ink">{pair.black ?? ""}</Text>
+              <Text className="w-8 font-pp text-xs text-pp-muted">{pair.no}.</Text>
+              <Text className="w-16 font-pp text-xs text-pp-ink">{pair.white}</Text>
+              <Text className="w-16 font-pp text-xs text-pp-ink">{pair.black ?? ""}</Text>
             </View>
           ))}
         </Panel>
@@ -253,30 +270,30 @@ export default function RoomScreen() {
       {/* A draw offer standing: the other player answers it here, and the one
           who offered is told they are waiting rather than left wondering. */}
       {room.status === "Active" && seat !== "" && room.drawOffer === opponentColour && (
-        <Panel className="items-center !p-3">
-          <Text className="text-center font-sans-bold text-sm text-ink">
+        <Panel className="items-center p-3">
+          <Text className="text-center font-pp-bold text-sm text-pp-ink">
             {t("draw.incoming", { name: opponent?.displayName ?? "" })}
           </Text>
           <View className="mt-2.5 w-full flex-row gap-2">
             <Pressable
               onPress={() => void draw("accept")}
               accessibilityRole="button"
-              className="flex-1 items-center rounded-xl bg-navy py-2.5 active:opacity-80"
+              className="min-h-11 flex-1 items-center justify-center rounded-full bg-pp-blue active:bg-pp-deep"
             >
-              <Text className="font-sans-bold text-sm text-white">{t("draw.accept")}</Text>
+              <Text className="font-pp-bold text-sm text-white">{t("draw.accept")}</Text>
             </Pressable>
             <Pressable
               onPress={() => void draw("decline")}
               accessibilityRole="button"
-              className="flex-1 items-center rounded-xl border-2 border-line bg-card py-2.5 active:opacity-80"
+              className="min-h-11 flex-1 items-center justify-center rounded-full border border-pp-line bg-pp-card active:bg-pp-soft"
             >
-              <Text className="font-sans-bold text-sm text-ink">{t("draw.decline")}</Text>
+              <Text className="font-pp-bold text-sm text-pp-ink">{t("draw.decline")}</Text>
             </Pressable>
           </View>
         </Panel>
       )}
       {room.status === "Active" && seat !== "" && room.drawOffer === seat && (
-        <Text accessibilityLiveRegion="polite" className="text-center font-sans-bold text-xs text-muted">
+        <Text accessibilityLiveRegion="polite" className="text-center font-pp-bold text-xs text-pp-muted">
           {t("draw.offered", { name: opponent?.displayName ?? "" })}
         </Text>
       )}
@@ -284,14 +301,14 @@ export default function RoomScreen() {
       {room.status === "Active" && seat !== "" && (
         confirmResign ? (
           <View className="flex-row gap-2">
-            <Pressable onPress={resign} className="flex-1 items-center rounded-xl bg-brick py-3 active:opacity-80">
-              <Text className="font-sans-bold text-sm text-white">{t("resignConfirm")}</Text>
+            <Pressable onPress={resign} accessibilityRole="button" className="min-h-12 flex-1 items-center justify-center rounded-full bg-pp-red active:opacity-80">
+              <Text className="font-pp-bold text-sm text-white">{t("resignConfirm")}</Text>
             </Pressable>
             <Pressable
               onPress={() => setConfirmResign(false)}
-              className="flex-1 items-center rounded-xl border-2 border-line bg-card py-3 active:opacity-80"
+              className="min-h-12 flex-1 items-center justify-center rounded-full border border-pp-line bg-pp-card active:bg-pp-soft"
             >
-              <Text className="font-sans-bold text-sm text-ink">{t("keepPlaying")}</Text>
+              <Text className="font-pp-bold text-sm text-pp-ink">{t("keepPlaying")}</Text>
             </Pressable>
           </View>
         ) : (
@@ -300,17 +317,17 @@ export default function RoomScreen() {
               <Pressable
                 onPress={() => void draw("offer")}
                 accessibilityRole="button"
-                className="flex-1 items-center rounded-xl border-2 border-line bg-card py-3 active:opacity-80"
+                className="min-h-12 flex-1 items-center justify-center rounded-full border border-pp-line bg-pp-card active:bg-pp-soft"
               >
-                <Text className="font-sans-bold text-sm text-ink">{t("draw.offer")}</Text>
+                <Text className="font-pp-bold text-sm text-pp-ink">{t("draw.offer")}</Text>
               </Pressable>
             )}
             <Pressable
               onPress={() => setConfirmResign(true)}
               accessibilityRole="button"
-              className="flex-1 items-center rounded-xl border-2 border-line bg-card py-3 active:opacity-80"
+              className="min-h-12 flex-1 items-center justify-center rounded-full border border-pp-line bg-pp-card active:bg-pp-soft"
             >
-              <Text className="font-sans-bold text-sm text-muted">{t("resign")}</Text>
+              <Text className="font-pp-bold text-sm text-pp-muted">{t("resign")}</Text>
             </Pressable>
           </View>
         )

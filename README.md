@@ -1,67 +1,100 @@
-# Welcome to your Expo app 👋
+# JTrax mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The JTrax student and parent app for iPhone and Android — an Expo port of
+the web portals in [`jtrax-web-app`](https://github.com/Kusk24/jtrax-web-app).
+Expo SDK 57, expo-router, NativeWind, use-intl (English and Thai).
 
-## Get started
+## Run it on the iOS simulator
 
-1. Install dependencies
+You need, once:
 
-   ```bash
-   pnpm install
-   ```
+- **macOS with Xcode** and an iOS simulator runtime (Xcode → Settings →
+  Components). Open Xcode once so it finishes installing.
+- **Node 22 or 24.** The tests need 22.12 or later; Node 20 runs the app but
+  not `pnpm test`.
+- **pnpm** — `corepack enable` turns on the version pinned in `package.json`.
+- **Go**, to run the backend locally (see its `go.mod` for the version).
 
-2. Start the app
+### 1. Start the backend
 
-   ```bash
-   pnpm start
-   ```
+The app needs the JTrax API. Clone
+[`jtrax-backend`](https://github.com/Kusk24/jtrax-backend) next to this repo
+and start it with demo data:
 
-In the output, you'll find options to open the app in a
+```bash
+cd jtrax-backend
+PORT=8790 JTRAX_DB=/tmp/jtrax-dev.db JTRAX_SEED=1 go run ./cmd/server
+```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+`JTRAX_SEED=1` fills a fresh database with a demo academy: a parent, two
+children, classes, puzzles. Every seeded account shares one development
+password, `DevPassword` in `jtrax-backend/internal/db/seed.go`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### 2. Install and configure
+
+```bash
+cd jtrax-mobile-app
+pnpm install
+cp .env.example .env.local
+```
+
+The defaults in `.env.example` point at the backend from step 1, which the
+simulator reaches as `localhost`.
+
+### 3. Open it
+
+```bash
+pnpm ios
+```
+
+This starts Metro and opens the app in **Expo Go** on the simulator,
+installing Expo Go the first time. Sign in as:
+
+| Who | Sign in with |
+| --- | --- |
+| A student | `penny@jca.ac.th` |
+| A parent | `sandy01234@gmail.com` |
+
+If the app shows an old screen after switching branches, restart Metro with
+`pnpm start --clear` and reopen Expo Go.
 
 ## Environment
 
-Set per build (an `EXPO_PUBLIC_*` variable, or `expo.extra` in `app.json`):
+Read from `.env.local` (git-ignored), or set per build:
 
 | Variable | What it does |
 | --- | --- |
-| `EXPO_PUBLIC_API_URL` | The JTrax backend. Defaults to `http://localhost:8790`, useless on a real device — a phone cannot reach the laptop's localhost, so supply a LAN address or the deployed API. |
-| `EXPO_PUBLIC_MODEL_BASE_URL` | Where the two trained chess models and onnxruntime-web are served from — the same host the web app points `NEXT_PUBLIC_MODEL_BASE_URL` at. Must be an absolute `https://` URL. With none set, the **Play the computer** screen offers Stockfish only; the Beginner and Club-player opponents report unavailable. |
+| `EXPO_PUBLIC_API_URL` | The JTrax backend. Defaults to `http://localhost:8790`, which works on the simulator but not on a real phone — a phone cannot reach the laptop's `localhost`, so use the laptop's LAN address or the deployed API. |
+| `EXPO_PUBLIC_MODEL_BASE_URL` | Where the two trained chess models and onnxruntime-web are served from — the same host the web app's `NEXT_PUBLIC_MODEL_BASE_URL` points at. Must be an absolute `https://` URL. Without it, **Play with Robot** offers the Advanced robot (Stockfish) only; Beginner and Intermediate say they could not be loaded. |
 
-That host must serve `novice_int8.onnx`, `strong_fp16.onnx`, and an `ort/` directory with onnxruntime-web's `ort.min.js` and its `.wasm`. The web app's `pnpm models:setup` stages exactly that layout under `jtrax-web-app/public/models/` — point both apps at the same place.
+The model host must serve `novice_int8.onnx`, `strong_fp16.onnx`, and an
+`ort/` directory with onnxruntime-web's `ort.min.js` and its `.wasm`. The web
+app's `pnpm models:setup` stages exactly that layout under
+`jtrax-web-app/public/models/` — point both apps at the same place.
 
-## Get a fresh project
+## Expo Go and its limits
 
-When you're ready, run:
+Expo Go runs everything except **push notifications**, which need a
+development build (`eas build --profile development`); the app still shows
+notifications in its own inbox. Expo Go also draws a floating gear button —
+that is Expo's developer menu, not part of the app.
 
-```bash
-pnpm reset-project
-```
+## Commands
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+| Command | |
+| --- | --- |
+| `pnpm ios` / `pnpm android` | Start Metro and open the simulator or emulator |
+| `pnpm start` | Start Metro only (scan the QR code with Expo Go on a phone) |
+| `pnpm test` | Unit tests (vitest) |
+| `pnpm lint` | ESLint |
+| `pnpm exec tsc --noEmit` | Typecheck |
 
-### Other setup steps
+## Where things are
 
-- To set up ESLint for linting, run `pnpm exec expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- `src/app/` — screens, by route (`student/`, `parent/`, `tournament/`).
+- `src/components/` — shared pieces; `student/` and `parent/` for each portal.
+- `src/lib/` — API clients and logic, each with its tests beside it.
+- `src/messages/en.json`, `th.json` — every string, in both languages.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Design decisions and the history behind them are in the JTrax vault
+(`jtrax-docs`), not here.

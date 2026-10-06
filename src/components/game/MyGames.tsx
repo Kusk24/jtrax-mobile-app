@@ -1,6 +1,6 @@
 /**
- * The games waiting for this pupil — on the home screen and on Play. The
- * mobile twin of the web app's MyGames.
+ * The games waiting for this pupil — on the home screen and on Games. The
+ * mobile twin of the web app's MyGames, drawn as it is there.
  *
  * When the teacher pairs two students, the game arrives here as an invitation:
  * who they are playing, which colour, the time control. Nothing starts until
@@ -20,12 +20,13 @@ import { useTranslations } from "use-intl";
 import { ChevronRight, DoorOpen, Hourglass, Pause, Swords } from "lucide-react-native";
 import { enterRoom, listMyRooms, type Room } from "@/lib/games";
 import { stepOf, timeControlLabel, unfinished } from "@/lib/live-games";
-import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 const POLL_MS = 8000;
 
 export function MyGames({ myAccountId }: { myAccountId: string }) {
   const t = useTranslations("play");
+  const { pp } = usePalette();
   const [games, setGames] = useState<Room[]>([]);
   const [entering, setEntering] = useState("");
 
@@ -63,7 +64,7 @@ export function MyGames({ myAccountId }: { myAccountId: string }) {
 
   return (
     <View className="gap-2.5">
-      <Text accessibilityRole="header" className="font-sans-bold text-base text-ink">
+      <Text accessibilityRole="header" className="font-pp-semibold text-[14px] text-pp-ink">
         {t("myGames.title")}
       </Text>
       {games.map((g) => {
@@ -82,27 +83,27 @@ export function MyGames({ myAccountId }: { myAccountId: string }) {
            is the loud card: who, which colour, and one button. */
         if (step === "invited") {
           return (
-            <View key={g.gameRoomId} className="rounded-card border-2 border-navySoft bg-highlight p-4">
-              <Text className="font-sans-bold text-[11px] uppercase tracking-[1px] text-navy">
+            <View key={g.gameRoomId} className="rounded-2xl border-[1.5px] border-st-brand-line bg-pp-soft p-[18px]">
+              <Text className="font-pp-bold text-[10.5px] uppercase tracking-[0.9px] text-pp-blue">
                 {g.moveCount ? t("myGames.continueTitle") : t("myGames.invited")}
               </Text>
-              <Text className="mt-1 font-sans-bold text-base text-ink">
+              <Text className="mt-1 font-pp-bold text-[16px] leading-snug text-pp-ink">
                 {t("myGames.competing", { name: opponent?.displayName ?? "" })}
               </Text>
-              <Text className="mt-1 font-sans text-xs text-muted">{details.join(" · ")}</Text>
-              {g.label ? <Text className="mt-0.5 font-sans text-xs text-muted">{g.label}</Text> : null}
+              <Text className="mt-1 font-pp text-[11.5px] text-pp-muted">{details.join(" · ")}</Text>
+              {g.label ? <Text className="mt-0.5 font-pp text-[11px] text-pp-muted">{g.label}</Text> : null}
               <Pressable
                 accessibilityRole="button"
                 disabled={entering === g.gameRoomId}
                 onPress={() => void enter(g.gameRoomId)}
-                className="mt-3 flex-row items-center justify-center gap-2 rounded-xl bg-navy py-3 active:opacity-80"
+                className="mt-3 min-h-11 flex-row items-center justify-center gap-[7px] rounded-full bg-pp-blue active:bg-pp-deep"
               >
                 {entering === g.gameRoomId ? (
                   <ActivityIndicator color="#ffffff" />
                 ) : (
                   <DoorOpen size={16} color="#ffffff" />
                 )}
-                <Text className="font-sans-bold text-sm text-white">
+                <Text className="font-pp-semibold text-[14px] text-white">
                   {entering === g.gameRoomId ? t("myGames.entering") : t("myGames.enter")}
                 </Text>
               </Pressable>
@@ -115,24 +116,26 @@ export function MyGames({ myAccountId }: { myAccountId: string }) {
             key={g.gameRoomId}
             accessibilityRole="button"
             onPress={() => router.push(`/student/play/room/${g.gameRoomId}`)}
-            className={`flex-row items-center gap-3 rounded-card border-2 bg-card p-3.5 active:opacity-80 ${
-              myTurn ? "border-olive" : "border-line"
+            /* Green when it is this pupil's move: the one game here that is
+               waiting on them. */
+            className={`flex-row items-center gap-3 rounded-2xl border-[1.5px] p-3.5 active:bg-pp-soft ${
+              myTurn ? "border-pp-green-soft bg-pp-green-soft" : "border-pp-line bg-pp-card"
             }`}
           >
-            <View className="size-11 items-center justify-center rounded-xl bg-highlight">
+            <View className="size-11 items-center justify-center rounded-2xl bg-pp-soft">
               {step === "onHold" ? (
-                <Pause size={20} color={C.highlightInk} />
+                <Pause size={20} color={pp.ink} strokeWidth={2.2} />
               ) : step === "waitingForOpponent" ? (
-                <Hourglass size={20} color={C.highlightInk} />
+                <Hourglass size={20} color={pp.ink} strokeWidth={2.2} />
               ) : (
-                <Swords size={20} color={C.highlightInk} />
+                <Swords size={20} color={pp.ink} strokeWidth={2.2} />
               )}
             </View>
-            <View className="min-w-0 flex-1">
-              <Text numberOfLines={1} className="font-sans-bold text-base text-ink">
+            <View className="min-w-0 flex-1 gap-0.5">
+              <Text numberOfLines={1} className="font-pp-bold text-[14px] text-pp-ink">
                 {t("myGames.vs", { name: opponent?.displayName ?? "" })}
               </Text>
-              <Text className="mt-0.5 font-sans text-xs text-muted">
+              <Text className="font-pp text-[10.5px] text-pp-muted">
                 {step === "onHold"
                   ? t("myGames.onHoldBody")
                   : step === "waitingForOpponent"
@@ -141,13 +144,13 @@ export function MyGames({ myAccountId }: { myAccountId: string }) {
               </Text>
             </View>
             {step === "onHold" ? (
-              <View className="rounded-full bg-highlight px-3 py-1.5">
-                <Text className="font-sans-bold text-xs text-navy">{t("myGames.onHold")}</Text>
+              <View className="rounded-full bg-st-gold-soft px-3 py-1.5">
+                <Text className="font-pp-bold text-[11.5px] text-st-gold">{t("myGames.onHold")}</Text>
               </View>
             ) : (
               <View className="flex-row items-center gap-1">
-                <Text className="font-sans-bold text-sm text-navy">{t("myGames.open")}</Text>
-                <ChevronRight size={16} color={C.navy} />
+                <Text className="font-pp-bold text-[12px] text-pp-ink">{t("myGames.open")}</Text>
+                <ChevronRight size={16} color={pp.ink} strokeWidth={2.2} />
               </View>
             )}
           </Pressable>

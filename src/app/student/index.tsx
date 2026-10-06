@@ -1,86 +1,71 @@
 /**
- * The student home, matching the portal's.
+ * Home: the pupil's own chess dashboard, as the web's HomeScreen draws it.
  *
- * Every number here is one the pupil actually has. The screen this replaces
- * greeted a hard-coded "Penny" and counted her classes; the streak is now the
- * server's, the puzzle count is today's real set, and the rating is a synced
- * Lichess one — *absent* rather than zero when there is no linked account,
- * because a rating of 0 is a claim about how well a child plays and an empty
- * corner is not.
+ * Top to bottom: who is here and their streak, today's puzzles (the one blue
+ * card in the portal), a robot game left unfinished, any game waiting on
+ * them, a tournament on now, the three ways to play, and practice puzzles.
+ * The summary numbers live on Profile.
+ *
+ * Every number here is one the pupil actually has, read from the server — a
+ * streak or a count a child sees on their own screen is a claim about them.
  */
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { Link, useFocusEffect } from "expo-router";
-import { useTranslations } from "use-intl";
-import { BarChart3, Bot, ChevronRight, Flame, GraduationCap, Puzzle, Swords, Trophy } from "lucide-react-native";
+import { router, useFocusEffect } from "expo-router";
+import Svg, { Path } from "react-native-svg";
+import { useLocale, useTranslations } from "use-intl";
+import { Bot, ChevronRight, DoorOpen, Flame } from "lucide-react-native";
+import { usePalette } from "@/components/ThemeProvider";
 import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
-import { HomeAction, StatTile } from "@/components/student/HomeTiles";
 import { MyGames } from "@/components/game/MyGames";
+import { DailyProgressCard } from "@/components/student/DailyProgressCard";
+import { FriendPawns } from "@/components/student/FriendPawns";
+import { ModeTile } from "@/components/student/ModeTile";
+import { ResumeGameCard } from "@/components/student/ResumeGameCard";
 import { useSession } from "@/lib/session";
-import { getDailyPuzzles, getPracticeSummary, solvedCount } from "@/lib/puzzles";
-import { getMyLichess } from "@/lib/lichess";
-import { api } from "@/lib/api";
-import { classesAttended } from "@/lib/classes-attended";
-import { C } from "@/lib/colors";
+import { dailyStep, getDailyPuzzles, solvedCount } from "@/lib/puzzles";
+import { getProgress } from "@/lib/progress";
 
-/** Today's set is three. Kept as a name so the progress bar and the "0/3" do
-    not disagree when the set is still loading. */
-const DAILY_TARGET = 3;
-
-/** One rating, chosen the way a coach would introduce a child: rapid is the
-    format the academy actually plays, so it leads, and the others stand in
-    only when there is no rapid game yet. Puzzle is deliberately last — it is
-    not a measure of playing strength. */
-const PERF_PREFERENCE = ["rapid", "blitz", "classical", "bullet", "puzzle"];
+function SectionTitle({ children }: { children: string }) {
+  return (
+    <Text accessibilityRole="header" className="px-0.5 font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+      {children}
+    </Text>
+  );
+}
 
 export default function StudentHome() {
-  const t = useTranslations("sv2");
-  const tp = useTranslations("play");
-  const tl = useTranslations("lichess");
+  const ts = useTranslations("st");
+  const t3 = useTranslations("sv3");
+  const tp = useTranslations("pv2");
+  const locale = useLocale();
+  const { pp, st } = usePalette();
   const { user } = useSession();
 
+  const [daily, setDaily] = useState({
+    solved: 0,
+    total: 3,
+    loading: true,
+    ...dailyStep([]),
+  });
   const [streak, setStreak] = useState(0);
-  const [solved, setSolved] = useState(0);
-  const [total, setTotal] = useState(DAILY_TARGET);
-  const [rating, setRating] = useState<{ perf: string; value: number } | null>(null);
-  /* Classes checked in to, as on the Profile. Null until it loads. */
-  const [classes, setClasses] = useState<number | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      getPracticeSummary()
-        .then((p) => !cancelled && setStreak(p.streak))
-        .catch(() => {});
       getDailyPuzzles()
         .then((set) => {
           if (cancelled) return;
-          setSolved(solvedCount(set.puzzles));
-          if (set.puzzles.length > 0) setTotal(set.puzzles.length);
+          setDaily({
+            solved: solvedCount(set.puzzles),
+            total: set.puzzles.length || 3,
+            loading: false,
+            ...dailyStep(set.puzzles),
+          });
         })
-        .catch(() => {});
-      getMyLichess()
-        .then((mine) => {
-          if (cancelled || !mine.linked) return;
-          const best = [...mine.link.ratings]
-            .filter((r) => r.rating > 0)
-            .sort(
-              (a, b) => PERF_PREFERENCE.indexOf(a.perf) - PERF_PREFERENCE.indexOf(b.perf),
-            )[0];
-          if (best) setRating({ perf: best.perf, value: best.rating });
-        })
-        .catch(() => {
-          /* No link, or a cold API. The tile simply says "not rated yet". */
-        });
-      // `attendance` is scoped to the pupil's own rows; the sessions are what
-      // the count checks each row against.
-      Promise.all([
-        api.get<{ session_id: string; check_in_time?: string }[]>("attendance"),
-        api.get<{ session_id: string }[]>("class-sessions"),
-      ])
-        .then(([attendance, sessions]) => {
-          if (!cancelled) setClasses(classesAttended(attendance, new Set(sessions.map((x) => x.session_id))));
-        })
+        .catch(() => !cancelled && setDaily((d) => ({ ...d, loading: false })));
+      getProgress()
+        .then((p) => !cancelled && setStreak(p.streak.current))
         .catch(() => {});
       return () => {
         cancelled = true;
@@ -89,138 +74,112 @@ export default function StudentHome() {
   );
 
   const name = user?.displayName?.trim() ?? "";
-  const firstName = name.split(/\s+/)[0] || name;
-  const initial = name.charAt(0).toUpperCase() || "S";
-  const done = solved >= total && total > 0;
+  const firstName = name.split(/\s+/)[0] || name || "—";
+  /* The actual today, as the parent home writes it; th-TH gives the Buddhist year. */
+  const todayLabel = new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+  /* "Start" goes straight to the next puzzle to solve rather than to a list
+     the pupil then has to choose from; once the day is done, to practice. */
+  const startChallenge = () => {
+    if (daily.label === "keepPractising") router.push("/student/puzzles");
+    else if (daily.next) router.push({ pathname: "/student/puzzles/[puzzleId]", params: { puzzleId: daily.next, set: "daily" } });
+    else router.push("/student/puzzles/daily");
+  };
 
   return (
-    <ScrollView
-      className="flex-1 bg-paper"
-      contentContainerClassName="px-4 pb-32 pt-3 gap-3"
-      showsVerticalScrollIndicator={false}
-    >
-      <View className="flex-row items-center justify-between gap-3">
-        <View className="min-w-0 flex-1">
-          <Text numberOfLines={1} className="font-display-semibold text-2xl text-navy">
-            {t("greeting", { name: firstName })}
+    <ScrollView className="flex-1 bg-pp-bg" contentContainerClassName="gap-5 px-4 pb-8 pt-3" showsVerticalScrollIndicator={false}>
+      {/* The parent home's greeting: "Hi, Penny!" and the date, the streak on the right. */}
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="min-w-0 flex-1 gap-1">
+          <Text numberOfLines={1} className="font-pp-display-bold text-[23px] leading-tight text-pp-ink">
+            {tp("hi", { name: firstName })}
           </Text>
-          <Text className="mt-1 font-sans text-xs text-muted">{t("greetingSub")}</Text>
+          <Text className="font-pp text-sm text-pp-muted">{todayLabel}</Text>
         </View>
-        <Link href="/student/profile" asChild>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t("profile")}
-            className="size-11 shrink-0 items-center justify-center rounded-full border-2 border-card bg-highlight shadow-clay"
-          >
-            <Text className="font-display-semibold text-base text-navy">{initial}</Text>
-          </Pressable>
-        </Link>
+        <View
+          accessibilityLabel={t3("dayStreak", { n: streak })}
+          className="flex-row items-center gap-1 rounded-full bg-st-orange-soft px-3 py-1.5"
+        >
+          <Flame size={16} color={st.orange} fill={st.orange} strokeWidth={2.2} />
+          <Text className="font-pp-bold text-[14px] text-st-orange">{streak}</Text>
+        </View>
       </View>
 
-      {/* A game the teacher set up is the first thing to act on. */}
+      <DailyProgressCard
+        solved={daily.solved}
+        total={daily.total}
+        loading={daily.loading}
+        onOpen={() => router.push("/student/puzzles/daily")}
+        action={{ label: ts(daily.label), onPress: startChallenge }}
+      />
+
+      {/* A robot game left unfinished — draws nothing when there is none. */}
+      <ResumeGameCard />
+
+      {/* Games somebody is waiting on — draws nothing when there are none. */}
       {user?.userAccountId && <MyGames myAccountId={user.userAccountId} />}
 
-      <View className="flex-row gap-2.5">
-        <StatTile
-          label={t("streakLabel")}
-          value={String(streak)}
-          icon={<Flame size={18} color={C.brick} strokeWidth={2.4} />}
-        />
-        <StatTile
-          label={t("dailyChallenge")}
-          value={`${solved}/${total}`}
-          icon={<Puzzle size={18} color={C.highlightInk} strokeWidth={2.2} />}
-        />
-      </View>
-
-      {/* Today's challenge. */}
-      <View className="overflow-hidden rounded-card border-2 border-highlight bg-highlight p-4 shadow-clay">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="min-w-0 flex-1">
-            <Text className="font-sans-bold text-sm text-ink">
-              {done ? t("missionComplete") : t("todaysChallenge")}
-            </Text>
-            <Text className="mt-1 font-sans text-[10.5px] leading-4 text-muted">
-              {done ? t("keepStreak") : t("challengeHint")}
-            </Text>
-          </View>
-          <View className="size-12 shrink-0 items-center justify-center rounded-full bg-card">
-            <Trophy size={24} color={C.gold} strokeWidth={2.2} />
-          </View>
-        </View>
-
-        <View className="mt-3 flex-row items-center justify-between">
-          <Text className="font-sans-semibold text-[10px] text-muted">
-            {t("puzzlesCount", { n: solved })}
-          </Text>
-          <Text className="font-sans-semibold text-[10px] text-muted">
-            {Math.round((solved / total) * 100)}%
-          </Text>
-        </View>
-        <View className="mt-1.5 h-2 overflow-hidden rounded-full bg-card">
-          <View
-            className="h-full rounded-full bg-navy"
-            style={{ width: `${(solved / total) * 100}%` }}
-          />
-        </View>
-
-        <Link href="/student/puzzles" asChild>
-          <Pressable className="mt-3 min-h-10 flex-row items-center justify-center gap-2 rounded-xl bg-navy active:opacity-80">
-            <Text className="font-sans-bold text-xs text-white">
-              {done ? t("freePlay") : t("startChallenge")}
-            </Text>
-            <ChevronRight size={16} color={C.white} strokeWidth={2.4} />
-          </Pressable>
-        </Link>
-      </View>
-
-      {/* The two things a pupil comes here to do. */}
-      <View className="flex-row gap-2.5">
-        <HomeAction
-          href="/student/play"
-          label={tp("title")}
-          body={t("practiceComputer")}
-          tone="mint"
-          icon={<Bot size={20} color={C.olive} strokeWidth={2.2} />}
-        />
-        <HomeAction
-          href="/student/challenge"
-          label={t("playFriend")}
-          body={t("playTogether")}
-          tone="lilac"
-          icon={<Swords size={20} color={C.highlightInk} strokeWidth={2.2} />}
-        />
-      </View>
-
-      <View>
-        <View className="mb-2 flex-row items-center justify-between">
-          <Text className="font-sans-bold text-xs text-ink">{t("myProgress")}</Text>
-          <Link href="/student/profile" asChild>
-            <Pressable>
-              <Text className="font-sans-bold text-[10px] text-navy">{t("viewAll")}</Text>
-            </Pressable>
-          </Link>
-        </View>
-        <View className="flex-row gap-2.5">
-          {/* With no linked account this is an em dash labelled "not rated
-              yet", not a 0 — and the label carries which format the number is,
-              because "1450" on its own does not say rapid from bullet. */}
-          <StatTile
-            label={rating ? tl(`perf.${rating.perf}`) : t("unrated")}
-            value={rating ? String(rating.value) : "—"}
-            icon={<BarChart3 size={18} color={C.highlightInk} strokeWidth={2.2} />}
-          />
-          {/* Classes, not a second "Daily Challenge": the same count already
-              sits at the top of the screen and fills the card below it. */}
-          <StatTile
-            label={t("classesLabel")}
-            value={classes === null ? "—" : String(classes)}
-            icon={<GraduationCap size={18} color={C.olive} strokeWidth={2.2} />}
-          />
-        </View>
-      </View>
-
       <LiveTournamentBanner />
+
+      <View className="gap-3">
+        <SectionTitle>{t3("games")}</SectionTitle>
+        <View className="flex-row gap-3">
+          <ModeTile
+            tone="blue"
+            title={t3("vsAi")}
+            sub={t3("vsAiSub")}
+            icon={<Bot size={24} color={st.indigo} strokeWidth={2} />}
+            onPress={() => router.navigate({ pathname: "/student/play", params: { open: "computer" } })}
+          />
+          <ModeTile
+            tone="orange"
+            title={t3("withFriend")}
+            sub={t3("withFriendSub")}
+            icon={<FriendPawns size={24} />}
+            onPress={() => router.navigate({ pathname: "/student/play", params: { open: "challenge" } })}
+          />
+          <ModeTile
+            tone="emerald"
+            title={t3("gameRoom")}
+            sub={t3("gameRoomSub")}
+            icon={<DoorOpen size={24} color={st.emerald} strokeWidth={2} />}
+            onPress={() => router.navigate({ pathname: "/student/play", params: { open: "room" } })}
+          />
+        </View>
+      </View>
+
+      <View className="gap-3">
+        <SectionTitle>{t3("practice")}</SectionTitle>
+        <Pressable
+          onPress={() => router.navigate("/student/puzzles")}
+          accessibilityRole="button"
+          className="flex-row items-center justify-between rounded-2xl border border-pp-line bg-pp-card p-3.5 active:bg-pp-mist"
+        >
+          <View className="min-w-0 flex-row items-center gap-3.5">
+            {/* A solid jigsaw piece — the tab bar's Puzzles icon is an
+                outline, so the two do not read as the same button. */}
+            <View className="size-11 items-center justify-center rounded-xl border border-st-brand-line bg-st-brand-soft">
+              <Svg width={20} height={20} viewBox="0 0 24 24">
+                <Path
+                  fill={st.brand}
+                  d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"
+                />
+              </Svg>
+            </View>
+            <View className="min-w-0">
+              <Text className="font-pp-bold text-[14px] text-pp-ink">{t3("puzzlesCard")}</Text>
+              <Text numberOfLines={1} className="mt-0.5 font-pp-medium text-[12px] text-pp-muted">
+                {t3("puzzlesCardSub")}
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={pp.faint} strokeWidth={2.5} />
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }

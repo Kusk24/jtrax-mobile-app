@@ -13,7 +13,6 @@ import { useTranslations } from "use-intl";
 import { KeyRound } from "lucide-react-native";
 import { ApiError, changePassword } from "@/lib/api";
 import { checkNewPassword } from "@/lib/password-rules";
-import { C } from "@/lib/colors";
 import { usePalette } from "@/components/ThemeProvider";
 import type { PPKey } from "@/lib/theme";
 
@@ -35,14 +34,16 @@ const LOOK: Record<
     bold: "font-pp-bold",
     semibold: "font-pp-semibold",
   },
+  /* The student panel's card, as the web draws it: the parent's form in a
+     slightly roomier box. */
   student: {
-    box: "rounded-card border-2 border-line bg-card p-4 shadow-clay",
-    label: "font-sans-semibold text-xs text-muted",
-    input: "rounded-xl border-2 border-line bg-white px-3 py-2.5 font-sans text-sm text-ink",
-    accent: C.navy,
-    text: "text-ink",
-    bold: "font-sans-bold",
-    semibold: "font-sans-semibold",
+    box: "rounded-2xl border-[1.5px] border-pp-line bg-pp-card p-[18px]",
+    label: "font-pp-semibold text-[13.5px] text-pp-muted",
+    input: "rounded-lg border-[1.5px] border-pp-line bg-pp-card px-3 py-2.5 font-pp text-sm text-pp-ink",
+    accent: { pp: "blue" },
+    text: "text-pp-ink",
+    bold: "font-pp-bold",
+    semibold: "font-pp-semibold",
   },
 };
 
@@ -112,7 +113,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
           <Text className={look.label}>{t("open")}</Text>
         </Pressable>
         {done && (
-          <Text accessibilityLiveRegion="polite" style={{ color: C.olive }} className={`mt-2 ${look.semibold} text-[12.5px]`}>
+          <Text accessibilityLiveRegion="polite" style={{ color: pp.green }} className={`mt-2 ${look.semibold} text-[12.5px]`}>
             {t("done")}
           </Text>
         )}
@@ -148,7 +149,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
       {field(t("confirm"), confirm, setConfirm, "newPassword")}
       <Text className={look.label}>{t("rule")}</Text>
       {error !== "" && (
-        <Text accessibilityRole="alert" style={{ color: C.brick }} className={`${look.semibold} text-[12.5px]`}>
+        <Text accessibilityRole="alert" style={{ color: pp.danger }} className={`${look.semibold} text-[12.5px]`}>
           {error}
         </Text>
       )}

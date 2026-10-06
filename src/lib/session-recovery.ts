@@ -10,7 +10,7 @@
  * Kept out of `session.tsx` so it can be tested: anything importing
  * `expo-secure-store` or `react-native` drags in native modules the test
  * runner cannot load. Same reason `portal-tabs.ts` lives apart from
- * `PortalNav.tsx`.
+ * `StudentNav.tsx`.
  */
 import { ApiError } from "./api";
 
