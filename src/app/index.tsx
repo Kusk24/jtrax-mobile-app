@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Redirect, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
@@ -82,6 +82,15 @@ export default function SignInScreen() {
         <LanguageToggle />
       </View>
 
+      {/* The academy's badge, as the portals' sidebars and the app icon show
+          it — the first thing a family sees is the school, then the app. */}
+      <Image
+        source={require("../../assets/images/jca-logo.png")}
+        accessibilityLabel="JCA Chess School"
+        style={{ width: 88, height: 88 }}
+        className="mb-4 self-center"
+        resizeMode="contain"
+      />
       <Text className="text-center font-display-semibold text-4xl text-navy">JTrax</Text>
       <Text className="mt-2 text-center font-sans text-sm text-muted">{t("tagline")}</Text>
 
