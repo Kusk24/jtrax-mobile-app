@@ -8,7 +8,8 @@
  * to, and that is how a board ended up wearing a nav bar and a back arrow at
  * the same time.
  *
- * Kept out of `PortalNav.tsx` so it can be tested: anything importing
+ * Kept out of the nav components (`StudentNav.tsx`, `ParentNav2.tsx`) so it
+ * can be tested: anything importing
  * `react-native` or `lucide-react-native` drags in Flow source the test runner
  * cannot parse. The shape here is structural for the same reason — an icon is
  * not part of either question.

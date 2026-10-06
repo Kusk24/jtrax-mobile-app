@@ -1,155 +1,136 @@
 /**
- * Today's puzzles, and Free Play under them.
+ * Puzzles: the practice list of twenty, as the web portal has it.
  *
- * The set comes from the academy's bank, matched to this pupil's rating, and
- * is never repeated — so an empty list means something and is explained rather
- * than left blank. Free Play is a puzzle at a time at a chosen difficulty, for
- * a pupil who wants to keep going; it opens on the same board screen.
+ * Levels mixed, two in three from the pupil's own level. Level tags on top,
+ * Today's Challenge as the first row (the day's three, on their own page),
+ * then each puzzle with its board, name, level and rating — ticked once
+ * solved today. Tomorrow the ticked ones are replaced and the rest stay.
+ *
+ * This replaced Free Play's three buttons, whose `puzzles/free` endpoint the
+ * server no longer has.
  */
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { Link, useFocusEffect } from "expo-router";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
 import { useTranslations } from "use-intl";
-import { Check, Puzzle as PuzzleIcon, Star } from "lucide-react-native";
-import { PlayShell, Panel } from "@/components/game/PlayShell";
-import { FREE_TIERS, getDailyPuzzles, solvedCount, type DailyPuzzle } from "@/lib/puzzles";
-import { C } from "@/lib/colors";
-
-/** One per puzzle in a set of three, so a child can tell them apart at a
-    glance before they have opened any of them. */
-const TOKENS = ["♟", "♞", "♜"];
-const TINTS = ["bg-highlight", "bg-olive-soft", "bg-brick-soft"];
-
-/** Free Play's three levels, with how many stars each shows. */
-const TIER_TITLE = {
-  beginner: "beginnerPuzzles",
-  intermediate: "intermediatePuzzles",
-  advanced: "advancedPuzzles",
-} as const;
+import { ChevronRight, Target } from "lucide-react-native";
+import { usePalette } from "@/components/ThemeProvider";
+import { PlayShell } from "@/components/game/PlayShell";
+import { PuzzleRow } from "@/components/student/PuzzleRow";
+import {
+  FREE_TIERS,
+  getDailyPuzzles,
+  getPuzzleList,
+  solvedCount,
+  type FreeTier,
+  type PuzzleList,
+} from "@/lib/puzzles";
 
 export default function PuzzlesScreen() {
   const t = useTranslations("sv2");
-  const [puzzles, setPuzzles] = useState<DailyPuzzle[]>([]);
-  const [exhausted, setExhausted] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const t3 = useTranslations("sv3");
+  const { pp } = usePalette();
+  /* Null until loaded. */
+  const [list, setList] = useState<PuzzleList | null>(null);
+  const [failed, setFailed] = useState(false);
+  /* "" for every level. */
+  const [level, setLevel] = useState<FreeTier | "">("");
+  const [daily, setDaily] = useState({ solved: 0, total: 3 });
 
-  /* Re-read on every visit rather than on mount: coming back from a solved
-     puzzle is the main way this screen is reached a second time, and a tick
-     that only appears after a restart is not a tick. */
+  /* Re-read on every visit: the server swaps yesterday's solved puzzles for
+     new ones, and coming back from a solve is the main way back here. */
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      setLoading(true);
+      getPuzzleList()
+        .then((l) => {
+          if (cancelled) return;
+          setFailed(false);
+          setList(l);
+        })
+        .catch(() => !cancelled && setFailed(true));
       getDailyPuzzles()
         .then((set) => {
-          if (cancelled) return;
-          setPuzzles(set.puzzles);
-          setExhausted(set.exhausted);
+          if (!cancelled) setDaily({ solved: solvedCount(set.puzzles), total: set.puzzles.length || 3 });
         })
-        .catch(() => {})
-        .finally(() => !cancelled && setLoading(false));
+        .catch(() => {});
       return () => {
         cancelled = true;
       };
     }, []),
   );
 
-  const done = solvedCount(puzzles);
-  const total = puzzles.length || 3;
+  const tags: [FreeTier | "", string][] = [["", t3("filterAll")], ...FREE_TIERS.map((k) => [k, t3(`level.${k}`)] as [FreeTier, string])];
 
   return (
     <PlayShell title={t("puzzles")} nav>
-      <Text className="-mt-1 mb-1 font-sans text-xs text-muted">{t("puzzlesSub")}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1.5" accessibilityRole="tablist">
+        {tags.map(([k, label]) => {
+          const on = level === k;
+          return (
+            <Pressable
+              key={k || "all"}
+              onPress={() => setLevel(k)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: on }}
+              className={`rounded-lg px-3.5 py-1.5 ${on ? "bg-pp-blue" : "bg-pp-line"}`}
+            >
+              <Text className={`font-pp-semibold text-[12.5px] ${on ? "text-white" : "text-pp-muted"}`}>{label}</Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
-      <Panel>
-        <View className="mb-3 flex-row items-center justify-between">
-          <View>
-            <Text className="font-sans-bold text-sm text-ink">{t("dailyChallenge")}</Text>
-            <Text className="mt-0.5 font-sans text-[10px] text-muted">
-              {t("puzzlesCount", { n: done })}
-            </Text>
-          </View>
-          <View className="size-8 items-center justify-center rounded-xl bg-highlight">
-            <PuzzleIcon size={16} color={C.highlightInk} strokeWidth={2.2} />
-          </View>
+      {/* Today's Challenge: the day's three, opening their own page. */}
+      <Pressable
+        onPress={() => router.push("/student/puzzles/daily")}
+        accessibilityRole="button"
+        className="flex-row items-center gap-3 rounded-xl border-[1.5px] border-pp-soft bg-pp-soft p-2.5 active:opacity-80"
+      >
+        <View className="size-12 items-center justify-center rounded-lg bg-pp-amber-soft">
+          <Target size={24} color={pp.amber} strokeWidth={2} />
         </View>
-
-        <View className="mb-4 h-2 overflow-hidden rounded-full bg-highlight">
-          <View
-            className="h-full rounded-full bg-navy"
-            style={{ width: `${(done / total) * 100}%` }}
-          />
-        </View>
-
-        {loading ? (
-          <View className="items-center gap-2 py-6">
-            <ActivityIndicator color={C.navy} />
-            <Text className="font-sans text-[11px] text-muted">{t("puzzlesLoading")}</Text>
-          </View>
-        ) : puzzles.length === 0 ? (
-          <Text className="px-3 py-6 text-center font-sans text-[11px] leading-5 text-muted">
-            {exhausted ? t("puzzlesExhausted") : t("puzzlesUnavailable")}
+        <View className="min-w-0 flex-1">
+          <Text className="font-pp-bold text-[14px] text-pp-ink">{t3("todaysChallenge")}</Text>
+          <Text className="font-pp text-[12px] text-pp-muted">
+            {t3("challengeCompleted", { n: daily.solved, total: daily.total })}
           </Text>
-        ) : (
-          <View className="gap-2.5">
-            {puzzles.map((p, i) => (
-              <Link key={p.puzzleId} href={`/student/puzzles/${p.puzzleId}`} asChild>
-                <Pressable className="flex-row items-center gap-3 rounded-2xl border-2 border-line bg-card px-3 py-2.5 active:opacity-80">
-                  <View
-                    className={`size-10 items-center justify-center rounded-xl ${TINTS[i % TINTS.length]}`}
-                  >
-                    <Text className="text-[22px] leading-7 text-ink">{TOKENS[i % TOKENS.length]}</Text>
-                  </View>
-                  <View className="min-w-0 flex-1">
-                    <Text className="font-sans-bold text-[13px] text-ink">
-                      {t("puzzleN", { n: i + 1 })}
-                    </Text>
-                    <Text className="font-sans text-[10px] text-muted">
-                      {p.solved ? t("solvedLabel") : t("ratingLabel", { rating: p.rating })}
-                    </Text>
-                  </View>
-                  {p.solved ? (
-                    <View className="size-7 items-center justify-center rounded-full bg-olive-soft">
-                      <Check size={16} color={C.olive} strokeWidth={3} />
-                    </View>
-                  ) : (
-                    <View className="flex-row items-center gap-1 rounded-full bg-highlight px-2 py-1">
-                      <Text className="font-sans-bold text-[10px] text-highlight-ink">+1</Text>
-                      <Star size={12} color={C.highlightInk} fill={C.highlightInk} />
-                    </View>
-                  )}
-                </Pressable>
-              </Link>
-            ))}
-          </View>
-        )}
-      </Panel>
+        </View>
+        <ChevronRight size={20} color={pp.blue} strokeWidth={2.4} />
+      </Pressable>
 
-      <Panel>
-        <View className="mb-3">
-          <Text className="font-sans-bold text-sm text-ink">{t("freePlay")}</Text>
-          <Text className="mt-0.5 font-sans text-[10px] text-muted">{t("freePlayHint")}</Text>
+      {failed && !list ? (
+        <Text className="rounded-xl border-[1.5px] border-pp-line bg-pp-card px-3 py-6 text-center font-pp text-[12.5px] text-pp-muted">
+          {t("puzzlesUnavailable")}
+        </Text>
+      ) : !list ? (
+        <View className="items-center gap-2 rounded-xl border-[1.5px] border-pp-line bg-pp-card py-6">
+          <ActivityIndicator color={pp.muted} />
+          <Text className="font-pp text-[12.5px] text-pp-muted">{t("puzzlesLoading")}</Text>
         </View>
-        <View className="gap-2.5">
-          {FREE_TIERS.map((tier, i) => (
-            <Link key={tier} href={`/student/puzzles/free?tier=${tier}`} asChild>
-              <Pressable className="flex-row items-center gap-3 rounded-2xl border-2 border-line bg-card px-3 py-2.5 active:opacity-80">
-                <View className="size-10 items-center justify-center rounded-xl bg-highlight">
-                  <Text className="text-[22px] leading-7 text-ink">♞</Text>
-                </View>
-                <Text className="min-w-0 flex-1 font-sans-bold text-[13px] text-ink">
-                  {t(TIER_TITLE[tier])}
-                </Text>
-                <View className="flex-row gap-0.5">
-                  {Array.from({ length: i + 1 }, (_, n) => (
-                    <Star key={n} size={16} color={C.highlightInk} fill={C.highlightInk} />
-                  ))}
-                </View>
-              </Pressable>
-            </Link>
-          ))}
+      ) : list.puzzles.length === 0 ? (
+        <Text className="rounded-xl border-[1.5px] border-pp-line bg-pp-card px-3 py-6 text-center font-pp text-[12.5px] text-pp-muted">
+          {t("puzzlesExhausted")}
+        </Text>
+      ) : (
+        <View className="gap-2">
+          {list.puzzles.map((p) =>
+            level && p.tier !== level ? null : (
+              <PuzzleRow
+                key={p.puzzleId}
+                puzzle={p}
+                tier={p.tier}
+                onPress={() =>
+                  router.push({
+                    pathname: "/student/puzzles/[puzzleId]",
+                    params: { puzzleId: p.puzzleId, set: "list", ...(level ? { level } : {}) },
+                  })
+                }
+              />
+            ),
+          )}
         </View>
-      </Panel>
+      )}
     </PlayShell>
   );
 }

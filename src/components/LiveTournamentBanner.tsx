@@ -6,11 +6,12 @@ import { Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useTranslations } from "use-intl";
 import { Trophy, ChevronRight } from "lucide-react-native";
-import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 import { fetchLiveTournaments, type LiveTournament } from "@/lib/tournaments";
 
 export function LiveTournamentBanner() {
   const t = useTranslations("tournament");
+  const { pp } = usePalette();
   const [live, setLive] = useState<LiveTournament[]>([]);
 
   useEffect(() => {
@@ -31,20 +32,21 @@ export function LiveTournamentBanner() {
           key={e.tournamentId}
           onPress={() => router.push(`/tournament/${e.tournamentId}`)}
           accessibilityLabel={t("openLive", { name: e.name })}
-          className="flex-row items-center gap-3 rounded-card bg-olive-soft px-4 py-3 active:opacity-90"
+          /* The portals' card, as the web's live-tournament row draws it. */
+          className="flex-row items-center gap-3 rounded-xl border-[1.5px] border-pp-line bg-pp-card px-3 py-2.5 active:bg-pp-mist"
         >
-          <View className="size-9 items-center justify-center rounded-full bg-card">
-            <Trophy size={18} color={C.olive} />
+          <View className="size-8 items-center justify-center rounded-lg bg-pp-green-soft">
+            <Trophy size={16} color={pp.green} strokeWidth={2} />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="font-sans-bold text-[11px] uppercase tracking-wide text-olive">
+            <Text className="font-pp-bold text-[10px] uppercase tracking-[1.2px] text-pp-green">
               {e.status === "Ongoing" ? t("liveNow") : t("startingSoon")}
             </Text>
-            <Text className="font-sans-bold text-sm text-ink" numberOfLines={1}>
+            <Text className="font-pp-bold text-[13.5px] text-pp-ink" numberOfLines={1}>
               {e.name}
             </Text>
           </View>
-          <ChevronRight size={16} color={C.olive} />
+          <ChevronRight size={16} color={pp.green} />
         </Pressable>
       ))}
     </View>

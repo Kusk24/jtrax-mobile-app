@@ -1,3 +1,5 @@
+// First: plural messages need Intl.PluralRules, which the phone's engine lacks.
+import "@/lib/intl-polyfills";
 import { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IntlProvider } from "use-intl";

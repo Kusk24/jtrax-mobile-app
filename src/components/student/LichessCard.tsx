@@ -33,12 +33,13 @@ import {
   type LichessLink,
   type LichessPlayStatus,
 } from "@/lib/lichess";
-import { C } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 /** How long the tick stays on the copy button. */
 const COPIED_MS = 1800;
 
 export function LichessCard() {
+  const { pp } = usePalette();
   const t = useTranslations("lichess");
   const tCommon = useTranslations("common");
 
@@ -142,35 +143,35 @@ export function LichessCard() {
 
   if (loading) {
     return (
-      <View className="flex-row items-center justify-center gap-2 rounded-card border-2 border-line bg-card p-4 shadow-clay">
-        <ActivityIndicator color={C.navy} size="small" />
-        <Text className="font-sans-bold text-sm text-muted">{t("loading")}</Text>
+      <View className="flex-row items-center justify-center gap-2 rounded-2xl border-[1.5px] border-pp-line bg-pp-card p-[18px]">
+        <ActivityIndicator color={pp.blue} size="small" />
+        <Text className="font-pp-bold text-sm text-pp-muted">{t("loading")}</Text>
       </View>
     );
   }
 
   return (
-    <View className="gap-2.5 rounded-card border-2 border-line bg-card p-4 shadow-clay">
+    <View className="gap-2.5 rounded-2xl border-[1.5px] border-pp-line bg-pp-card p-[18px]">
       <View className="flex-row items-center justify-between gap-2">
-        <Text className="font-sans-bold text-base text-ink">{t("title")}</Text>
+        <Text className="font-pp-bold text-base text-pp-ink">{t("title")}</Text>
         {link?.verified && (
-          <View className="flex-row items-center gap-1 rounded-full bg-olive-soft px-2.5 py-0.5">
-            <Check size={12} color={C.olive} strokeWidth={3} />
-            <Text className="font-sans-bold text-[11px] text-olive">{t("verified")}</Text>
+          <View className="flex-row items-center gap-1 rounded-full bg-pp-green-soft px-2.5 py-0.5">
+            <Check size={12} color={pp.green} strokeWidth={3} />
+            <Text className="font-pp-bold text-[11px] text-pp-green">{t("verified")}</Text>
           </View>
         )}
       </View>
 
       {/* The grant bounces back here with an outcome to show. */}
       {outcome !== "" && outcome !== "connected" && (
-        <View className="rounded-xl bg-brick-soft px-3 py-2">
-          <Text className="font-sans-bold text-xs text-maroon">{t(`outcome.${outcome}`)}</Text>
+        <View className="rounded-xl bg-pp-danger-soft px-3 py-2">
+          <Text className="font-pp-bold text-xs text-pp-danger">{t(`outcome.${outcome}`)}</Text>
         </View>
       )}
 
       {loadFailed && (
-        <View className="rounded-xl bg-brick-soft px-3 py-2">
-          <Text accessibilityRole="alert" className="font-sans-bold text-xs text-maroon">
+        <View className="rounded-xl bg-pp-danger-soft px-3 py-2">
+          <Text accessibilityRole="alert" className="font-pp-bold text-xs text-pp-danger">
             {tCommon("loadFailed")}
           </Text>
         </View>
@@ -179,7 +180,7 @@ export function LichessCard() {
       {/* ---- not linked yet ---- */}
       {!link && !loadFailed && (
         <>
-          <Text className="font-sans text-xs leading-5 text-muted">{t("intro")}</Text>
+          <Text className="font-pp text-xs leading-5 text-pp-muted">{t("intro")}</Text>
 
           {/* The recommended path. It proves the account *and* unlocks rated
               games, so it is offered first and the bio-code route below is
@@ -187,33 +188,33 @@ export function LichessCard() {
           <Pressable
             onPress={() => void connectForPlay()}
             disabled={busy}
-            className="min-h-11 flex-row items-center justify-center gap-2 rounded-xl bg-navy active:opacity-80 disabled:opacity-60"
+            className="min-h-11 flex-row items-center justify-center gap-2 rounded-xl bg-pp-blue active:opacity-80 disabled:opacity-60"
           >
-            <Swords size={16} color={C.white} />
-            <Text className="font-sans-bold text-xs text-white">
+            <Swords size={16} color="#ffffff" />
+            <Text className="font-pp-bold text-xs text-white">
               {busy ? t("checking") : t("connectWithLichess")}
             </Text>
           </Pressable>
 
-          <Text className="text-center font-sans text-[11px] text-muted">{t("orTrackOnly")}</Text>
+          <Text className="text-center font-pp text-[11px] text-pp-muted">{t("orTrackOnly")}</Text>
 
           <TextInput
             value={username}
             onChangeText={setUsername}
             onSubmitEditing={() => void submitLink()}
             placeholder={t("usernamePlaceholder")}
-            placeholderTextColor={C.muted}
+            placeholderTextColor={pp.faint}
             accessibilityLabel={t("usernameLabel")}
             autoCapitalize="none"
             autoCorrect={false}
-            className="min-h-11 rounded-xl border-2 border-line bg-paper px-3 font-sans-bold text-sm text-ink"
+            className="min-h-11 rounded-xl border-[1.5px] border-pp-line bg-pp-mist px-3 font-pp-bold text-sm text-pp-ink"
           />
           <Pressable
             onPress={() => void submitLink()}
             disabled={busy || username.trim() === ""}
-            className="min-h-11 items-center justify-center rounded-xl bg-navy active:opacity-80 disabled:opacity-60"
+            className="min-h-11 items-center justify-center rounded-xl bg-pp-blue active:opacity-80 disabled:opacity-60"
           >
-            <Text className="font-sans-bold text-xs text-white">
+            <Text className="font-pp-bold text-xs text-white">
               {busy ? t("checking") : t("connect")}
             </Text>
           </Pressable>
@@ -223,14 +224,14 @@ export function LichessCard() {
       {/* ---- linked, waiting on proof ---- */}
       {link && !link.verified && (
         <>
-          <Text className="font-sans-bold text-sm text-ink">{link.username}</Text>
-          <Text className="font-sans text-xs leading-5 text-muted">{t("proveHint")}</Text>
+          <Text className="font-pp-bold text-sm text-pp-ink">{link.username}</Text>
+          <Text className="font-pp text-xs leading-5 text-pp-muted">{t("proveHint")}</Text>
 
           {link.verifyCode ? (
             <View className="flex-row items-center gap-2">
               <Text
                 selectable
-                className="flex-1 rounded-xl border-2 border-line bg-paper px-3 py-2 font-sans-bold text-sm text-ink"
+                className="flex-1 rounded-xl border-[1.5px] border-pp-line bg-pp-mist px-3 py-2 font-pp-bold text-sm text-pp-ink"
               >
                 {link.verifyCode}
               </Text>
@@ -238,32 +239,32 @@ export function LichessCard() {
                 onPress={() => void copyCode()}
                 accessibilityRole="button"
                 accessibilityLabel={t("copyCode")}
-                className="size-11 shrink-0 items-center justify-center rounded-xl border-2 border-line bg-paper active:opacity-80"
+                className="size-11 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-pp-line bg-pp-mist active:opacity-80"
               >
                 {copied ? (
-                  <Check size={16} color={C.olive} strokeWidth={3} />
+                  <Check size={16} color={pp.green} strokeWidth={3} />
                 ) : (
-                  <Copy size={16} color={C.ink} />
+                  <Copy size={16} color={pp.ink} />
                 )}
               </Pressable>
             </View>
           ) : (
             /* A staff-created link has no code on this screen — staff cannot
                edit a pupil's bio, so the pupil starts the proof themselves. */
-            <Text className="font-sans text-xs leading-5 text-muted">{t("addedByStaff")}</Text>
+            <Text className="font-pp text-xs leading-5 text-pp-muted">{t("addedByStaff")}</Text>
           )}
 
           <Pressable
             onPress={() => void Linking.openURL(`${link.profileUrl}/edit`)}
             className="min-h-11 flex-row items-center justify-center gap-1.5"
           >
-            <Text className="font-sans-bold text-xs text-navy underline">{t("openLichess")}</Text>
-            <ExternalLink size={14} color={C.navy} />
+            <Text className="font-pp-bold text-xs text-pp-blue underline">{t("openLichess")}</Text>
+            <ExternalLink size={14} color={pp.blue} />
           </Pressable>
 
           {notFound && (
-            <View className="rounded-xl bg-brick-soft px-3 py-2">
-              <Text className="font-sans-bold text-xs text-maroon">{t("codeNotFound")}</Text>
+            <View className="rounded-xl bg-pp-danger-soft px-3 py-2">
+              <Text className="font-pp-bold text-xs text-pp-danger">{t("codeNotFound")}</Text>
             </View>
           )}
 
@@ -271,18 +272,18 @@ export function LichessCard() {
             <Pressable
               onPress={() => void checkCode()}
               disabled={busy}
-              className="min-h-11 flex-1 items-center justify-center rounded-xl bg-navy active:opacity-80 disabled:opacity-60"
+              className="min-h-11 flex-1 items-center justify-center rounded-xl bg-pp-blue active:opacity-80 disabled:opacity-60"
             >
-              <Text className="font-sans-bold text-xs text-white">
+              <Text className="font-pp-bold text-xs text-white">
                 {busy ? t("checking") : t("checkNow")}
               </Text>
             </Pressable>
             <Pressable
               onPress={() => void run(unlinkLichess)}
               disabled={busy}
-              className="min-h-11 items-center justify-center rounded-xl border-2 border-line bg-paper px-4 active:opacity-80 disabled:opacity-60"
+              className="min-h-11 items-center justify-center rounded-xl border-[1.5px] border-pp-line bg-pp-mist px-4 active:opacity-80 disabled:opacity-60"
             >
-              <Text className="font-sans-bold text-xs text-muted">{t("remove")}</Text>
+              <Text className="font-pp-bold text-xs text-pp-muted">{t("remove")}</Text>
             </Pressable>
           </View>
         </>
@@ -295,29 +296,29 @@ export function LichessCard() {
             onPress={() => void Linking.openURL(link.profileUrl)}
             className="flex-row items-center gap-1.5"
           >
-            <Text className="font-sans-bold text-sm text-navy underline">{link.username}</Text>
-            <ExternalLink size={14} color={C.navy} />
+            <Text className="font-pp-bold text-sm text-pp-blue underline">{link.username}</Text>
+            <ExternalLink size={14} color={pp.blue} />
           </Pressable>
 
           {link.ratings.length === 0 ? (
-            <Text className="font-sans text-xs text-muted">{t("noGamesYet")}</Text>
+            <Text className="font-pp text-xs text-pp-muted">{t("noGamesYet")}</Text>
           ) : (
             <View>
               {sortRatings(link.ratings).map((r, i) => (
                 <View
                   key={r.perf}
                   className={`flex-row items-center justify-between gap-3 py-1.5 ${
-                    i === 0 ? "" : "border-t-2 border-line"
+                    i === 0 ? "" : "border-t border-pp-line"
                   }`}
                 >
-                  <Text className="font-sans text-sm text-muted">{t(`perf.${r.perf}`)}</Text>
+                  <Text className="font-pp text-sm text-pp-muted">{t(`perf.${r.perf}`)}</Text>
                   <View className="flex-row items-baseline gap-1.5">
-                    <Text className="font-sans-bold text-sm text-ink">{r.rating}</Text>
+                    <Text className="font-pp-bold text-sm text-pp-ink">{r.rating}</Text>
                     {/* A provisional rating swings wildly and is not an
                         achievement yet — saying so is kinder than a number
                         that drops 200 points tomorrow. */}
                     {r.provisional && (
-                      <Text className="font-sans text-[10.5px] text-muted">{t("provisional")}</Text>
+                      <Text className="font-pp text-[10.5px] text-pp-muted">{t("provisional")}</Text>
                     )}
                   </View>
                 </View>
@@ -326,38 +327,38 @@ export function LichessCard() {
           )}
 
           {/* ---- rated play ---- */}
-          <View className="gap-1 rounded-xl border-2 border-line bg-paper px-3 py-2.5">
+          <View className="gap-1 rounded-xl border-[1.5px] border-pp-line bg-pp-mist px-3 py-2.5">
             {play?.canPlay ? (
               <>
                 <View className="flex-row items-center gap-1.5">
-                  <Swords size={14} color={C.ink} />
-                  <Text className="font-sans-bold text-xs text-ink">{t("ratedOn")}</Text>
+                  <Swords size={14} color={pp.ink} />
+                  <Text className="font-pp-bold text-xs text-pp-ink">{t("ratedOn")}</Text>
                 </View>
-                <Text className="font-sans text-[11px] leading-4 text-muted">{t("ratedOnHint")}</Text>
+                <Text className="font-pp text-[11px] leading-4 text-pp-muted">{t("ratedOnHint")}</Text>
                 {/* A token cannot be refreshed, only granted again — so the
                     warning has to come before it dies, not after. */}
                 {play.expiringSoon && (
-                  <Text className="font-sans-bold text-[11px] leading-4 text-gold">
+                  <Text className="font-pp-bold text-[11px] leading-4 text-st-gold">
                     {t("expiringSoon")}
                   </Text>
                 )}
                 {play.managed && (
-                  <Text className="font-sans text-[11px] leading-4 text-muted">
+                  <Text className="font-pp text-[11px] leading-4 text-pp-muted">
                     {t("managedAccount")}
                   </Text>
                 )}
               </>
             ) : (
               <>
-                <Text className="font-sans-bold text-xs text-ink">{t("ratedOff")}</Text>
-                <Text className="font-sans text-[11px] leading-4 text-muted">{t("ratedOffHint")}</Text>
+                <Text className="font-pp-bold text-xs text-pp-ink">{t("ratedOff")}</Text>
+                <Text className="font-pp text-[11px] leading-4 text-pp-muted">{t("ratedOffHint")}</Text>
                 <Pressable
                   onPress={() => void connectForPlay()}
                   disabled={busy}
-                  className="mt-1 min-h-11 flex-row items-center justify-center gap-2 rounded-xl bg-navy active:opacity-80 disabled:opacity-60"
+                  className="mt-1 min-h-11 flex-row items-center justify-center gap-2 rounded-xl bg-pp-blue active:opacity-80 disabled:opacity-60"
                 >
-                  <Swords size={16} color={C.white} />
-                  <Text className="font-sans-bold text-xs text-white">
+                  <Swords size={16} color="#ffffff" />
+                  <Text className="font-pp-bold text-xs text-white">
                     {busy ? t("checking") : t("enableRated")}
                   </Text>
                 </Pressable>
@@ -370,14 +371,14 @@ export function LichessCard() {
             disabled={busy}
             className="min-h-11 justify-center disabled:opacity-60"
           >
-            <Text className="font-sans-bold text-xs text-muted underline">{t("remove")}</Text>
+            <Text className="font-pp-bold text-xs text-pp-muted underline">{t("remove")}</Text>
           </Pressable>
         </>
       )}
 
       {error !== "" && (
-        <View className="rounded-xl bg-brick-soft px-3 py-2">
-          <Text className="font-sans-bold text-xs text-maroon">{error}</Text>
+        <View className="rounded-xl bg-pp-danger-soft px-3 py-2">
+          <Text className="font-pp-bold text-xs text-pp-danger">{error}</Text>
         </View>
       )}
     </View>

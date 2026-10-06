@@ -26,6 +26,11 @@ import { STOCKFISH_GLUE } from "../../assets/stockfish/engine-glue";
  *     origin, and WKWebView will not let that read a `file://` .wasm — the
  *     fetch fails silently, with no error surfacing on either side.
  *
+ *  3. Even from the same directory, WKWebView answers the engine's `fetch`
+ *     of the `file://` .wasm with status 0 (iOS 18), so the engine is handed
+ *     the file through XHR instead — see WORKER_PRELUDE. Without it Master
+ *     never got past "Waking up the computer…".
+ *
  * The view is 0×0 and never interacted with; it is an engine, not a screen.
  */
 
@@ -60,6 +65,31 @@ const PAGE = `<!doctype html>
   }
 </script></body></html>`;
 
+/* The engine fetches its .wasm, and WebKit answers a fetch for a file:// URL
+   with status 0 — which the engine reads as a failed download and never
+   starts. XHR does read a local file, so inside the worker a fetch for
+   anything that is not a network URL goes through XHR instead, and comes back
+   as the 200 and application/wasm type the engine's streaming compile needs. */
+const WORKER_PRELUDE = `(function () {
+  var nativeFetch = self.fetch;
+  self.fetch = function (url, init) {
+    var target = String(url);
+    if (/^(https?|blob|data):/.test(target)) return nativeFetch(url, init);
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", target);
+      xhr.responseType = "arraybuffer";
+      xhr.onload = function () {
+        if (!xhr.response || !xhr.response.byteLength) return reject(new Error("empty " + target));
+        resolve(new Response(xhr.response, { status: 200, headers: { "Content-Type": "application/wasm" } }));
+      };
+      xhr.onerror = function () { reject(new Error("could not read " + target)); };
+      xhr.send();
+    });
+  };
+})();
+`;
+
 /** Lays the three files out in one cache directory and returns the page's URI.
     Rewritten every launch: this is cache, and a stale copy after an engine
     upgrade would cost more than the copy does. */
@@ -78,7 +108,7 @@ async function stageEngine(): Promise<string> {
   const worker = new File(dir, WORKER);
   if (worker.exists) worker.delete();
   worker.create();
-  worker.write(STOCKFISH_GLUE);
+  worker.write(WORKER_PRELUDE + STOCKFISH_GLUE);
 
   const page = new File(dir, "index.html");
   if (page.exists) page.delete();
