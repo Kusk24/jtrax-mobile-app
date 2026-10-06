@@ -12,19 +12,21 @@
  * moved.
  */
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import { useTranslations } from "use-intl";
 import {
-  CalendarClock, CalendarDays, Check, CircleDollarSign, Layers, MapPin, Trophy, UserRound,
+  CalendarClock, CalendarDays, Check, ChevronRight, CircleDollarSign, FileText, Layers, MapPin, Trophy, UserRound,
 } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
 import { TournamentIdCheck, type IdCardRead } from "@/components/parent/TournamentIdCheck";
 import { TournamentBanner } from "@/components/parent/TournamentBanner";
 import { BackHeader } from "@/components/parent/BackHeader";
 import { usePalette } from "@/components/ThemeProvider";
-import { api } from "@/lib/api";
+import { API_BASE, api, getAuthToken } from "@/lib/api";
+import { Directory, File, Paths } from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import { ageFromDOB, categoryAllows, type PublicCategory } from "@/lib/registration";
 
 /* "done" is a fee that has been settled; "held" is a place taken with the fee
@@ -48,6 +50,25 @@ function longDate(iso: string): string {
   return Number.isNaN(d.getTime())
     ? iso
     : new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(d);
+}
+
+/* A link the event offers — the regulation, the venue on a map. The uploaded
+   regulation is the API's own file, which wants the session's token for an
+   event that is not public. A token does not belong in a URL (it would sit in
+   the browser's history), so that file is downloaded with the token in the
+   header and handed to the share sheet, whose preview opens a PDF. Anything
+   else — a pasted link, a map — opens as it is. */
+async function openLink(url: string) {
+  const token = getAuthToken();
+  if (!url.startsWith(API_BASE)) {
+    await Linking.openURL(url);
+    return;
+  }
+  const file = await File.downloadFileAsync(url, new Directory(Paths.cache), {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    idempotent: true,
+  });
+  await Sharing.shareAsync(file.uri);
 }
 
 function SectionLabel({ children }: { children: string }) {
@@ -576,6 +597,36 @@ export default function TournamentFlow() {
         </View>
       </View>
 
+      {/* Only what there is to open: the regulation the organiser uploaded
+          (or linked), and the venue on a map. A row with nothing behind it is
+          left out rather than drawn as a link that goes nowhere. */}
+      {(tournament.regulationUrl || tournament.mapUrl) && (
+        <View className="gap-2">
+          <SectionLabel>{t("viewDetailsOn")}</SectionLabel>
+          <View className="overflow-hidden rounded-card bg-pp-card shadow-clay">
+            {(
+              [
+                [tournament.regulationUrl, FileText, t("regulationsPdf")],
+                [tournament.mapUrl, MapPin, t("venueMap")],
+              ] as const
+            )
+              .filter(([url]) => url)
+              .map(([url, Icon, text], i) => (
+                <Pressable
+                  key={text}
+                  onPress={() => void openLink(url).catch(() => {})}
+                  accessibilityRole="link"
+                  className={`flex-row items-center gap-3 px-4 py-3.5 active:bg-pp-soft ${i > 0 ? "border-t border-pp-line" : ""}`}
+                >
+                  <Icon size={17} color={pp.blue} strokeWidth={1.8} />
+                  <Text className="flex-1 font-pp text-[13px] text-pp-ink">{text}</Text>
+                  <ChevronRight size={16} color={pp.muted} />
+                </Pressable>
+              ))}
+          </View>
+        </View>
+      )}
+
       {tournamentEntries.length > 0 && (
         <View className="gap-2">
           <SectionLabel>{t("yourEntries")}</SectionLabel>
@@ -632,7 +683,15 @@ export default function TournamentFlow() {
           )}
         </View>
       )}
-      {available.length > 0 ? (
+      {tournament.registration !== "open" ? (
+        /* Closed by the academy or past its closing date: the server would
+           refuse the entry, so there is no button to start one. */
+        <View accessibilityRole="summary" className="rounded-card bg-pp-panel px-4 py-3">
+          <Text className="text-center font-pp-semibold text-[13px] text-pp-sub">
+            {tournament.registration === "closed" ? t("registrationClosed") : t("registrationDeadlinePassed")}
+          </Text>
+        </View>
+      ) : available.length > 0 ? (
         <Cta
           label={tournamentEntries.length > 0 ? t("registerAnother") : t("registerMyChild")}
           onPress={() => {

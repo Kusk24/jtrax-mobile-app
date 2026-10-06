@@ -677,7 +677,9 @@
     "creditsPlus": "+{count} credits",
     "verifyIdFirst": "Upload the ID card to continue.",
     "chooseCategoryFirst": "Choose a category to continue.",
-    "category": "Category"
+    "category": "Category",
+    "registrationClosed": "Registration for this tournament is closed.",
+    "registrationDeadlinePassed": "Registration closed on the closing date."
   },
   "changePassword": {
     "title": "Change password",
