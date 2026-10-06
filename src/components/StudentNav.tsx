@@ -18,5 +18,5 @@ const tabs: PortalTab[] = [
 ];
 
 export function StudentBottomNav() {
-  return <PortalBottomNav tabs={tabs} rootsOnly />;
+  return <PortalBottomNav base="/student" tabs={tabs} rootsOnly />;
 }

@@ -11,6 +11,7 @@ import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { Bell, ClipboardCheck, Home, Settings, UserRound, type LucideIcon } from "lucide-react-native";
 import { isActive, type TabPath } from "@/lib/portal-tabs";
+import { useTabPress } from "@/components/useTabPress";
 import { useParentData } from "./ParentData";
 import { usePalette } from "@/components/ThemeProvider";
 
@@ -38,29 +39,30 @@ export function ParentBottomNav2() {
   const { pp } = usePalette();
   const pathname = usePathname();
   const t = useTranslations("pv2");
+  const goToTab = useTabPress("/parent");
   return (
     <View className="flex-row border-t border-pp-line bg-pp-bg px-2 pb-6 pt-2">
       {tabs.map((tab) => {
         const active = isActive(pathname, tab);
         const Icon = tab.icon;
         return (
-          <Link key={tab.href} href={tab.href as never} asChild>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
-              className={`min-w-0 flex-1 items-center gap-0.5 rounded-[13px] py-1.5 ${
-                active ? "bg-pp-soft" : ""
-              }`}
+          <Pressable
+            key={tab.href}
+            onPress={() => goToTab(tab.href)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            className={`min-w-0 flex-1 items-center gap-0.5 rounded-[13px] py-1.5 ${
+              active ? "bg-pp-soft" : ""
+            }`}
+          >
+            <Icon size={22} color={active ? pp.blue : pp.faint} strokeWidth={1.8} />
+            <Text
+              numberOfLines={1}
+              className={`text-[10px] font-pp-bold ${active ? "text-pp-blue" : "text-pp-faint"}`}
             >
-              <Icon size={22} color={active ? pp.blue : pp.faint} strokeWidth={1.8} />
-              <Text
-                numberOfLines={1}
-                className={`text-[10px] font-pp-bold ${active ? "text-pp-blue" : "text-pp-faint"}`}
-              >
-                {t(tab.labelKey)}
-              </Text>
-            </Pressable>
-          </Link>
+              {t(tab.labelKey)}
+            </Text>
+          </Pressable>
         );
       })}
     </View>

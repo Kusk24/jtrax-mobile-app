@@ -1,9 +1,10 @@
-import { Link, usePathname } from "expo-router";
+import { usePathname } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import type { LucideIcon } from "lucide-react-native";
 import { C } from "@/lib/colors";
 import { isActive, isRoot, type TabPath } from "@/lib/portal-tabs";
+import { useTabPress } from "@/components/useTabPress";
 
 export type PortalTab = TabPath & {
   labelKey: string;
@@ -11,9 +12,12 @@ export type PortalTab = TabPath & {
 };
 
 export function PortalBottomNav({
+  base,
   tabs,
   rootsOnly = false,
 }: {
+  /** The portal's own path — the stack a tab press resets. */
+  base: string;
   tabs: PortalTab[];
   /** Show the bar only on the tabs themselves. A pushed screen takes the back
       arrow instead and keeps the whole phone — a board with a nav bar across
@@ -22,6 +26,7 @@ export function PortalBottomNav({
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const goToTab = useTabPress(base);
   if (rootsOnly && !isRoot(pathname, tabs)) return null;
   return (
     <View className="absolute bottom-3 left-3 right-3 z-20 rounded-3xl border-2 border-line bg-card px-2 py-1.5 shadow-clay-lg">
@@ -30,30 +35,32 @@ export function PortalBottomNav({
           const active = isActive(pathname, tab);
           const Icon = tab.icon;
           return (
-            <Link key={tab.href} href={tab.href as never} asChild>
-              <Pressable
-                /* flex-1 rather than px-4: five fixed-padding tabs overflowed
-                   a 320px screen by 37px — the bar's width belongs to the
-                   screen, and the tabs share whatever it has. */
-                className={`min-w-0 flex-1 items-center gap-0.5 rounded-2xl px-1 py-1.5 ${
-                  active ? "bg-navy-soft/50" : ""
+            <Pressable
+              key={tab.href}
+              onPress={() => goToTab(tab.href)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+              /* flex-1 rather than px-4: five fixed-padding tabs overflowed
+                 a 320px screen by 37px — the bar's width belongs to the
+                 screen, and the tabs share whatever it has. */
+              className={`min-w-0 flex-1 items-center gap-0.5 rounded-2xl px-1 py-1.5 ${
+                active ? "bg-navy-soft/50" : ""
+              }`}
+            >
+              <Icon
+                size={20}
+                color={active ? C.navy : C.muted}
+                strokeWidth={active ? 2.4 : 2}
+              />
+              <Text
+                numberOfLines={1}
+                className={`text-[10px] ${
+                  active ? "font-sans-bold text-navy" : "font-sans text-muted"
                 }`}
               >
-                <Icon
-                  size={20}
-                  color={active ? C.navy : C.muted}
-                  strokeWidth={active ? 2.4 : 2}
-                />
-                <Text
-                  numberOfLines={1}
-                  className={`text-[10px] ${
-                    active ? "font-sans-bold text-navy" : "font-sans text-muted"
-                  }`}
-                >
-                  {t(tab.labelKey)}
-                </Text>
-              </Pressable>
-            </Link>
+                {t(tab.labelKey)}
+              </Text>
+            </Pressable>
           );
         })}
       </View>
