@@ -783,6 +783,21 @@
     "seeAllGames": "ดูทั้งหมด",
     "noGamesYet": "ยังไม่มีเกมที่เล่นจบ",
     "playWith": "เล่นกับ",
-    "view": "ดู"
+    "view": "ดู",
+    "completedOf": "ทำแล้ว {n} จาก {total}",
+    "vsAi": "เล่นกับหุ่นยนต์",
+    "vsAiSub": "หุ่นยนต์ 3 ตัว",
+    "withFriend": "เล่นกับเพื่อน",
+    "withFriendSub": "ท้าดวล",
+    "gameRoom": "ห้องเกม",
+    "gameRoomSub": "ใส่รหัส",
+    "practice": "ฝึกซ้อม",
+    "puzzlesCard": "โจทย์หมากรุก",
+    "puzzlesCardSub": "มาฝึกกันต่อเลย!",
+    "dayStreak": "ต่อเนื่อง {n} วัน",
+    "resumeGame": "เล่นเกมต่อ",
+    "resume": "เล่นต่อ",
+    "moveN": "ตาที่ {n}",
+    "dismissGame": "ทิ้งเกมนี้"
   }
 }
