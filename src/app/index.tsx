@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Redirect, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 import { Lock, Mail } from "lucide-react-native";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -16,6 +17,10 @@ import { C } from "@/lib/colors";
 export default function SignInScreen() {
   const t = useTranslations("signIn");
   const { user, loading, signIn } = useSession();
+  /* Sign-in has no safe-area wrapper, so the language switch is placed below
+     the status bar by hand — at a fixed 16pt it sat on top of the clock's
+     neighbours, the Wi-Fi and battery icons. */
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -73,7 +78,7 @@ export default function SignInScreen() {
       contentContainerClassName="min-h-full justify-center px-6 py-12"
       keyboardShouldPersistTaps="handled"
     >
-      <View className="absolute right-4 top-4">
+      <View style={{ top: insets.top + 8 }} className="absolute right-4">
         <LanguageToggle />
       </View>
 
