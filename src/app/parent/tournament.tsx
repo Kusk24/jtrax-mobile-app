@@ -17,7 +17,7 @@ import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import { useTranslations } from "use-intl";
 import {
-  CalendarClock, CalendarDays, Check, ChevronRight, CircleDollarSign, FileText, Layers, MapPin, Trophy, UserRound,
+  CalendarClock, CalendarDays, Check, ChevronRight, FileText, MapPin,
 } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
 import { TournamentIdCheck, type IdCardRead } from "@/components/parent/TournamentIdCheck";
@@ -555,28 +555,6 @@ export default function TournamentFlow() {
           <Text className="font-pp-bold text-[12.5px] text-pp-amber">
             {tournament.regDeadline}
           </Text>
-        </View>
-      </View>
-
-      <View className="gap-2">
-        <SectionLabel>{t("eventInfo")}</SectionLabel>
-        <View className={`${CARD} flex-row flex-wrap`}>
-          {(
-            [
-              [Layers, t("swiss"), ""],
-              [Trophy, t("trophyMedal"), ""],
-              [UserRound, t("openTo"), ""],
-              [CircleDollarSign, t("entryFee"), tournament.fee],
-            ] as const
-          ).map(([Icon, text, strong], i) => (
-            <View key={i} className="w-1/2 gap-1 pb-3.5 pr-3.5">
-              <Icon size={18} color={pp.blue} strokeWidth={1.8} />
-              <Text className="font-pp text-[12.5px] text-pp-ink">{text}</Text>
-              {!!strong && (
-                <Text className="font-pp-bold text-[12.5px] text-pp-ink">{strong}</Text>
-              )}
-            </View>
-          ))}
         </View>
       </View>
 

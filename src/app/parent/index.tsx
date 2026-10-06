@@ -7,7 +7,7 @@
  * own balance — and what each of them did today.
  */
 import { useState } from "react";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { useLocale, useTranslations } from "use-intl";
@@ -17,7 +17,7 @@ import { ChildHomeCard } from "@/components/parent/ChildHomeCard";
 import { LiveTournamentCard, useLiveTournaments } from "@/components/parent/LiveTournamentCard";
 import { ParentBell } from "@/components/parent/ParentNav2";
 import { TapTip } from "@/components/parent/TapTip";
-import { TournamentBanner } from "@/components/parent/TournamentBanner";
+import { TournamentHomeCard } from "@/components/parent/TournamentHomeCard";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
 import { homeAnnouncements } from "@/lib/home-announcements";
@@ -35,15 +35,15 @@ function SectionLabel({ children }: { children: string }) {
 export default function ParentHome() {
   const t = useTranslations("pv2");
   const locale = useLocale();
-  const router = useRouter();
   const { width } = useWindowDimensions();
   const {
-    announcements, tournament, parent, isAnnRead, markAnnRead,
+    announcements, tournamentCards, parent, isAnnRead, markAnnRead,
     children: childList, todayActivity, lowCreditAt,
   } = useParentData();
   const [modalId, setModalId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const live = useLiveTournaments();
+  const upcoming = tournamentCards.filter((c) => c.status === "Upcoming");
 
   const modal = announcements.find((a) => a.id === modalId);
   /* Recent only — the rest stay under View all. */
@@ -79,7 +79,7 @@ export default function ParentHome() {
 
       {/* Announcements and tournaments are occasional. With none of either the
           section is left out, rather than leaving a gap under the greeting. */}
-      {(recent.length > 0 || live.length > 0 || tournament) && (
+      {(recent.length > 0 || live.length > 0 || upcoming.length > 0) && (
       <View className="gap-3.5">
         {/* Only while there is something recent; the full list is on the
             Announcements page. */}
@@ -115,52 +115,21 @@ export default function ParentHome() {
           </>
         )}
 
+        {/* What is on now, with its results — the same card the student
+            portal shows. */}
         <LiveTournamentCard live={live} />
 
-        {/* Only when an event is actually open — the card that used to sit
-            here advertised the same tournament forever. */}
-        {tournament && (
+        {/* Only while one is coming up: registration, then the registered
+            child's entry (lib/tournament-card). Gone once it starts, when the
+            card above takes over. */}
+        {upcoming.length > 0 && (
           <>
             <View className="mt-2">
               <SectionLabel>{t("upcomingTournament")}</SectionLabel>
             </View>
-            <View className="overflow-hidden rounded-2xl bg-pp-card shadow-clay-lg">
-              <View>
-                <TournamentBanner
-                  name={tournament.name}
-                  when={tournament.date}
-                  venue={tournament.venue}
-                  tournamentId={tournament.id}
-                  hasBanner={tournament.hasBanner}
-                  height={158}
-                />
-                <View className="absolute right-4 top-2.5 size-16 items-center justify-center rounded-full border-[2.5px] border-white bg-pp-danger px-1">
-                  {tournament.registration === "open" ? (
-                    <>
-                      <Text className="text-center font-pp-bold text-[7.5px] uppercase leading-tight text-white">
-                        {t("registerCloses")}
-                      </Text>
-                      <Text className="font-pp-display-bold text-xl leading-none text-white">{tournament.closesInDays}</Text>
-                      <Text className="font-pp-bold text-[8px] uppercase leading-none text-white">{t("days")}</Text>
-                    </>
-                  ) : (
-                    <Text className="text-center font-pp-bold text-[9px] uppercase leading-tight text-white">
-                      {t("registrationClosedShort")}
-                    </Text>
-                  )}
-                </View>
-              </View>
-              <View className="gap-2 px-4 pb-4 pt-4">
-                <Text className="font-pp-display-semibold text-lg leading-tight text-pp-ink">{tournament.name}</Text>
-                <Pressable
-                  onPress={() => router.push("/parent/tournament")}
-                  accessibilityRole="button"
-                  className="mt-1 rounded-xl bg-pp-navy py-3 active:opacity-90"
-                >
-                  <Text className="text-center font-pp-bold text-sm text-white">{t("registerNow")}</Text>
-                </Pressable>
-              </View>
-            </View>
+            {upcoming.map((card) => (
+              <TournamentHomeCard key={card.id} card={card} />
+            ))}
           </>
         )}
       </View>
