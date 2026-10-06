@@ -26,7 +26,13 @@ import { usePalette } from "@/components/ThemeProvider";
 
 /* "done" is a fee that has been settled; "held" is a place taken with the fee
    still owed — the screen used to show the first for both, and for the card
-   path it showed it without charging anything at all. */
+   path it showed it without charging anything at all.
+
+   Each stage's scroll view has its own key, so moving between stages mounts
+   a fresh tree. Without it React reused one stage's views for the next, and
+   NativeWind cannot restyle a view that way after its first render: it
+   remounts it, and in development its warning about doing so crashed the
+   payment stage outright. */
 type Step = "detail" | "register" | "payment" | "done" | "held";
 
 const CARD = "rounded-card bg-pp-card p-4 shadow-clay";
@@ -166,6 +172,7 @@ export default function TournamentFlow() {
   if (step === "register") {
     return (
       <ScrollView
+        key="register"
         className="flex-1 bg-pp-bg"
         contentContainerClassName="gap-4 px-4 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
@@ -269,6 +276,7 @@ export default function TournamentFlow() {
   if (step === "payment") {
     return (
       <ScrollView
+        key="payment"
         className="flex-1 bg-pp-bg"
         contentContainerClassName="gap-4 px-4 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
@@ -395,6 +403,7 @@ export default function TournamentFlow() {
 
   return (
     <ScrollView
+      key="detail"
       className="flex-1 bg-pp-bg"
       contentContainerClassName="gap-4 px-4 pb-10 pt-4"
       showsVerticalScrollIndicator={false}
