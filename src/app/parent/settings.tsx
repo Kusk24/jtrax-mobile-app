@@ -30,22 +30,25 @@ export default function ParentSettings() {
   const t = useTranslations("pv2");
   const { locale, setLocale } = useLocaleSwitch();
   const { signOut } = useSession();
-  const { prefs, savePref } = useParentData();
+  const { prefs, schoolAllows, savePref } = useParentData();
   /* A failed save belongs next to the switch that failed, not in an alert. */
   const [prefError, setPrefError] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
-  /* The backend's whole catalogue, one switch each, all on until the parent
-     turns one off. */
-  const prefDefs = [
-    { k: "check_in" as const, label: t("prefCheckin"), sub: t("prefCheckinSub") },
-    { k: "credit_deducted" as const, label: t("prefDeducted"), sub: t("prefDeductedSub") },
-    { k: "low_credit" as const, label: t("prefLowCredit"), sub: t("prefLowCreditSub") },
-    { k: "credit_expiry" as const, label: t("prefExpiry"), sub: t("prefExpirySub") },
-    { k: "announcement" as const, label: t("prefNews"), sub: t("prefNewsSub") },
-    { k: "payment_received" as const, label: t("prefPayment"), sub: t("prefPaymentSub") },
-    { k: "class_cancelled" as const, label: t("prefCancelled"), sub: t("prefCancelledSub") },
+  /* The catalogue, one switch each, all on until the parent turns one off —
+     but only the types the school sends. The school's switch (Admin →
+     Settings → Notifications) is the master: a type it has off is not
+     offered here at all, rather than shown as a switch that does nothing. */
+  const allPrefDefs = [
+    { k: "check_in" as const, label: t("prefCheckin") },
+    { k: "credit_deducted" as const, label: t("prefDeducted") },
+    { k: "low_credit" as const, label: t("prefLowCredit") },
+    { k: "credit_expiry" as const, label: t("prefExpiry") },
+    { k: "announcement" as const, label: t("prefNews") },
+    { k: "payment_received" as const, label: t("prefPayment") },
+    { k: "class_cancelled" as const, label: t("prefCancelled") },
   ];
+  const prefDefs = allPrefDefs.filter((p) => schoolAllows[p.k]);
 
   return (
     <ScrollView
@@ -63,6 +66,9 @@ export default function ParentSettings() {
       <View className="gap-3">
         <SectionLabel>{t("notifPrefs")}</SectionLabel>
         <View className="overflow-hidden rounded-card border-[1.5px] border-pp-line bg-pp-card">
+          {prefDefs.length === 0 && (
+            <Text className="px-4 py-3.5 font-pp text-[13px] text-pp-muted">{t("notifNoneFromSchool")}</Text>
+          )}
           {prefDefs.map((p, i) => (
             <View
               key={p.k}
@@ -70,10 +76,7 @@ export default function ParentSettings() {
                 i < prefDefs.length - 1 ? "border-b border-pp-panel" : ""
               }`}
             >
-              <View className="min-w-0 flex-1 gap-0.5">
-                <Text className="font-pp-bold text-sm text-pp-ink">{p.label}</Text>
-                <Text className="font-pp text-[11px] text-pp-muted">{p.sub}</Text>
-              </View>
+              <Text className="min-w-0 flex-1 font-pp-bold text-sm text-pp-ink">{p.label}</Text>
               <Pressable
                 onPress={() => {
                   setPrefError(false);
