@@ -1,6 +1,8 @@
 /* "There is a tournament on right now" — the web's LiveTournamentCard, the
-   parent home's pointer to the public results page. Renders nothing when
-   there is nothing live, so the home carries no dead card between events.
+   parent home's pointer to the public results page, the same card the student
+   portal shows. Ongoing events only: an upcoming one has its own card, with
+   registration. Renders nothing when nothing is on, so the home carries no
+   dead card between events.
    The list is the screen's, through `useLiveTournaments`, so the home can
    also leave out the whole section when this and its neighbours are empty. */
 import { useEffect, useState } from "react";
@@ -17,7 +19,7 @@ export function useLiveTournaments(): LiveTournament[] {
   useEffect(() => {
     let cancelled = false;
     fetchLiveTournaments().then((list) => {
-      if (!cancelled) setLive(list);
+      if (!cancelled) setLive(list.filter((e) => e.status === "Ongoing"));
     });
     return () => {
       cancelled = true;

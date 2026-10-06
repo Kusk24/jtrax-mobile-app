@@ -687,7 +687,16 @@
     "chooseCategoryFirst": "Choose a category to continue.",
     "category": "Category",
     "registrationClosed": "Registration for this tournament is closed.",
-    "registrationDeadlinePassed": "Registration closed on the closing date."
+    "registrationDeadlinePassed": "Registration closed on the closing date.",
+    "tagOngoing": "Ongoing",
+    "tagResults": "Results Available",
+    "tagCompleted": "Completed",
+    "tagRegistrationClosed": "Registration Closed",
+    "registeredNames": "Registered · {names}",
+    "registeredShort": "Registered",
+    "viewRegistration": "View Registration",
+    "viewResults": "View Results",
+    "notRegisteredNote": "Your child was not registered for this tournament."
   },
   "changePassword": {
     "title": "Change password",
