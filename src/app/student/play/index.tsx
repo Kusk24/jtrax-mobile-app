@@ -4,7 +4,8 @@
  * The games already under way come first, because somebody may be waiting on
  * this pupil's move. Then the three ways to start one, each a card that opens
  * to what it holds: against the computer (three robots, by level), against
- * another student (the challenge panel), or at a board by its code.
+ * another student (the challenge panel), or at a board by its code. Recent
+ * games close the page, with the way into the full history.
  */
 import { Pressable, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -17,6 +18,7 @@ import { JoinForm } from "@/components/game/JoinForm";
 import { ChallengePanel } from "@/components/student/ChallengePanel";
 import { FriendPawns } from "@/components/student/FriendPawns";
 import { GameModeCard } from "@/components/student/GameModeCard";
+import { RecentGames } from "@/components/student/RecentGames";
 import { useSession } from "@/lib/session";
 import type { PPKey } from "@/lib/theme";
 
@@ -68,6 +70,8 @@ export default function GamesScreen() {
           <JoinForm />
         </GameModeCard>
       </View>
+
+      {user?.studentId && <RecentGames studentId={user.studentId} />}
     </PlayShell>
   );
 }
