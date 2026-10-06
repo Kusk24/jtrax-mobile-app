@@ -56,7 +56,7 @@ export default function ChildProfile() {
           accessibilityRole="button"
           className="rounded-card bg-pp-navy px-6 py-2.5"
         >
-          <Text className="font-pp-bold text-sm text-white">{t("navChildren")}</Text>
+          <Text className="font-pp-bold text-sm text-white">{t("navAttendance")}</Text>
         </Pressable>
       </View>
     );

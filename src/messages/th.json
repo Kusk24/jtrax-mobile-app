@@ -646,7 +646,14 @@
     "resetChildPasswordBody": "ตั้งรหัสผ่านใหม่สำหรับบัญชีนักเรียนของ {name}",
     "newPassword": "รหัสผ่านใหม่",
     "confirmNewPassword": "ยืนยันรหัสผ่านใหม่",
-    "passwordRuleHint": "อย่างน้อย 8 ตัวอักษร มีทั้งตัวอักษรและตัวเลข"
+    "passwordRuleHint": "อย่างน้อย 8 ตัวอักษร มีทั้งตัวอักษรและตัวเลข",
+    "registrationClosedShort": "ปิดรับ",
+    "dailyPuzzlesDone": "ทำโจทย์ประจำวันแล้ว {count} ข้อ",
+    "practiceTimeTip": "เวลาฝึกซ้อม",
+    "classesJoined": "เข้าเรียนแล้ว {count} คลาส",
+    "announcementLabel": "ประกาศ",
+    "fromSender": "จาก {name}",
+    "navAttendance": "การเข้าเรียน"
   },
   "changePassword": {
     "title": "เปลี่ยนรหัสผ่าน",

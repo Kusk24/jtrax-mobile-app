@@ -400,7 +400,15 @@ export default function TournamentFlow() {
       showsVerticalScrollIndicator={false}
     >
       <BackHeader title={t("tournamentTitle")} onBack={() => router.replace("/parent")} />
-      <TournamentBanner height={200} rounded={20} />
+      <TournamentBanner
+        name={tournament.name}
+        when={tournament.date}
+        venue={tournament.venue}
+        tournamentId={tournament.id}
+        hasBanner={tournament.hasBanner}
+        height={200}
+        rounded={20}
+      />
       <Text className="font-pp-display-semibold text-xl leading-snug text-pp-ink">
         {tournament.name}
       </Text>

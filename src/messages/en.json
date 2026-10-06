@@ -646,7 +646,14 @@
     "resetChildPasswordBody": "Set a new password for {name}'s student account.",
     "newPassword": "New password",
     "confirmNewPassword": "Confirm new password",
-    "passwordRuleHint": "At least 8 characters, with a letter and a number."
+    "passwordRuleHint": "At least 8 characters, with a letter and a number.",
+    "registrationClosedShort": "Closed",
+    "dailyPuzzlesDone": "{count, plural, one {# daily puzzle finished} other {# daily puzzles finished}}",
+    "practiceTimeTip": "Practice time",
+    "classesJoined": "{count, plural, one {# class joined} other {# classes joined}}",
+    "announcementLabel": "Announcement",
+    "fromSender": "From {name}",
+    "navAttendance": "Attendance"
   },
   "changePassword": {
     "title": "Change password",
