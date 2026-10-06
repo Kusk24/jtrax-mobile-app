@@ -62,9 +62,9 @@ export function PlayShell({
       </View>
       <ScrollView
         className="flex-1"
-        /* A tab keeps the bar, so it reserves room for it; a pushed screen has
-           the bottom of the phone to itself. */
-        contentContainerClassName={`px-4 pt-2 gap-4 ${nav ? "pb-32" : "pb-8"}`}
+        /* The tab bar sits under the screen rather than over it, so a tab
+           needs no room kept for it. */
+        contentContainerClassName="gap-4 px-4 pb-8 pt-2"
         showsVerticalScrollIndicator={false}
       >
         {children}

@@ -57,6 +57,10 @@ export const acceptChallenge = (id: string) =>
 export const declineChallenge = (id: string) =>
   api.post<{ status: string }>(`challenges/${id}/decline`, {});
 
+/** Clears a decline off the challenger's list once they have seen it. */
+export const dismissDecline = (id: string) =>
+  api.post<{ status: string }>(`challenges/${id}/dismiss`, {});
+
 export const cancelChallenge = (id: string) => api.del<{ status: string }>(`challenges/${id}`);
 
 /** The clocks the backend accepts, matching the console's rated-room options. */
