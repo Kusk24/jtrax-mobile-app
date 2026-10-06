@@ -22,6 +22,7 @@ import { DailyProgressCard } from "@/components/student/DailyProgressCard";
 import { FriendPawns } from "@/components/student/FriendPawns";
 import { ModeTile } from "@/components/student/ModeTile";
 import { ResumeGameCard } from "@/components/student/ResumeGameCard";
+import { IncomingChallenges } from "@/components/student/IncomingChallenges";
 import { useSession } from "@/lib/session";
 import { dailyStep, getDailyPuzzles, solvedCount } from "@/lib/puzzles";
 import { getProgress } from "@/lib/progress";
@@ -119,6 +120,10 @@ export default function StudentHome() {
 
       {/* A robot game left unfinished — draws nothing when there is none. */}
       <ResumeGameCard />
+
+      {/* A friend's invitation to play, here as well as in Games, so it is
+          seen without going looking — draws nothing when there is none. */}
+      <IncomingChallenges />
 
       {/* Games somebody is waiting on — draws nothing when there are none. */}
       {user?.userAccountId && <MyGames myAccountId={user.userAccountId} />}
