@@ -30,6 +30,11 @@ export type Challenge = {
   bothCanPlayRated: boolean;
 };
 
+/** The invitations this pupil has to answer: still pending, and sent to
+    them rather than by them. The Games panel and the home both list these. */
+export const incomingInvitations = (list: Challenge[]) =>
+  list.filter((c) => c.status === "Pending" && c.direction === "in");
+
 export const searchPlayers = (q: string) =>
   api
     .get<{ players: PlayerResult[] }>(`players/search?q=${encodeURIComponent(q)}`)

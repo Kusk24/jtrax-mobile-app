@@ -27,6 +27,7 @@ import {
   cancelChallenge,
   declineChallenge,
   dismissDecline,
+  incomingInvitations,
   listChallenges,
   searchPlayers,
   sendChallenge,
@@ -118,7 +119,7 @@ export function ChallengePanel({ myStudentId }: { myStudentId: string }) {
   const pending = challenges.filter((c) => c.status === "Pending");
   /* Split by who has to act: an invitation is theirs to answer, so it gets
      full Accept / Decline buttons; one they sent only needs a Cancel. */
-  const incoming = pending.filter((c) => c.direction === "in");
+  const incoming = incomingInvitations(challenges);
   const sent = pending.filter((c) => c.direction === "out");
   /* The backend returns a decline only to the one who asked, until they
      dismiss it — so their invitation is answered, not just gone. */
