@@ -641,7 +641,40 @@
     "filterCourse": "คอร์ส",
     "allCourses": "ทุกคอร์ส",
     "creditsUsedSuffix": "เครดิตที่ใช้ไป",
-    "notifNoneFromSchool": "ขณะนี้โรงเรียนยังไม่ได้เปิดการแจ้งเตือนใด ๆ"
+    "notifNoneFromSchool": "ขณะนี้โรงเรียนยังไม่ได้เปิดการแจ้งเตือนใด ๆ",
+    "paymentHistory": "ประวัติการชำระเงิน",
+    "noPayments": "ยังไม่มีการชำระเงิน",
+    "payStatus": {
+      "Paid": "ชำระแล้ว",
+      "Pending": "รอชำระ",
+      "Cancelled": "ยกเลิก"
+    },
+    "payMethodName": {
+      "Cash": "เงินสด",
+      "BankTransfer": "โอนเงิน",
+      "PromptPay": "พร้อมเพย์",
+      "CreditCard": "บัตร"
+    },
+    "payDate": "วันที่",
+    "receivedFrom": "ได้รับเงินจาก",
+    "payChild": "นักเรียน",
+    "payMethod": "วิธีชำระเงิน",
+    "payReference": "เลขอ้างอิง",
+    "receiptOfficial": "ใบเสร็จรับเงิน",
+    "receiptItem": "รายการ",
+    "receiptAmount": "จำนวนเงิน",
+    "payTournament": "การแข่งขัน",
+    "payCourse": "คอร์ส",
+    "creditsCount": "{count} เครดิต",
+    "paySubtotal": "ยอดก่อนส่วนลด",
+    "payDiscount": "ส่วนลด",
+    "payAmountPaid": "ยอดที่ชำระ",
+    "receiptThanks": "ขอบคุณที่เรียนกับเรา!",
+    "receiptFootnote": "ใบเสร็จนี้ออกทางอิเล็กทรอนิกส์ ใช้ได้โดยไม่ต้องลงนาม",
+    "receiptTitle": "ใบเสร็จรับเงิน",
+    "close": "ปิด",
+    "saveImage": "บันทึกรูปภาพ",
+    "creditsPlus": "+{count} เครดิต"
   },
   "changePassword": {
     "title": "เปลี่ยนรหัสผ่าน",
