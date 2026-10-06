@@ -46,7 +46,7 @@ export function ChildLichess({ studentId }: { studentId: string }) {
   return (
     <View className="gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-4">
       <View className="flex-row items-center justify-between gap-2">
-        <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+        <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
           {t("lichess.title")}
         </Text>
         <Pressable
@@ -54,7 +54,7 @@ export function ChildLichess({ studentId }: { studentId: string }) {
           accessibilityRole="link"
           className="flex-row items-center gap-1"
         >
-          <Text className="font-sans-semibold text-[12px] text-pp-ink underline">
+          <Text className="font-pp-semibold text-[12px] text-pp-ink underline">
             {link.username}
           </Text>
           <ExternalLink size={12} color={PP.ink} />
@@ -62,7 +62,7 @@ export function ChildLichess({ studentId }: { studentId: string }) {
       </View>
 
       {ratings.length === 0 ? (
-        <Text className="font-sans text-[12.5px] text-pp-muted">{t("lichess.noGames")}</Text>
+        <Text className="font-pp text-[12.5px] text-pp-muted">{t("lichess.noGames")}</Text>
       ) : (
         <View>
           {ratings.map((r, i) => (
@@ -72,15 +72,15 @@ export function ChildLichess({ studentId }: { studentId: string }) {
                 i === 0 ? "" : "border-t border-pp-line"
               }`}
             >
-              <Text className="font-sans text-[13px] text-pp-muted">
+              <Text className="font-pp text-[13px] text-pp-muted">
                 {t(`lichess.perf.${r.perf}`)}
               </Text>
               <View className="flex-row items-baseline gap-1.5">
-                <Text className="font-sans-bold text-[13.5px] text-pp-ink">{r.rating}</Text>
+                <Text className="font-pp-bold text-[13.5px] text-pp-ink">{r.rating}</Text>
                 {/* A provisional rating swings wildly and is not an achievement
                     yet. Saying so is kinder than a number that drops tomorrow. */}
                 {r.provisional && (
-                  <Text className="font-sans text-[10.5px] text-pp-muted">
+                  <Text className="font-pp text-[10.5px] text-pp-muted">
                     {t("lichess.provisional")}
                   </Text>
                 )}
@@ -90,7 +90,7 @@ export function ChildLichess({ studentId }: { studentId: string }) {
         </View>
       )}
 
-      <Text className="font-sans text-[11.5px] leading-snug text-pp-muted">
+      <Text className="font-pp text-[11.5px] leading-snug text-pp-muted">
         {t("lichess.footnote")}
       </Text>
     </View>

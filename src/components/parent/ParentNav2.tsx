@@ -53,7 +53,7 @@ export function ParentBottomNav2() {
               <Icon size={22} color={active ? PP.blue : PP.faint} strokeWidth={1.8} />
               <Text
                 numberOfLines={1}
-                className={`text-[10px] font-sans-bold ${active ? "text-pp-blue" : "text-pp-faint"}`}
+                className={`text-[10px] font-pp-bold ${active ? "text-pp-blue" : "text-pp-faint"}`}
               >
                 {t(tab.labelKey)}
               </Text>
@@ -73,7 +73,7 @@ export function ParentAccountChip() {
   const initial = (parent.name.trim()[0] ?? "?").toUpperCase();
   return (
     <View className="flex-row items-center justify-between gap-2 bg-pp-bg px-4 pt-3">
-      <Text className="text-[10px] font-sans-bold uppercase tracking-[1.2px] text-pp-blue">
+      <Text className="text-[10px] font-pp-bold uppercase tracking-[1.2px] text-pp-blue">
         JTrax — {t("roleParent")}
       </Text>
       <View className="flex-row items-center gap-2">
@@ -92,13 +92,13 @@ export function ParentAccountChip() {
         <Link href="/parent/profile" asChild>
           <Pressable className="max-w-[190px] flex-row items-center gap-2.5 rounded-full border-[1.5px] border-pp-line bg-pp-card py-1.5 pl-1.5 pr-3.5">
             <View className="size-8 items-center justify-center rounded-full bg-pp-deep">
-              <Text className="font-sans-extrabold text-sm text-white">{initial}</Text>
+              <Text className="font-pp-extrabold text-sm text-white">{initial}</Text>
             </View>
             <View className="min-w-0 shrink">
-              <Text numberOfLines={1} className="font-sans-bold text-[12.5px] text-pp-ink">
+              <Text numberOfLines={1} className="font-pp-bold text-[12.5px] text-pp-ink">
                 {parent.name}
               </Text>
-              <Text numberOfLines={1} className="font-sans text-[10px] text-pp-muted">
+              <Text numberOfLines={1} className="font-pp text-[10px] text-pp-muted">
                 {t("roleParent")} · {parentId}
               </Text>
             </View>

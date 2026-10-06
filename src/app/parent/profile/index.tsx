@@ -14,7 +14,7 @@ import { PP } from "@/lib/colors";
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+    <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
       {children}
     </Text>
   );
@@ -32,33 +32,33 @@ export default function ParentProfile() {
       showsVerticalScrollIndicator={false}
     >
       <View className="gap-1">
-        <Text className="font-display-semibold text-2xl leading-tight text-pp-ink">
+        <Text className="font-pp-display-semibold text-2xl leading-tight text-pp-ink">
           {t("myProfile")}
         </Text>
-        <Text className="font-sans text-[12.5px] text-pp-muted">{t("profileSub")}</Text>
+        <Text className="font-pp text-[12.5px] text-pp-muted">{t("profileSub")}</Text>
       </View>
 
       <View className="flex-row items-center gap-3 rounded-card border-[1.5px] border-pp-line bg-pp-card p-3.5 shadow-clay">
         <View className="size-[58px] items-center justify-center rounded-[15px] border-[3px] border-pp-soft bg-pp-deep">
-          <Text className="font-display-semibold text-2xl text-white">{initial}</Text>
+          <Text className="font-pp-display-semibold text-2xl text-white">{initial}</Text>
         </View>
         <View className="min-w-0 flex-1">
           <View className="flex-row items-center gap-2">
-            <Text numberOfLines={1} className="shrink font-display-semibold text-[18px] text-pp-ink">
+            <Text numberOfLines={1} className="shrink font-pp-display-semibold text-[18px] text-pp-ink">
               {parent.name}
             </Text>
             <View className="rounded-full bg-pp-soft px-2 py-0.5">
-              <Text className="font-sans-bold text-[9px] uppercase text-pp-blue">
+              <Text className="font-pp-bold text-[9px] uppercase text-pp-blue">
                 {t("roleParent")}
               </Text>
             </View>
           </View>
-          <Text numberOfLines={1} className="mt-1 font-sans text-[10.5px] text-pp-faint">
+          <Text numberOfLines={1} className="mt-1 font-pp text-[10.5px] text-pp-faint">
             {t("idLabel", { id: parentId })}
           </Text>
           <View className="mt-1 flex-row items-center gap-1">
             <BadgeCheck size={12} color={PP.green} />
-            <Text className="font-sans-semibold text-[10px] text-pp-green">
+            <Text className="font-pp-semibold text-[10px] text-pp-green">
               {t("verifiedAccount")}
             </Text>
           </View>
@@ -86,8 +86,8 @@ export default function ParentProfile() {
               >
                 <ChildFace name={c.name} tint={c.avBg} size={42} />
                 <View className="flex-1 gap-0.5">
-                  <Text className="font-sans-bold text-sm text-pp-ink">{c.name}</Text>
-                  <Text className="font-sans text-[11px] text-pp-faint">
+                  <Text className="font-pp-bold text-sm text-pp-ink">{c.name}</Text>
+                  <Text className="font-pp text-[11px] text-pp-faint">
                     {t("idLabel", { id: c.id })}
                   </Text>
                 </View>
@@ -106,8 +106,8 @@ export default function ParentProfile() {
               <Phone size={16} color={PP.blue} />
             </View>
             <View className="min-w-0 flex-1">
-              <Text className="font-sans text-[10px] text-pp-muted">{t("phone")}</Text>
-              <Text numberOfLines={1} className="font-sans-bold text-[13px] text-pp-ink">
+              <Text className="font-pp text-[10px] text-pp-muted">{t("phone")}</Text>
+              <Text numberOfLines={1} className="font-pp-bold text-[13px] text-pp-ink">
                 {parent.phone || "—"}
               </Text>
             </View>
@@ -117,13 +117,13 @@ export default function ParentProfile() {
               <Mail size={16} color={PP.blue} />
             </View>
             <View className="min-w-0 flex-1">
-              <Text className="font-sans text-[10px] text-pp-muted">{t("email")}</Text>
-              <Text numberOfLines={1} className="font-sans-bold text-[13px] text-pp-ink">
+              <Text className="font-pp text-[10px] text-pp-muted">{t("email")}</Text>
+              <Text numberOfLines={1} className="font-pp-bold text-[13px] text-pp-ink">
                 {parent.email || "—"}
               </Text>
             </View>
             <View className="rounded-full bg-pp-green-soft px-2 py-0.5">
-              <Text className="font-sans-bold text-[9px] text-pp-green">{t("verified")}</Text>
+              <Text className="font-pp-bold text-[9px] text-pp-green">{t("verified")}</Text>
             </View>
           </View>
         </View>

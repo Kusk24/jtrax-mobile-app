@@ -20,7 +20,7 @@ import type { AnnouncementV2 } from "@/lib/parent-v2-data";
 /** Section heading — the portal's uppercase tracked label. */
 function SectionLabel({ children }: { children: string }) {
   return (
-    <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+    <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
       {children}
     </Text>
   );
@@ -55,16 +55,16 @@ export default function ParentHome() {
     >
       <View className="gap-1">
         <View className="flex-row items-center gap-2">
-          <Text className="font-display-semibold text-[23px] leading-tight text-pp-ink">
+          <Text className="font-pp-display-semibold text-[23px] leading-tight text-pp-ink">
             {t("hi", { name: parent.name.split(/\s+/)[0] || parent.name })}
           </Text>
           <View className="rounded-full border-[1.5px] border-pp-blue px-2 py-0.5">
-            <Text className="font-sans-bold text-[10px] uppercase tracking-[1.2px] text-pp-blue">
+            <Text className="font-pp-bold text-[10px] uppercase tracking-[1.2px] text-pp-blue">
               {t("roleParent")}
             </Text>
           </View>
         </View>
-        <Text className="font-sans text-sm text-pp-muted">{todayLabel}</Text>
+        <Text className="font-pp text-sm text-pp-muted">{todayLabel}</Text>
       </View>
 
       {/* Announcements */}
@@ -73,12 +73,12 @@ export default function ParentHome() {
           <SectionLabel>{t("announcements")}</SectionLabel>
           <Link href="/parent/announcements" asChild>
             <Pressable>
-              <Text className="font-sans-bold text-xs text-pp-blue">{t("viewAll")} →</Text>
+              <Text className="font-pp-bold text-xs text-pp-blue">{t("viewAll")} →</Text>
             </Pressable>
           </Link>
         </View>
         {announcements.length === 0 && (
-          <Text className="font-sans text-[12.5px] text-pp-muted">{t("noAnnouncements")}</Text>
+          <Text className="font-pp text-[12.5px] text-pp-muted">{t("noAnnouncements")}</Text>
         )}
         <ScrollView
           horizontal
@@ -97,25 +97,25 @@ export default function ParentHome() {
                 className="w-[300px] gap-1.5 rounded-card p-4"
               >
                 <View className="flex-row items-center justify-between gap-2">
-                  <Text className="min-w-0 flex-1 font-sans-bold text-sm leading-snug text-pp-ink">
+                  <Text className="min-w-0 flex-1 font-pp-bold text-sm leading-snug text-pp-ink">
                     {a.title}
                   </Text>
                   {!isAnnRead(a.id) && (
                     <View className="rounded-full bg-pp-blue px-2 py-0.5">
-                      <Text className="font-sans-bold text-[9px] uppercase text-white">
+                      <Text className="font-pp-bold text-[9px] uppercase text-white">
                         {t("new")}
                       </Text>
                     </View>
                   )}
                 </View>
-                <Text numberOfLines={2} className="font-sans text-xs leading-relaxed text-pp-sub">
+                <Text numberOfLines={2} className="font-pp text-xs leading-relaxed text-pp-sub">
                   {a.msg}
                 </Text>
                 <View className="flex-row items-center justify-between gap-2">
-                  <Text style={{ color: ss.c }} className="font-sans-semibold text-[11px]">
+                  <Text style={{ color: ss.c }} className="font-pp-semibold text-[11px]">
                     {a.senderName}
                   </Text>
-                  <Text className="font-sans text-[10.5px] text-pp-muted">{a.time}</Text>
+                  <Text className="font-pp text-[10.5px] text-pp-muted">{a.time}</Text>
                 </View>
               </Pressable>
             );
@@ -133,19 +133,19 @@ export default function ParentHome() {
               <View>
                 <TournamentBanner height={158} />
                 <View className="absolute right-4 top-2.5 size-16 items-center justify-center rounded-full border-[2.5px] border-white bg-pp-danger">
-                  <Text className="text-center font-sans-bold text-[7.5px] uppercase leading-tight text-white">
+                  <Text className="text-center font-pp-bold text-[7.5px] uppercase leading-tight text-white">
                     {t("registerCloses")}
                   </Text>
-                  <Text className="font-display-semibold text-xl leading-none text-white">
+                  <Text className="font-pp-display-semibold text-xl leading-none text-white">
                     {tournament.closesInDays}
                   </Text>
-                  <Text className="font-sans-bold text-[8px] uppercase leading-none text-white">
+                  <Text className="font-pp-bold text-[8px] uppercase leading-none text-white">
                     {t("days")}
                   </Text>
                 </View>
               </View>
               <View className="gap-2 px-4 pb-4 pt-4">
-                <Text className="font-display-semibold text-lg leading-tight text-pp-ink">
+                <Text className="font-pp-display-semibold text-lg leading-tight text-pp-ink">
                   {tournament.name}
                 </Text>
                 <Pressable
@@ -153,7 +153,7 @@ export default function ParentHome() {
                   accessibilityRole="button"
                   className="mt-1 rounded-card bg-pp-navy py-3"
                 >
-                  <Text className="text-center font-sans-bold text-sm text-white">
+                  <Text className="text-center font-pp-bold text-sm text-white">
                     {t("registerNow")}
                   </Text>
                 </Pressable>
@@ -169,7 +169,7 @@ export default function ParentHome() {
           <SectionLabel>{t("myChildren", { count: childList.length })}</SectionLabel>
           <Link href="/parent/attendance" asChild>
             <Pressable>
-              <Text className="font-sans-bold text-xs text-pp-blue">{t("viewAll")} →</Text>
+              <Text className="font-pp-bold text-xs text-pp-blue">{t("viewAll")} →</Text>
             </Pressable>
           </Link>
         </View>
@@ -184,16 +184,16 @@ export default function ParentHome() {
                 <ChildFace name={c.name} tint={c.avBg} size={42} />
                 <View className="min-w-0 flex-1 gap-0.5">
                   <View className="flex-row items-center gap-1.5">
-                    <Text className="font-sans-bold text-sm text-pp-ink">{c.name}</Text>
+                    <Text className="font-pp-bold text-sm text-pp-ink">{c.name}</Text>
                     {!!c.level && (
                       <View className="rounded-full bg-pp-soft px-2 py-0.5">
-                        <Text className="font-sans-bold text-[9.5px] text-pp-blue">{c.level}</Text>
+                        <Text className="font-pp-bold text-[9.5px] text-pp-blue">{c.level}</Text>
                       </View>
                     )}
                   </View>
-                  <Text className="font-sans text-[11.5px] text-pp-muted">{c.clsTitle}</Text>
+                  <Text className="font-pp text-[11.5px] text-pp-muted">{c.clsTitle}</Text>
                 </View>
-                <Text className="font-sans-bold text-[12.5px] text-pp-ink">
+                <Text className="font-pp-bold text-[12.5px] text-pp-ink">
                   {t("creditsShort", { count: c.credits })}
                 </Text>
               </Pressable>
@@ -204,7 +204,7 @@ export default function ParentHome() {
         <SectionLabel>{t("todaysActivity")}</SectionLabel>
         <View className="rounded-card border-[1.5px] border-pp-line bg-pp-card px-4">
           {todayActivity.length === 0 && (
-            <Text className="py-3.5 font-sans text-[12.5px] text-pp-muted">
+            <Text className="py-3.5 font-pp text-[12.5px] text-pp-muted">
               {t("noPracticeToday")}
             </Text>
           )}
@@ -221,13 +221,13 @@ export default function ParentHome() {
                 }`}
               >
                 <Text
-                  className={`font-sans-bold text-[11px] ${r.done ? "text-white" : "text-pp-muted"}`}
+                  className={`font-pp-bold text-[11px] ${r.done ? "text-white" : "text-pp-muted"}`}
                 >
                   {r.done ? "✓" : "·"}
                 </Text>
               </View>
-              <Text className="flex-1 font-sans text-[13.5px] text-pp-ink">{r.child}</Text>
-              <Text className="font-sans-semibold text-[13px] text-pp-muted">
+              <Text className="flex-1 font-pp text-[13.5px] text-pp-ink">{r.child}</Text>
+              <Text className="font-pp-semibold text-[13px] text-pp-muted">
                 {t("minShort", { count: r.mins })}
               </Text>
             </View>

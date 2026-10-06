@@ -55,7 +55,7 @@ export default function ParentNotifications() {
         subtitle={unreadNotifs > 0 ? t("unreadCount", { count: unreadNotifs }) : t("allCaughtUp")}
         right={
           <Pressable onPress={markAllNotifsRead} accessibilityRole="button">
-            <Text className="font-sans-bold text-xs text-pp-blue">{t("markAllRead")}</Text>
+            <Text className="font-pp-bold text-xs text-pp-blue">{t("markAllRead")}</Text>
           </Pressable>
         }
       />
@@ -70,7 +70,7 @@ export default function ParentNotifications() {
             className={`rounded-full px-4 py-1.5 ${tab === k ? "bg-pp-deep" : ""}`}
           >
             <Text
-              className={`font-sans-bold text-xs ${tab === k ? "text-[#fbfff1]" : "text-pp-muted"}`}
+              className={`font-pp-bold text-xs ${tab === k ? "text-[#fbfff1]" : "text-pp-muted"}`}
             >
               {k === "all" ? t("tabAll") : t("tabUnread")}
               {k === "unread" && unreadNotifs > 0 ? ` (${unreadNotifs})` : ""}
@@ -81,7 +81,7 @@ export default function ParentNotifications() {
 
       {shown.length === 0 && (
         <View className="rounded-card border-[1.5px] border-dashed border-pp-dash p-6">
-          <Text className="text-center font-sans text-[12.5px] text-pp-muted">
+          <Text className="text-center font-pp text-[12.5px] text-pp-muted">
             ♞ {t("caughtUpBody")}
           </Text>
         </View>
@@ -116,13 +116,13 @@ export default function ParentNotifications() {
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <View className="flex-row items-center gap-1.5">
-                  <Text className="font-sans-bold text-[13.5px] text-pp-ink">{n.title}</Text>
+                  <Text className="font-pp-bold text-[13.5px] text-pp-ink">{n.title}</Text>
                   {isUnread && <View className="size-[7px] rounded-full bg-pp-blue" />}
                 </View>
-                <Text className="font-sans text-[12.5px] leading-relaxed text-pp-muted">
+                <Text className="font-pp text-[12.5px] leading-relaxed text-pp-muted">
                   {n.body}
                 </Text>
-                <Text className="font-sans text-[10.5px] text-pp-faint">{whenLabel(n.at)}</Text>
+                <Text className="font-pp text-[10.5px] text-pp-faint">{whenLabel(n.at)}</Text>
               </View>
             </Pressable>
           );

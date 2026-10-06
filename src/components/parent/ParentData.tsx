@@ -478,7 +478,7 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-paper">
         <ActivityIndicator color="#4e5f7b" />
-        <Text className="font-sans-bold text-[13.5px] text-muted">{t("loading")}</Text>
+        <Text className="font-pp-bold text-[13.5px] text-muted">{t("loading")}</Text>
       </View>
     );
   }
@@ -486,14 +486,14 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
     return (
       <View className="flex-1 items-center justify-center bg-paper px-5">
         <View className="w-full max-w-[380px] items-center gap-3 rounded-card border-[1.5px] border-line bg-card p-6">
-          <Text className="text-center font-sans-extrabold text-lg text-ink">{t("serverDownTitle")}</Text>
-          <Text className="text-center font-sans text-xs leading-relaxed text-muted">{t("serverDownBody")}</Text>
+          <Text className="text-center font-pp-extrabold text-lg text-ink">{t("serverDownTitle")}</Text>
+          <Text className="text-center font-pp text-xs leading-relaxed text-muted">{t("serverDownBody")}</Text>
           <Pressable
             onPress={retry}
             accessibilityRole="button"
             className="mt-1 rounded-card bg-navy px-6 py-2.5"
           >
-            <Text className="font-sans-bold text-sm text-white">{t("retry")}</Text>
+            <Text className="font-pp-bold text-sm text-white">{t("retry")}</Text>
           </Pressable>
         </View>
       </View>

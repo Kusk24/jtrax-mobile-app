@@ -21,7 +21,7 @@ const SCHOOL_PHONE = "+66123456789";
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+    <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
       {children}
     </Text>
   );
@@ -55,10 +55,10 @@ export default function ParentSettings() {
       showsVerticalScrollIndicator={false}
     >
       <View className="gap-1">
-        <Text className="font-display-semibold text-2xl leading-tight text-pp-ink">
+        <Text className="font-pp-display-semibold text-2xl leading-tight text-pp-ink">
           {t("settingsTitle")}
         </Text>
-        <Text className="font-sans text-[12.5px] text-pp-muted">{t("settingsSub")}</Text>
+        <Text className="font-pp text-[12.5px] text-pp-muted">{t("settingsSub")}</Text>
       </View>
 
       <View className="gap-3">
@@ -72,8 +72,8 @@ export default function ParentSettings() {
               }`}
             >
               <View className="min-w-0 flex-1 gap-0.5">
-                <Text className="font-sans-bold text-sm text-pp-ink">{p.label}</Text>
-                <Text className="font-sans text-[11px] text-pp-muted">{p.sub}</Text>
+                <Text className="font-pp-bold text-sm text-pp-ink">{p.label}</Text>
+                <Text className="font-pp text-[11px] text-pp-muted">{p.sub}</Text>
               </View>
               <Pressable
                 onPress={() => {
@@ -96,7 +96,7 @@ export default function ParentSettings() {
           {prefError && (
             <Text
               accessibilityRole="alert"
-              className="px-4 py-2.5 font-sans-bold text-[12px] text-pp-danger"
+              className="px-4 py-2.5 font-pp-bold text-[12px] text-pp-danger"
             >
               {t("prefSaveFailed")}
             </Text>
@@ -113,7 +113,7 @@ export default function ParentSettings() {
         <SectionLabel>{t("more")}</SectionLabel>
         <View className="overflow-hidden rounded-card border-[1.5px] border-pp-line bg-pp-card">
           <View className="flex-row items-center justify-between border-b border-pp-panel px-4 py-3.5">
-            <Text className="font-sans-bold text-sm text-pp-ink">{t("language")}</Text>
+            <Text className="font-pp-bold text-sm text-pp-ink">{t("language")}</Text>
             <View className="flex-row gap-1 rounded-full bg-pp-panel p-[3px]">
               {(
                 [
@@ -131,7 +131,7 @@ export default function ParentSettings() {
                 >
                   <Text
                     style={{ color: locale === code ? "#fbfff1" : PP.muted }}
-                    className="font-sans-bold text-xs"
+                    className="font-pp-bold text-xs"
                   >
                     {lbl}
                   </Text>
@@ -144,8 +144,8 @@ export default function ParentSettings() {
             accessibilityRole="button"
             className="flex-row items-center justify-between px-4 py-4"
           >
-            <Text className="font-sans-bold text-sm text-pp-ink">{t("contactSchool")}</Text>
-            <Text className="font-sans-bold text-[12.5px] text-pp-blue">✆ {t("call")}</Text>
+            <Text className="font-pp-bold text-sm text-pp-ink">{t("contactSchool")}</Text>
+            <Text className="font-pp-bold text-[12.5px] text-pp-blue">✆ {t("call")}</Text>
           </Pressable>
         </View>
       </View>
@@ -164,7 +164,7 @@ export default function ParentSettings() {
         style={{ opacity: signingOut ? 0.6 : 1 }}
       >
         <LogOut size={16} color={PP.danger} />
-        <Text className="font-sans-bold text-[13.5px] text-pp-danger">{t("logOut")}</Text>
+        <Text className="font-pp-bold text-[13.5px] text-pp-danger">{t("logOut")}</Text>
       </Pressable>
     </ScrollView>
   );

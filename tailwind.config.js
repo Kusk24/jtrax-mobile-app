@@ -77,6 +77,18 @@ module.exports = {
         "sans-extrabold": "Nunito_800ExtraBold",
         display: "Fredoka_500Medium",
         "display-semibold": "Fredoka_600SemiBold",
+
+        /* The portals' pairing on the web (app/parent/layout.tsx and
+           app/student/layout.tsx): DM Sans for body copy, Poppins for
+           display. Sign-in keeps Nunito and Fredoka, as the web's does. */
+        pp: "DMSans_400Regular",
+        "pp-medium": "DMSans_500Medium",
+        "pp-semibold": "DMSans_600SemiBold",
+        "pp-bold": "DMSans_700Bold",
+        "pp-extrabold": "DMSans_800ExtraBold",
+        "pp-display": "Poppins_500Medium",
+        "pp-display-semibold": "Poppins_600SemiBold",
+        "pp-display-bold": "Poppins_700Bold",
       },
       boxShadow: {
         clay: "0 4px 12px rgba(36, 65, 124, 0.08)",

@@ -25,7 +25,7 @@ const W = 280, H = 64, P = 6;
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <Text className="font-sans-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
+    <Text className="font-pp-bold text-[11.5px] uppercase tracking-[1.6px] text-pp-sub">
       {children}
     </Text>
   );
@@ -44,13 +44,13 @@ export default function ChildProfile() {
   if (!ch) {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-pp-bg px-5">
-        <Text className="text-center font-sans text-[13px] text-pp-muted">{t("childGone")}</Text>
+        <Text className="text-center font-pp text-[13px] text-pp-muted">{t("childGone")}</Text>
         <Pressable
           onPress={() => router.replace("/parent/attendance")}
           accessibilityRole="button"
           className="rounded-card bg-pp-navy px-6 py-2.5"
         >
-          <Text className="font-sans-bold text-sm text-white">{t("navChildren")}</Text>
+          <Text className="font-pp-bold text-sm text-white">{t("navChildren")}</Text>
         </Pressable>
       </View>
     );
@@ -89,9 +89,9 @@ export default function ChildProfile() {
       <View className="flex-row items-center gap-3.5">
         <ChildFace name={ch.name} tint={ch.avBg} size={62} textClass="text-[24px]" />
         <View className="gap-0.5">
-          <Text className="font-display-semibold text-[22px] text-pp-ink">{ch.name}</Text>
-          <Text className="font-sans text-xs text-pp-muted">{t("idLabel", { id: ch.id })}</Text>
-          <Text className="font-sans-bold text-[12.5px] text-pp-ink">
+          <Text className="font-pp-display-semibold text-[22px] text-pp-ink">{ch.name}</Text>
+          <Text className="font-pp text-xs text-pp-muted">{t("idLabel", { id: ch.id })}</Text>
+          <Text className="font-pp-bold text-[12.5px] text-pp-ink">
             {ch.level || "—"}
             {ch.age > 0 ? ` · ${ch.age}` : ""}
           </Text>
@@ -101,12 +101,12 @@ export default function ChildProfile() {
       {/* Credits */}
       <View className="gap-3 rounded-[14px] bg-pp-deep p-5">
         <View className="flex-row items-center justify-between">
-          <Text className="font-sans-bold text-[11px] uppercase tracking-[1.3px] text-[#b4c5e4]">
+          <Text className="font-pp-bold text-[11px] uppercase tracking-[1.3px] text-[#b4c5e4]">
             {t("remainingCredits")}
           </Text>
           {/* The balance alone. A "/ total bought" used to sit beside it, and
               it read as a quota when it is only history. */}
-          <Text className="font-display-semibold text-[34px] leading-none text-[#fbfff1]">
+          <Text className="font-pp-display-semibold text-[34px] leading-none text-[#fbfff1]">
             {ch.credits}
           </Text>
         </View>
@@ -119,13 +119,13 @@ export default function ChildProfile() {
           <View className="gap-0.5">
             <Text
               style={{ color: expSoon || expired ? PP.danger : "#fbfff1" }}
-              className="font-sans-bold text-[12.5px]"
+              className="font-pp-bold text-[12.5px]"
             >
               {expired ? t("expired") : expSoon ? t("expiresSoon") : t("validUntil")}
             </Text>
             <Text
               style={{ color: expSoon || expired ? PP.amber : "#b4c5e4" }}
-              className="font-sans text-[11px]"
+              className="font-pp text-[11px]"
             >
               {ch.valid}
             </Text>
@@ -133,14 +133,14 @@ export default function ChildProfile() {
           {hasExpiry && ch.expiresAhead && (
             <Text
               style={{ color: expSoon ? PP.danger : "#fbfff1" }}
-              className="font-display-semibold text-[19px]"
+              className="font-pp-display-semibold text-[19px]"
             >
               {t("daysLeftShort", { count: ch.daysLeft })}
             </Text>
           )}
         </View>
         {hasExpiry && (
-          <Text className="font-sans text-[10.5px] leading-relaxed text-[#b4c5e4]">
+          <Text className="font-pp text-[10.5px] leading-relaxed text-[#b4c5e4]">
             {t("creditsExpireNote", { date: ch.valid })}
           </Text>
         )}
@@ -152,13 +152,13 @@ export default function ChildProfile() {
           <SectionLabel>{t("practiceProgress")}</SectionLabel>
           <View className="flex-row items-center gap-1">
             <Flame size={14} color={PP.amber} fill={PP.amber} />
-            <Text className="font-sans-bold text-[12.5px] text-pp-amber">
+            <Text className="font-pp-bold text-[12.5px] text-pp-amber">
               {t("dayStreak", { count: ch.streak })}
             </Text>
           </View>
         </View>
         <View className="gap-2.5 rounded-card bg-pp-card p-4 shadow-clay">
-          <Text className="font-sans-bold text-[11px] uppercase tracking-[0.9px] text-pp-faint">
+          <Text className="font-pp-bold text-[11px] uppercase tracking-[0.9px] text-pp-faint">
             {t("thisWeek")}
           </Text>
           <View className="h-16 w-full">
@@ -206,10 +206,10 @@ export default function ChildProfile() {
               edge at Monday and at Sunday. */}
           {picked !== null && (
             <View className="flex-row items-center gap-2.5 self-start rounded-[10px] bg-pp-ink px-2.5 py-2">
-              <Text className="font-sans-bold text-[9.5px] uppercase tracking-[0.6px] text-[#b4c5e4]">
+              <Text className="font-pp-bold text-[9.5px] uppercase tracking-[0.6px] text-[#b4c5e4]">
                 {DAYS[picked]}
               </Text>
-              <Text className="font-sans-bold text-[12.5px] text-white">
+              <Text className="font-pp-bold text-[12.5px] text-white">
                 {t("minsTip", { count: vals[picked] })}
               </Text>
               {vals[picked] >= GOAL ? (
@@ -243,12 +243,12 @@ export default function ChildProfile() {
 
           <View className="flex-row justify-between">
             {DAYS.map((d) => (
-              <Text key={d} className="font-sans-semibold text-[10px] text-pp-faint">
+              <Text key={d} className="font-pp-semibold text-[10px] text-pp-faint">
                 {d}
               </Text>
             ))}
           </View>
-          <Text className="pt-0.5 font-sans-bold text-[12.5px] text-pp-ink">
+          <Text className="pt-0.5 font-pp-bold text-[12.5px] text-pp-ink">
             {t("weekTotal", { h: Math.floor(weekMins / 60), m: weekMins % 60 })}
           </Text>
         </View>
@@ -262,7 +262,7 @@ export default function ChildProfile() {
             <View className="size-10 items-center justify-center rounded-card bg-pp-mist">
               <PawnIcon size={17} color={PP.ink} />
             </View>
-            <Text className="flex-1 font-sans-bold text-sm text-pp-ink">{ch.clsTitle}</Text>
+            <Text className="flex-1 font-pp-bold text-sm text-pp-ink">{ch.clsTitle}</Text>
           </View>
           {/* Branch, room, a teacher's name and an upcoming-session line all
               used to sit here. The first three were invented on the client —
@@ -279,11 +279,11 @@ export default function ChildProfile() {
               ] as const
             ).map(([k, v, danger]) => (
               <View key={k} className="w-1/2 gap-0.5 pb-2.5 pr-3.5">
-                <Text className="font-sans-bold text-[10px] uppercase tracking-[1px] text-pp-faint">
+                <Text className="font-pp-bold text-[10px] uppercase tracking-[1px] text-pp-faint">
                   {k}
                 </Text>
                 <Text
-                  className={`font-sans-bold text-[12.5px] ${
+                  className={`font-pp-bold text-[12.5px] ${
                     danger ? "text-pp-danger" : "text-pp-ink"
                   }`}
                 >
@@ -296,19 +296,19 @@ export default function ChildProfile() {
               forward, unlike the credit totals that used to be here. */}
           <View className="flex-row items-center gap-3.5 rounded-[13px] border-[1.5px] border-pp-soft bg-pp-mist px-3.5 py-3">
             <View className="min-w-[78px]">
-              <Text className="font-display-semibold text-[32px] leading-none text-pp-blue">
+              <Text className="font-pp-display-semibold text-[32px] leading-none text-pp-blue">
                 {ch.attended}
               </Text>
-              <Text className="mt-1 font-sans-bold text-[10px] uppercase tracking-[0.8px] text-pp-blue">
+              <Text className="mt-1 font-pp-bold text-[10px] uppercase tracking-[0.8px] text-pp-blue">
                 {t("classesAttended")}
               </Text>
             </View>
             <View className="flex-1 gap-1.5">
               <View className="flex-row justify-between">
-                <Text className="font-sans text-[11px] text-pp-muted">
+                <Text className="font-pp text-[11px] text-pp-muted">
                   {t("attendedOf", { attended: ch.attended, total: certSessions })}
                 </Text>
-                <Text className="font-sans text-[11px] text-pp-muted">
+                <Text className="font-pp text-[11px] text-pp-muted">
                   {t("remainingOf", { count: toCert })}
                 </Text>
               </View>
@@ -320,7 +320,7 @@ export default function ChildProfile() {
                   className="h-full rounded-full bg-pp-blue"
                 />
               </View>
-              <Text className="font-sans text-[10.5px] text-pp-faint">
+              <Text className="font-pp text-[10.5px] text-pp-faint">
                 {t("certNote", { count: certSessions })}
               </Text>
             </View>
@@ -334,13 +334,13 @@ export default function ChildProfile() {
           <SectionLabel>{t("attHistory")}</SectionLabel>
           <Link href={`/parent/child/${ch.key}/history` as never} asChild>
             <Pressable>
-              <Text className="font-sans-bold text-xs text-pp-blue">{t("viewAll")} →</Text>
+              <Text className="font-pp-bold text-xs text-pp-blue">{t("viewAll")} →</Text>
             </Pressable>
           </Link>
         </View>
         <View className="overflow-hidden rounded-card bg-pp-card shadow-clay">
           {histRows.length === 0 && (
-            <Text className="px-4 py-5 text-center font-sans text-[12.5px] text-pp-muted">
+            <Text className="px-4 py-5 text-center font-pp text-[12.5px] text-pp-muted">
               {t("noSessions")}
             </Text>
           )}
@@ -352,8 +352,8 @@ export default function ChildProfile() {
               }`}
             >
               <View className="min-w-0 flex-1 gap-0.5">
-                <Text className="font-sans-bold text-[12.5px] text-pp-ink">{h.cls}</Text>
-                <Text className="font-sans text-[11px] text-pp-muted">
+                <Text className="font-pp-bold text-[12.5px] text-pp-ink">{h.cls}</Text>
+                <Text className="font-pp text-[11px] text-pp-muted">
                   {h.date} · {h.time}
                 </Text>
               </View>
@@ -365,7 +365,7 @@ export default function ChildProfile() {
               >
                 <Text
                   style={{ color: h.status === "Present" ? PP.green : PP.danger }}
-                  className="font-sans-bold text-[10.5px] uppercase"
+                  className="font-pp-bold text-[10.5px] uppercase"
                 >
                   {h.status === "Present" ? t("present") : t("absent")}
                 </Text>

@@ -25,7 +25,7 @@ export default function ParentAnnouncements() {
 
       {announcements.length === 0 && (
         <View className="rounded-card border-[1.5px] border-dashed border-pp-dash p-6">
-          <Text className="text-center font-sans text-[12.5px] text-pp-muted">
+          <Text className="text-center font-pp text-[12.5px] text-pp-muted">
             {t("noAnnouncements")}
           </Text>
         </View>
@@ -50,48 +50,48 @@ export default function ParentAnnouncements() {
               className="gap-2 rounded-card border-[1.5px] p-4"
             >
               <View className="flex-row items-center justify-between gap-2">
-                <Text className="min-w-0 flex-1 font-sans-bold text-[14.5px] text-pp-ink">
+                <Text className="min-w-0 flex-1 font-pp-bold text-[14.5px] text-pp-ink">
                   {a.title}
                 </Text>
                 {isUnread && (
                   <View className="rounded-full bg-pp-blue px-2 py-0.5">
-                    <Text className="font-sans-bold text-[9px] uppercase text-white">
+                    <Text className="font-pp-bold text-[9px] uppercase text-white">
                       {t("new")}
                     </Text>
                   </View>
                 )}
               </View>
-              <Text numberOfLines={2} className="font-sans text-[12.5px] leading-relaxed text-pp-muted">
+              <Text numberOfLines={2} className="font-pp text-[12.5px] leading-relaxed text-pp-muted">
                 {a.msg}
               </Text>
               <View className="flex-row flex-wrap items-center gap-x-3 gap-y-1">
                 {!!a.child && (
                   <View className="flex-row items-center gap-1">
                     <UserRound size={12} color={PP.faint} strokeWidth={2} />
-                    <Text className="font-sans text-[10.5px] text-pp-faint">{a.child}</Text>
+                    <Text className="font-pp text-[10.5px] text-pp-faint">{a.child}</Text>
                   </View>
                 )}
                 {!!a.cls && (
                   <View className="flex-row items-center gap-1">
                     <GraduationCap size={12} color={PP.faint} strokeWidth={2} />
-                    <Text className="font-sans text-[10.5px] text-pp-faint">{a.cls}</Text>
+                    <Text className="font-pp text-[10.5px] text-pp-faint">{a.cls}</Text>
                   </View>
                 )}
                 {a.attachment && (
                   <View className="flex-row items-center gap-1">
                     <Paperclip size={12} color={PP.faint} strokeWidth={2} />
-                    <Text className="font-sans text-[10.5px] text-pp-faint">
+                    <Text className="font-pp text-[10.5px] text-pp-faint">
                       {t("attachmentWord")}
                     </Text>
                   </View>
                 )}
               </View>
               <View className="flex-row items-center justify-between gap-2">
-                <Text className="font-sans text-[10.5px] text-pp-faint">{a.time}</Text>
+                <Text className="font-pp text-[10.5px] text-pp-faint">{a.time}</Text>
                 <View style={{ backgroundColor: ss.bg }} className="rounded-full px-2 py-0.5">
                   <Text
                     style={{ color: ss.c }}
-                    className="font-sans-bold text-[9px] uppercase"
+                    className="font-pp-bold text-[9px] uppercase"
                   >
                     {t(ss.labelKey)}
                   </Text>

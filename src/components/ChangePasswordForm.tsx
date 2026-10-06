@@ -17,13 +17,20 @@ import { C, PP } from "@/lib/colors";
 
 type Tone = "parent" | "student";
 
-const LOOK: Record<Tone, { box: string; label: string; input: string; accent: string; text: string }> = {
+/* `bold` and `semibold` are the portal's own faces: native text does not
+   inherit a font from the screen around it, so the form carries them. */
+const LOOK: Record<
+  Tone,
+  { box: string; label: string; input: string; accent: string; text: string; bold: string; semibold: string }
+> = {
   parent: {
     box: "rounded-card border-[1.5px] border-pp-line bg-pp-card p-4",
-    label: "font-sans-semibold text-[12.5px] text-pp-sub",
-    input: "rounded-lg border-[1.5px] border-pp-line bg-pp-card px-3 py-2.5 font-sans text-sm text-pp-ink",
+    label: "font-pp-semibold text-[12.5px] text-pp-sub",
+    input: "rounded-lg border-[1.5px] border-pp-line bg-pp-card px-3 py-2.5 font-pp text-sm text-pp-ink",
     accent: PP.blue,
     text: "text-pp-ink",
+    bold: "font-pp-bold",
+    semibold: "font-pp-semibold",
   },
   student: {
     box: "rounded-card border-2 border-line bg-card p-4 shadow-clay",
@@ -31,6 +38,8 @@ const LOOK: Record<Tone, { box: string; label: string; input: string; accent: st
     input: "rounded-xl border-2 border-line bg-white px-3 py-2.5 font-sans text-sm text-ink",
     accent: C.navy,
     text: "text-ink",
+    bold: "font-sans-bold",
+    semibold: "font-sans-semibold",
   },
 };
 
@@ -93,12 +102,12 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
         >
           <View className="flex-row items-center gap-2">
             <KeyRound size={16} color={look.accent} />
-            <Text className={`font-sans-bold text-sm ${look.text}`}>{t("title")}</Text>
+            <Text className={`${look.bold} text-sm ${look.text}`}>{t("title")}</Text>
           </View>
           <Text className={look.label}>{t("open")}</Text>
         </Pressable>
         {done && (
-          <Text accessibilityLiveRegion="polite" style={{ color: C.olive }} className="mt-2 font-sans-semibold text-[12.5px]">
+          <Text accessibilityLiveRegion="polite" style={{ color: C.olive }} className={`mt-2 ${look.semibold} text-[12.5px]`}>
             {t("done")}
           </Text>
         )}
@@ -127,14 +136,14 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
     <View className={`${look.box} gap-3`}>
       <View className="flex-row items-center gap-2">
         <KeyRound size={16} color={look.accent} />
-        <Text className={`font-sans-bold text-sm ${look.text}`}>{t("title")}</Text>
+        <Text className={`${look.bold} text-sm ${look.text}`}>{t("title")}</Text>
       </View>
       {field(t("current"), current, setCurrent, "password")}
       {field(t("new"), next, setNext, "newPassword")}
       {field(t("confirm"), confirm, setConfirm, "newPassword")}
       <Text className={look.label}>{t("rule")}</Text>
       {error !== "" && (
-        <Text accessibilityRole="alert" style={{ color: C.brick }} className="font-sans-semibold text-[12.5px]">
+        <Text accessibilityRole="alert" style={{ color: C.brick }} className={`${look.semibold} text-[12.5px]`}>
           {error}
         </Text>
       )}
@@ -149,7 +158,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
           {busy ? (
             <ActivityIndicator color="#ffffff" />
           ) : (
-            <Text className="font-sans-bold text-sm text-white">{t("save")}</Text>
+            <Text className={`${look.bold} text-sm text-white`}>{t("save")}</Text>
           )}
         </Pressable>
         <Pressable
@@ -160,7 +169,7 @@ export function ChangePasswordForm({ tone }: { tone: Tone }) {
           accessibilityRole="button"
           className="items-center justify-center rounded-lg px-4 py-2.5"
         >
-          <Text style={{ color: look.accent }} className="font-sans-bold text-sm">
+          <Text style={{ color: look.accent }} className={`${look.bold} text-sm`}>
             {t("cancel")}
           </Text>
         </Pressable>
