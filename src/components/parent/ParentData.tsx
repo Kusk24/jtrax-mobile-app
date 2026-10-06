@@ -103,8 +103,13 @@ type ParentDataValue = {
   /** Signs a child up and answers with the new registration's id, which is
       what `payCardFee` needs to collect the entry fee. */
   register: (input: {
-    tournamentId: string; studentId: string; contact: string;
-    medicalNotes: string; remarks: string;
+    tournamentId: string; studentId: string;
+    /** The ID card check for this child, and the category it allows. */
+    idCheck: string; categoryId: string;
+    /** As the public form asks: the name called in the hall, the Thai name
+        (optional), and the conditions of entry. The family's contact
+        details come from their record on the server. */
+    nickname: string; nameTh: string; acceptTerms: boolean;
   }) => Promise<string>;
   /** Opens (or reopens) the card checkout for a registration's entry fee and
       answers with the URL to send the parent to, or `null` when the academy
@@ -450,17 +455,20 @@ export function ParentDataProvider({ children: kids }: { children: ReactNode }) 
   }, []);
 
   const register = useCallback(async (input: {
-    tournamentId: string; studentId: string; contact: string;
-    medicalNotes: string; remarks: string;
+    tournamentId: string; studentId: string;
+    idCheck: string; categoryId: string;
+    nickname: string; nameTh: string; acceptTerms: boolean;
   }) => {
     /* No name, fee or status: the server takes the name from the academy's
        records and the price from the tournament. This used to send the fee,
        and the card payment charged whatever it said. */
     const row = await api.post<Row>(`tournaments/${input.tournamentId}/entries`, {
       student_id: input.studentId,
-      participant_contact: input.contact,
-      medical_notes: input.medicalNotes,
-      remarks: input.remarks,
+      id_check: input.idCheck,
+      ...(input.categoryId ? { tournament_category_id: input.categoryId } : {}),
+      nickname: input.nickname,
+      ...(input.nameTh ? { participant_name_th: input.nameTh } : {}),
+      accept_terms: input.acceptTerms,
     });
     return s(row, "tournament_registration_id");
   }, []);
