@@ -36,7 +36,7 @@ export default function ChildProfile() {
   const t = useTranslations("pv2");
   const router = useRouter();
   const { childId } = useLocalSearchParams<{ childId: string }>();
-  const { children: kids, hist, certSessions } = useParentData();
+  const { children: kids, hist, certHours } = useParentData();
   const [picked, setPicked] = useState<number | null>(null);
   const ch = kids.find((c) => c.key === childId);
 
@@ -62,9 +62,9 @@ export default function ChildProfile() {
      saying "expires soon · 0 days" about it understates what happened. */
   const expired = hasExpiry && !ch.expiresAhead;
   const expSoon = hasExpiry && ch.expiresAhead && ch.daysLeft <= 14;
-  /* Progress toward the certificate — the milestone is the academy's own,
-     from Settings, not a number this app knows. */
-  const toCert = Math.max(0, certSessions - ch.attended);
+  /* Progress toward the certificate, in hours of class as the academy counts
+     it — the milestone is its own, from Settings, not a number this app knows. */
+  const toCert = Math.max(0, Math.round((certHours - ch.hoursAttended) * 10) / 10);
 
   const vals = ch.practiceWeek;
   const max = Math.max(...vals, 1);
@@ -307,7 +307,7 @@ export default function ChildProfile() {
             <View className="flex-1 gap-1.5">
               <View className="flex-row justify-between">
                 <Text className="font-pp text-[11px] text-pp-muted">
-                  {t("attendedOf", { attended: ch.attended, total: certSessions })}
+                  {t("attendedOf", { attended: ch.hoursAttended, total: certHours })}
                 </Text>
                 <Text className="font-pp text-[11px] text-pp-muted">
                   {t("remainingOf", { count: toCert })}
@@ -316,13 +316,13 @@ export default function ChildProfile() {
               <View className="h-2 overflow-hidden rounded-full bg-pp-soft">
                 <View
                   style={{
-                    width: `${Math.min(100, Math.round((ch.attended / certSessions) * 100))}%`,
+                    width: `${Math.min(100, Math.round((ch.hoursAttended / certHours) * 100))}%`,
                   }}
                   className="h-full rounded-full bg-pp-blue"
                 />
               </View>
               <Text className="font-pp text-[10.5px] text-pp-faint">
-                {t("certNote", { count: certSessions })}
+                {t("certNote", { count: certHours })}
               </Text>
             </View>
           </View>

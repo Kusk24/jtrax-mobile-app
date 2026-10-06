@@ -2,6 +2,10 @@
    The shapes come from the JTrax Parent design port; the data behind them is
    real backend rows, joined in components/parent/ParentData.tsx. */
 
+import type { CourseCredit } from "./course-credits";
+import type { CreditLifetime } from "./credit-lifetime";
+import { API_BASE } from "./api";
+
 export type ChildKey = string;
 
 export interface ChildV2 {
@@ -28,6 +32,12 @@ export interface ChildV2 {
       behind "used" ("4 / 20 credits used"), which is history rather than a
       quota; the child screen still shows the balance alone. */
   creditsBought: number;
+  /** The balance right after the latest top-up — the "of" in "18 / 20". */
+  creditsOf: number | null;
+  /** Each active course's own balance and expiry. */
+  courses: CourseCredit[];
+  /** All-time, across every course: credits bought, and credits classes used. */
+  lifetime: CreditLifetime;
   /** Latest expiry date on the ledger, formatted, or "—" when none is set. */
   valid: string;
   daysLeft: number;
@@ -35,15 +45,19 @@ export interface ChildV2 {
   expiresAhead: boolean;
   /** Classes this child was checked in to — see `classesAttended`. */
   attended: number;
+  /** Hours of class attended, toward the certificate — see `hoursAttended`. */
+  hoursAttended: number;
   streak: number;
   practiceWeek: number[];
 }
 
-/** The academy awards a certificate after this many classes attended — the
+/** The academy awards a certificate after this many hours of class — the
     milestone the child screen counts toward. This is the fallback: the real
-    figure is the academy's own, `certificate_sessions` in
+    figure is the academy's own, `certificate_hours` in
     `system_configuration`, edited on the console's Settings screen. */
-export const CERT_SESSIONS = 50;
+export const CERT_HOURS = 50;
+/** The console's default low-credit line, until the academy saves its own. */
+export const LOW_CREDIT_AT = 3;
 
 export type SenderKind = "teacher" | "branch" | "admin";
 
@@ -58,6 +72,8 @@ export interface AnnouncementV2 {
   attachment: boolean;
   attachmentImg?: string;
   time: string;
+  /** When it was posted, as the server sent it — for the home's recent-only rule. */
+  postedAt: string;
 }
 
 /** The notification catalogue the backend sends, in the order Settings lists
@@ -122,6 +138,41 @@ export interface TournamentV2 {
   day: string;
   fee: string;
   closesInDays: number;
+  /** Whether it is taking entries: "closed" by the organiser, or past its "deadline". */
+  registration: "open" | "closed" | "deadline";
+  /** The organiser uploaded a banner; without one the card draws its own. */
+  hasBanner: boolean;
+  /** Where the regulation opens, or "" when there is none — the row is then
+      not shown rather than drawn as a link that goes nowhere. */
+  regulationUrl: string;
+  /** Where the venue opens on a map, or "" with no venue to find. */
+  mapUrl: string;
+  /** YYYY-MM-DD, unformatted: the age groups go by the event's year. */
+  startDate: string;
+}
+
+/** A web address the office typed, only if it is one: http(s), nothing else. */
+function webUrl(raw: string): string {
+  const v = raw.trim();
+  return /^https?:\/\//i.test(v) ? v : "";
+}
+
+/** The regulation: the uploaded file when there is one, else a link the office
+    pasted. The phone has no same-origin proxy to sign the request in, so this
+    is the API's own address: open as it stands for a public event; one open to
+    the academy's families only needs the session's token sent with it. */
+export function regulationUrlOf(id: string, hasUpload: boolean, pastedUrl: string): string {
+  if (hasUpload && id) return `${API_BASE}/api/v1/tournaments/${encodeURIComponent(id)}/regulation`;
+  return webUrl(pastedUrl);
+}
+
+/** The venue on a map: the exact link the office set when there is one, else
+    a map search for the venue's name and address. */
+export function mapUrlOf(mapLink: string, venueName: string, venueAddress: string): string {
+  const exact = webUrl(mapLink);
+  if (exact) return exact;
+  const where = [venueName.trim(), venueAddress.trim()].filter(Boolean).join(", ");
+  return where ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(where)}` : "";
 }
 
 /** One attendance row joined to its session, for the history lists. */
@@ -134,6 +185,9 @@ export interface HistRow {
   /** The session's own class — not the child's current one, which would
       relabel every old row the day the child changes class. */
   cls: string;
+  /** Credits this visit cost (positive), from its consumption entries; 0 when
+      nothing was charged. */
+  credits: number;
 }
 
 /* ---- calendar months ----

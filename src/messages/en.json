@@ -604,7 +604,7 @@
     "notifCreditsBody": "Credits expire on {date} — {days} days left.",
     "expired": "Expired",
     "classesAttended": "Classes attended",
-    "certNote": "A certificate is awarded after {count} classes.",
+    "certNote": "A certificate is awarded after {count} hours of class.",
     "navSettings": "Settings",
     "settingsTitle": "Settings",
     "navChildren": "Children",
