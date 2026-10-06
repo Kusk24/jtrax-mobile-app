@@ -8,12 +8,13 @@
  * arrow and the whole phone, because a board with a bar across the bottom is
  * eight ranks in seven ranks' worth of space.
  */
-import { Link, usePathname } from "expo-router";
+import { usePathname } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { Gamepad2, Home, Puzzle, UserRound, type LucideIcon } from "lucide-react-native";
 import { usePalette } from "@/components/ThemeProvider";
 import { isActive, isRoot, type TabPath } from "@/lib/portal-tabs";
+import { useTabPress } from "@/components/useTabPress";
 
 type Tab = TabPath & { labelKey: "home" | "puzzles" | "games" | "profile"; icon: LucideIcon };
 
@@ -28,6 +29,7 @@ export function StudentBottomNav() {
   const pathname = usePathname();
   const t = useTranslations("sv2");
   const { pp } = usePalette();
+  const goToTab = useTabPress("/student");
   if (!isRoot(pathname, tabs)) return null;
   return (
     <View className="flex-row border-t border-pp-line bg-pp-bg px-2 pb-6 pt-2">
@@ -35,18 +37,18 @@ export function StudentBottomNav() {
         const active = isActive(pathname, tab);
         const Icon = tab.icon;
         return (
-          <Link key={tab.href} href={tab.href as never} asChild>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
-              className={`min-w-0 flex-1 items-center gap-0.5 rounded-[13px] py-1.5 ${active ? "bg-pp-soft" : ""}`}
-            >
-              <Icon size={22} color={active ? pp.blue : pp.faint} strokeWidth={1.8} />
-              <Text numberOfLines={1} className={`font-pp-bold text-[10px] ${active ? "text-pp-blue" : "text-pp-faint"}`}>
-                {t(tab.labelKey)}
-              </Text>
-            </Pressable>
-          </Link>
+          <Pressable
+            key={tab.href}
+            onPress={() => goToTab(tab.href)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            className={`min-w-0 flex-1 items-center gap-0.5 rounded-[13px] py-1.5 ${active ? "bg-pp-soft" : ""}`}
+          >
+            <Icon size={22} color={active ? pp.blue : pp.faint} strokeWidth={1.8} />
+            <Text numberOfLines={1} className={`font-pp-bold text-[10px] ${active ? "text-pp-blue" : "text-pp-faint"}`}>
+              {t(tab.labelKey)}
+            </Text>
+          </Pressable>
         );
       })}
     </View>
