@@ -2,7 +2,7 @@
  * Everything a parent can change: notifications, Appearance, the password,
  * the language, and how to reach the school.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useTranslations } from "use-intl";
@@ -13,9 +13,7 @@ import { useLocaleSwitch } from "@/i18n";
 import { usePalette } from "@/components/ThemeProvider";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { AppearancePicker } from "@/components/AppearancePicker";
-
-/** The academy's front desk, as the portal's Contact row dials. */
-const SCHOOL_PHONE = "+66123456789";
+import { ACADEMY_CONTACT, getAcademyContact, telHref } from "@/lib/academy-contact";
 
 function SectionLabel({ children }: { children: string }) {
   return (
@@ -34,6 +32,16 @@ export default function ParentSettings() {
   /* A failed save belongs next to the switch that failed, not in an alert. */
   const [prefError, setPrefError] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  /* The number the office keeps in the console's Academy Contact. The row
+     used to dial +66123456789, a placeholder that was never the school's. */
+  const [phones, setPhones] = useState(ACADEMY_CONTACT.phones);
+  useEffect(() => {
+    let alive = true;
+    getAcademyContact().then((c) => alive && setPhones(c.phones));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   /* The catalogue, one switch each, all on until the parent turns one off —
      but only the types the school sends. The school's switch (Admin →
@@ -146,14 +154,25 @@ export default function ParentSettings() {
               ))}
             </View>
           </View>
-          <Pressable
-            onPress={() => Linking.openURL(`tel:${SCHOOL_PHONE}`)}
-            accessibilityRole="button"
-            className="flex-row items-center justify-between px-4 py-4"
-          >
-            <Text className="font-pp-bold text-sm text-pp-ink">{t("contactSchool")}</Text>
-            <Text className="font-pp-bold text-[12.5px] text-pp-blue">✆ {t("call")}</Text>
-          </Pressable>
+          {/* One row per number: the front desk's line and its mobile. A
+              simulator has no dialler, so a failed open is swallowed. */}
+          {phones.map((phone, i) => (
+            <Pressable
+              key={phone}
+              onPress={() => Linking.openURL(telHref(phone)).catch(() => {})}
+              accessibilityRole="button"
+              accessibilityLabel={`${t("call")} ${phone}`}
+              className={`flex-row items-center justify-between gap-3 px-4 py-3.5 active:bg-pp-mist ${
+                i < phones.length - 1 ? "border-b border-pp-panel" : ""
+              }`}
+            >
+              <View className="min-w-0 flex-1 gap-0.5">
+                {i === 0 && <Text className="font-pp-bold text-sm text-pp-ink">{t("contactSchool")}</Text>}
+                <Text className="font-pp-semibold text-[13px] text-pp-muted">{phone}</Text>
+              </View>
+              <Text className="font-pp-bold text-[12.5px] text-pp-blue">✆ {t("call")}</Text>
+            </Pressable>
+          ))}
         </View>
       </View>
 
