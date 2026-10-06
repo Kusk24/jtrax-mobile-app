@@ -15,7 +15,7 @@ import { CURRENT, type ChildKey, type HistRow } from "@/lib/parent-v2-data";
 import { creditsUsed } from "@/lib/credits-used";
 import { ChildBanner, ChildFace } from "@/components/parent/ChildFace";
 import { useParentData } from "@/components/parent/ParentData";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 const WD_KEYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
@@ -28,6 +28,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function ParentChildren() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { children: childList, att: ATT, hist, months, todayActivity } = useParentData();
   const [filter, setFilter] = useState<"all" | ChildKey>("all");
@@ -87,7 +88,7 @@ export default function ParentChildren() {
             return (
               <Link key={c.key} href={`/parent/child/${c.key}` as never} asChild>
                 <Pressable
-                  style={{ backgroundColor: isBeg ? PP.greenSoft : PP.card }}
+                  style={{ backgroundColor: isBeg ? pp.greenSoft : pp.card }}
                   /* Two to a row, with the 16px gap taken out of the width. */
                   className="min-w-0 flex-1 basis-[45%] overflow-hidden rounded-card border-[1.5px] border-pp-line"
                 >
@@ -97,11 +98,11 @@ export default function ParentChildren() {
                       <Text className="font-pp-bold text-[15px] text-pp-ink">{c.name}</Text>
                       {!!c.level && (
                         <View
-                          style={{ backgroundColor: isBeg ? PP.greenSoft : PP.amberSoft }}
+                          style={{ backgroundColor: isBeg ? pp.greenSoft : pp.amberSoft }}
                           className="rounded-full px-2 py-0.5"
                         >
                           <Text
-                            style={{ color: isBeg ? PP.green : PP.amber }}
+                            style={{ color: isBeg ? pp.green : pp.amber }}
                             className="font-pp-bold text-[9.5px]"
                           >
                             {c.level}
@@ -110,7 +111,7 @@ export default function ParentChildren() {
                       )}
                     </View>
                     <View className="flex-row items-center gap-2 pt-0.5">
-                      <CheckSquare size={16} color={PP.muted} strokeWidth={1.8} />
+                      <CheckSquare size={16} color={pp.muted} strokeWidth={1.8} />
                       <Text className="font-pp-semibold text-xs text-pp-ink">
                         {t("completedClasses", { count: c.attended })}
                       </Text>
@@ -120,7 +121,7 @@ export default function ParentChildren() {
                         <View
                           style={{
                             width: `${pct}%`,
-                            backgroundColor: low ? PP.amber : PP.blue,
+                            backgroundColor: low ? pp.amber : pp.blue,
                           }}
                           className="h-full rounded-full"
                         />
@@ -140,7 +141,7 @@ export default function ParentChildren() {
       {/* Today's activity */}
       <View className="gap-3.5">
         <View className="flex-row items-center gap-2">
-          <Star size={16} color={PP.amber} fill={PP.amber} strokeWidth={1.8} />
+          <Star size={16} color={pp.amber} fill={pp.amber} strokeWidth={1.8} />
           <SectionLabel>{t("todaysActivity")}</SectionLabel>
         </View>
         <View>
@@ -177,20 +178,20 @@ export default function ParentChildren() {
                     <>
                       <View style={{ position: "absolute", transform: [{ rotate: "-90deg" }] }}>
                         <Svg width={20} height={20} viewBox="0 0 20 20">
-                          <Circle cx="10" cy="10" r="8.5" fill="none" stroke="#f3e6d8" strokeWidth="3" />
+                          <Circle cx="10" cy="10" r="8.5" fill="none" stroke={pp.track} strokeWidth="3" />
                           <Circle
                             cx="10"
                             cy="10"
                             r="8.5"
                             fill="none"
-                            stroke={PP.amber}
+                            stroke={pp.amber}
                             strokeWidth="3"
                             strokeLinecap="round"
                             strokeDasharray={`${((circ * pct) / 100).toFixed(1)} ${circ.toFixed(1)}`}
                           />
                         </Svg>
                       </View>
-                      <Star size={9} color={PP.amber} fill={PP.amber} strokeWidth={2} />
+                      <Star size={9} color={pp.amber} fill={pp.amber} strokeWidth={2} />
                     </>
                   )}
                 </View>
@@ -202,7 +203,7 @@ export default function ParentChildren() {
                   <Text className="font-pp-bold text-[13px] text-pp-blue">
                     {r.puzzles}
                   </Text>
-                  <Star size={15} color={PP.amber} fill={PP.amber} strokeWidth={1.8} />
+                  <Star size={15} color={pp.amber} fill={pp.amber} strokeWidth={1.8} />
                 </View>
               </View>
             );
@@ -222,7 +223,7 @@ export default function ParentChildren() {
             disabled={month === 0}
             className="size-[30px] items-center justify-center rounded-[10px] border-[1.5px] border-pp-line bg-pp-card"
           >
-            <ChevronLeft size={16} color={month === 0 ? PP.line : PP.blue} />
+            <ChevronLeft size={16} color={month === 0 ? pp.line : pp.blue} />
           </Pressable>
           <Text className="font-pp-display-semibold text-[17px] text-pp-ink">{M.name}</Text>
           <Pressable
@@ -232,7 +233,7 @@ export default function ParentChildren() {
             disabled={month === months.length - 1}
             className="size-[30px] items-center justify-center rounded-[10px] border-[1.5px] border-pp-line bg-pp-card"
           >
-            <ChevronRight size={16} color={month === months.length - 1 ? PP.line : PP.blue} />
+            <ChevronRight size={16} color={month === months.length - 1 ? pp.line : pp.blue} />
           </Pressable>
         </View>
         <View className="flex-row flex-wrap">
@@ -245,14 +246,14 @@ export default function ParentChildren() {
             <View key={i} className="w-[14.28%] p-0.5">
               <View
                 style={{
-                  backgroundColor: c.present ? PP.greenDot : "transparent",
+                  backgroundColor: c.present ? pp.greenDot : "transparent",
                   borderWidth: c.today && !c.present ? 1.5 : 0,
-                  borderColor: PP.blue,
+                  borderColor: pp.blue,
                 }}
                 className="aspect-square items-center justify-center rounded-full"
               >
                 <Text
-                  style={{ color: c.present ? "#fbfff1" : PP.ink }}
+                  style={{ color: c.present ? "#fbfff1" : pp.ink }}
                   className={`text-[12.5px] ${
                     c.present || c.today ? "font-pp-bold" : "font-pp"
                   }`}
@@ -285,13 +286,13 @@ export default function ParentChildren() {
               accessibilityRole="button"
               accessibilityState={{ selected: filter === f.k }}
               style={{
-                backgroundColor: filter === f.k ? PP.deep : PP.card,
-                borderColor: filter === f.k ? PP.deep : PP.line,
+                backgroundColor: filter === f.k ? pp.deep : pp.card,
+                borderColor: filter === f.k ? pp.deep : pp.line,
               }}
               className="rounded-full border-[1.5px] px-4 py-2"
             >
               <Text
-                style={{ color: filter === f.k ? "#fbfff1" : PP.muted }}
+                style={{ color: filter === f.k ? "#fbfff1" : pp.muted }}
                 className="font-pp-bold text-xs"
               >
                 {f.label}
@@ -330,12 +331,12 @@ export default function ParentChildren() {
                         <View
                           style={{
                             backgroundColor:
-                              h.status === "Present" ? PP.greenSoft : "#fdece0",
+                              h.status === "Present" ? pp.greenSoft : pp.dangerSoft,
                           }}
                           className="rounded-full px-2 py-0.5"
                         >
                           <Text
-                            style={{ color: h.status === "Present" ? PP.green : PP.danger }}
+                            style={{ color: h.status === "Present" ? pp.green : pp.danger }}
                             className="font-pp-bold text-[10px] uppercase"
                           >
                             {h.status === "Present" ? t("present") : t("absent")}

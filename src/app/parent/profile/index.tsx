@@ -10,7 +10,7 @@ import { useTranslations } from "use-intl";
 import { BadgeCheck, ChevronRight, Mail, Pencil, Phone } from "lucide-react-native";
 import { ChildFace } from "@/components/parent/ChildFace";
 import { useParentData } from "@/components/parent/ParentData";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 function SectionLabel({ children }: { children: string }) {
   return (
@@ -21,6 +21,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function ParentProfile() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { children: childList, parent, parentId } = useParentData();
   const initial = (parent.name.trim()[0] ?? "?").toUpperCase();
@@ -57,7 +58,7 @@ export default function ParentProfile() {
             {t("idLabel", { id: parentId })}
           </Text>
           <View className="mt-1 flex-row items-center gap-1">
-            <BadgeCheck size={12} color={PP.green} />
+            <BadgeCheck size={12} color={pp.green} />
             <Text className="font-pp-semibold text-[10px] text-pp-green">
               {t("verifiedAccount")}
             </Text>
@@ -69,7 +70,7 @@ export default function ParentProfile() {
             accessibilityLabel={t("navSettings")}
             className="size-9 items-center justify-center rounded-card border border-pp-line"
           >
-            <Pencil size={16} color={PP.muted} />
+            <Pencil size={16} color={pp.muted} />
           </Pressable>
         </Link>
       </View>
@@ -91,7 +92,7 @@ export default function ParentProfile() {
                     {t("idLabel", { id: c.id })}
                   </Text>
                 </View>
-                <ChevronRight size={16} color={PP.line} />
+                <ChevronRight size={16} color={pp.line} />
               </Pressable>
             </Link>
           ))}
@@ -103,7 +104,7 @@ export default function ParentProfile() {
         <View className="overflow-hidden rounded-card border-[1.5px] border-pp-line bg-pp-card">
           <View className="flex-row items-center gap-3 border-b border-pp-panel px-4 py-3.5">
             <View className="size-8 items-center justify-center rounded-card bg-pp-soft">
-              <Phone size={16} color={PP.blue} />
+              <Phone size={16} color={pp.blue} />
             </View>
             <View className="min-w-0 flex-1">
               <Text className="font-pp text-[10px] text-pp-muted">{t("phone")}</Text>
@@ -114,7 +115,7 @@ export default function ParentProfile() {
           </View>
           <View className="flex-row items-center gap-3 px-4 py-3.5">
             <View className="size-8 items-center justify-center rounded-card bg-pp-soft">
-              <Mail size={16} color={PP.blue} />
+              <Mail size={16} color={pp.blue} />
             </View>
             <View className="min-w-0 flex-1">
               <Text className="font-pp text-[10px] text-pp-muted">{t("email")}</Text>

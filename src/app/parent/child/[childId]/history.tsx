@@ -8,11 +8,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { CURRENT } from "@/lib/parent-v2-data";
 import { useParentData } from "@/components/parent/ParentData";
 import { BackHeader } from "@/components/parent/BackHeader";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 const WD_KEYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
 export default function ChildHistory() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const router = useRouter();
   const { childId } = useLocalSearchParams<{ childId: string }>();
@@ -83,7 +84,7 @@ export default function ChildHistory() {
               disabled={month === 0}
               className="size-[30px] items-center justify-center rounded-[10px] border-[1.5px] border-pp-line bg-pp-card"
             >
-              <ChevronLeft size={16} color={month === 0 ? PP.line : PP.blue} />
+              <ChevronLeft size={16} color={month === 0 ? pp.line : pp.blue} />
             </Pressable>
             <Text className="font-pp-display-semibold text-[17px] text-pp-ink">{M.name}</Text>
             <Pressable
@@ -96,7 +97,7 @@ export default function ChildHistory() {
               disabled={month === months.length - 1}
               className="size-[30px] items-center justify-center rounded-[10px] border-[1.5px] border-pp-line bg-pp-card"
             >
-              <ChevronRight size={16} color={month === months.length - 1 ? PP.line : PP.blue} />
+              <ChevronRight size={16} color={month === months.length - 1 ? pp.line : pp.blue} />
             </Pressable>
           </View>
 
@@ -117,9 +118,9 @@ export default function ChildHistory() {
                   }
                   style={{
                     backgroundColor: c.selected
-                      ? PP.blue
+                      ? pp.blue
                       : c.present
-                        ? PP.greenDot
+                        ? pp.greenDot
                         : "transparent",
                     borderWidth: c.today && !c.selected && !c.present ? 1.5 : 0,
                     borderColor: "#b4c5e4",
@@ -127,7 +128,7 @@ export default function ChildHistory() {
                   className="aspect-square items-center justify-center rounded-full"
                 >
                   <Text
-                    style={{ color: c.selected || c.present ? "#fbfff1" : PP.ink }}
+                    style={{ color: c.selected || c.present ? "#fbfff1" : pp.ink }}
                     className={`text-[12.5px] ${
                       c.selected || c.present ? "font-pp-bold" : "font-pp"
                     }`}
@@ -196,11 +197,11 @@ export default function ChildHistory() {
                   </Text>
                 </View>
                 <View
-                  style={{ backgroundColor: h.status === "Present" ? PP.greenSoft : "#fdece0" }}
+                  style={{ backgroundColor: h.status === "Present" ? pp.greenSoft : pp.dangerSoft }}
                   className="rounded-full px-2.5 py-1"
                 >
                   <Text
-                    style={{ color: h.status === "Present" ? PP.green : PP.danger }}
+                    style={{ color: h.status === "Present" ? pp.green : pp.danger }}
                     className="font-pp-bold text-[10.5px] uppercase"
                   >
                     {h.status === "Present" ? t("present") : t("absent")}

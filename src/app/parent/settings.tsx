@@ -1,9 +1,6 @@
 /**
- * Everything a parent can change.
- *
- * The portal's Appearance block is not here: this app has no dark theme to
- * offer, and a theme picker that changes nothing is the kind of control the
- * portal deleted a screen-time limit for. It arrives when the theme does.
+ * Everything a parent can change: notifications, Appearance, the password,
+ * the language, and how to reach the school.
  */
 import { useState } from "react";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
@@ -13,8 +10,9 @@ import { LogOut } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
 import { useSession } from "@/lib/session";
 import { useLocaleSwitch } from "@/i18n";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import { AppearancePicker } from "@/components/AppearancePicker";
 
 /** The academy's front desk, as the portal's Contact row dials. */
 const SCHOOL_PHONE = "+66123456789";
@@ -28,6 +26,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function ParentSettings() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { locale, setLocale } = useLocaleSwitch();
   const { signOut } = useSession();
@@ -83,7 +82,7 @@ export default function ParentSettings() {
                 accessibilityRole="switch"
                 accessibilityState={{ checked: prefs[p.k] }}
                 accessibilityLabel={p.label}
-                style={{ backgroundColor: prefs[p.k] ? PP.greenDot : PP.faint }}
+                style={{ backgroundColor: prefs[p.k] ? pp.greenDot : pp.faint }}
                 className="h-7 w-[46px] rounded-full"
               >
                 <View
@@ -102,6 +101,11 @@ export default function ParentSettings() {
             </Text>
           )}
         </View>
+      </View>
+
+      <View className="gap-3">
+        <SectionLabel>{t("appearance")}</SectionLabel>
+        <AppearancePicker />
       </View>
 
       <View className="gap-3">
@@ -126,11 +130,11 @@ export default function ParentSettings() {
                   onPress={() => setLocale(code)}
                   accessibilityRole="button"
                   accessibilityState={{ selected: locale === code }}
-                  style={{ backgroundColor: locale === code ? PP.blue : "transparent" }}
+                  style={{ backgroundColor: locale === code ? pp.blue : "transparent" }}
                   className="rounded-full px-3.5 py-1"
                 >
                   <Text
-                    style={{ color: locale === code ? "#fbfff1" : PP.muted }}
+                    style={{ color: locale === code ? "#fbfff1" : pp.muted }}
                     className="font-pp-bold text-xs"
                   >
                     {lbl}
@@ -163,7 +167,7 @@ export default function ParentSettings() {
         className="flex-row items-center justify-center gap-2 rounded-card border-[1.5px] border-pp-danger-line bg-pp-card p-3.5"
         style={{ opacity: signingOut ? 0.6 : 1 }}
       >
-        <LogOut size={16} color={PP.danger} />
+        <LogOut size={16} color={pp.danger} />
         <Text className="font-pp-bold text-[13.5px] text-pp-danger">{t("logOut")}</Text>
       </Pressable>
     </ScrollView>

@@ -1,7 +1,6 @@
 import "../global.css";
 
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import {
   useFonts,
   Fredoka_500Medium,
@@ -24,6 +23,7 @@ import { Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from "@expo-g
 import { I18nProvider } from "@/i18n";
 import { SessionProvider } from "@/lib/session";
 import { PushResponder } from "@/components/PushResponder";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { C } from "@/lib/colors";
 
 export default function RootLayout() {
@@ -48,14 +48,15 @@ export default function RootLayout() {
   return (
     <I18nProvider>
       <SessionProvider>
-        <StatusBar style="dark" />
-        <PushResponder />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: C.paper },
-          }}
-        />
+        <ThemeProvider>
+          <PushResponder />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: C.paper },
+            }}
+          />
+        </ThemeProvider>
       </SessionProvider>
     </I18nProvider>
   );

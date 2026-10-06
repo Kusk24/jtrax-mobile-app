@@ -15,6 +15,7 @@ import { ChildFace } from "@/components/parent/ChildFace";
 import { TournamentBanner } from "@/components/parent/TournamentBanner";
 import { LiveTournamentBanner } from "@/components/LiveTournamentBanner";
 import { useParentData } from "@/components/parent/ParentData";
+import { usePalette } from "@/components/ThemeProvider";
 import type { AnnouncementV2 } from "@/lib/parent-v2-data";
 
 /** Section heading — the portal's uppercase tracked label. */
@@ -27,6 +28,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function ParentHome() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const locale = useLocale();
   const router = useRouter();
@@ -93,7 +95,7 @@ export default function ParentHome() {
                 key={a.id}
                 onPress={() => open(a)}
                 accessibilityRole="button"
-                style={{ backgroundColor: ss.bg }}
+                style={{ backgroundColor: pp[ss.bg] }}
                 className="w-[300px] gap-1.5 rounded-card p-4"
               >
                 <View className="flex-row items-center justify-between gap-2">
@@ -112,7 +114,7 @@ export default function ParentHome() {
                   {a.msg}
                 </Text>
                 <View className="flex-row items-center justify-between gap-2">
-                  <Text style={{ color: ss.c }} className="font-pp-semibold text-[11px]">
+                  <Text style={{ color: pp[ss.c] }} className="font-pp-semibold text-[11px]">
                     {a.senderName}
                   </Text>
                   <Text className="font-pp text-[10.5px] text-pp-muted">{a.time}</Text>

@@ -9,23 +9,25 @@ import {
 } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
 import { BackHeader } from "@/components/parent/BackHeader";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
+import type { PPKey } from "@/lib/theme";
 
 /* One face per notification type in the backend's catalogue. A type this map
    has never heard of gets the announcement look rather than a crash — the
    server's catalogue is allowed to grow first. */
-const TYPE_STYLE: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
-  check_in: { icon: Check, color: PP.green, bg: PP.greenSoft },
-  credit_deducted: { icon: DoorOpen, color: PP.blue, bg: PP.soft },
-  low_credit: { icon: AlertTriangle, color: PP.amber, bg: PP.amberSoft },
-  credit_expiry: { icon: Clock3, color: PP.amber, bg: PP.amberSoft },
-  payment_received: { icon: Receipt, color: PP.green, bg: PP.greenSoft },
-  announcement: { icon: Megaphone, color: PP.blue, bg: PP.soft },
-  class_cancelled: { icon: CalendarX2, color: PP.danger, bg: PP.redSoft },
+const TYPE_STYLE: Record<string, { icon: LucideIcon; color: PPKey; bg: PPKey }> = {
+  check_in: { icon: Check, color: "green", bg: "greenSoft" },
+  credit_deducted: { icon: DoorOpen, color: "blue", bg: "soft" },
+  low_credit: { icon: AlertTriangle, color: "amber", bg: "amberSoft" },
+  credit_expiry: { icon: Clock3, color: "amber", bg: "amberSoft" },
+  payment_received: { icon: Receipt, color: "green", bg: "greenSoft" },
+  announcement: { icon: Megaphone, color: "blue", bg: "soft" },
+  class_cancelled: { icon: CalendarX2, color: "danger", bg: "redSoft" },
 };
 const FALLBACK_STYLE = TYPE_STYLE.announcement;
 
 export default function ParentNotifications() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const locale = useLocale();
   const router = useRouter();
@@ -103,16 +105,16 @@ export default function ParentNotifications() {
                 router.push(n.href as never);
               }}
               style={{
-                backgroundColor: isUnread ? PP.mist : PP.card,
-                borderColor: isUnread ? PP.soft : PP.line,
+                backgroundColor: isUnread ? pp.mist : pp.card,
+                borderColor: isUnread ? pp.soft : pp.line,
               }}
               className="flex-row items-start gap-3 rounded-card border-[1.5px] p-4"
             >
               <View
-                style={{ backgroundColor: ks.bg }}
+                style={{ backgroundColor: pp[ks.bg] }}
                 className="size-10 items-center justify-center rounded-[13px]"
               >
-                <Icon size={18} color={ks.color} strokeWidth={2.2} />
+                <Icon size={18} color={pp[ks.color]} strokeWidth={2.2} />
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <View className="flex-row items-center gap-1.5">

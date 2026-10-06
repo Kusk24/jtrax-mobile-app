@@ -11,7 +11,7 @@ import { useTranslations } from "use-intl";
 import { Bell, ClipboardCheck, Home, Settings, UserRound, type LucideIcon } from "lucide-react-native";
 import { isActive, type TabPath } from "@/lib/portal-tabs";
 import { useParentData } from "./ParentData";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 type Tab = TabPath & { labelKey: string; icon: LucideIcon };
 
@@ -34,6 +34,7 @@ const tabs: Tab[] = [
 ];
 
 export function ParentBottomNav2() {
+  const { pp } = usePalette();
   const pathname = usePathname();
   const t = useTranslations("pv2");
   return (
@@ -50,7 +51,7 @@ export function ParentBottomNav2() {
                 active ? "bg-pp-soft" : ""
               }`}
             >
-              <Icon size={22} color={active ? PP.blue : PP.faint} strokeWidth={1.8} />
+              <Icon size={22} color={active ? pp.blue : pp.faint} strokeWidth={1.8} />
               <Text
                 numberOfLines={1}
                 className={`text-[10px] font-pp-bold ${active ? "text-pp-blue" : "text-pp-faint"}`}
@@ -68,6 +69,7 @@ export function ParentBottomNav2() {
 /** The signed-in parent, top right — where the console and the portal both
     put the account. The bell carries the unread dot. */
 export function ParentAccountChip() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { parent, parentId, unreadNotifs } = useParentData();
   const initial = (parent.name.trim()[0] ?? "?").toUpperCase();
@@ -83,7 +85,7 @@ export function ParentAccountChip() {
             accessibilityLabel={t("notificationsTitle")}
             className="size-[38px] items-center justify-center rounded-full border-[1.5px] border-pp-line bg-pp-card"
           >
-            <Bell size={18} color={PP.ink} strokeWidth={1.8} />
+            <Bell size={18} color={pp.ink} strokeWidth={1.8} />
             {unreadNotifs > 0 && (
               <View className="absolute right-2 top-2 size-[9px] rounded-full border-2 border-pp-card bg-pp-red" />
             )}

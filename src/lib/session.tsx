@@ -22,6 +22,10 @@ type SessionState = {
   retry: () => void;
   signIn: (email: string, password: string) => Promise<string>;
   signOut: () => Promise<void>;
+  /** Changes the signed-in identity here, after a change saved to the
+      account (Appearance, a display name) — so the screen follows at once
+      rather than on the next launch. */
+  updateUser: (patch: Partial<Identity>) => void;
 };
 
 const SessionContext = createContext<SessionState>({
@@ -31,6 +35,7 @@ const SessionContext = createContext<SessionState>({
   retry: () => {},
   signIn: async () => "",
   signOut: async () => {},
+  updateUser: () => {},
 });
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -112,9 +117,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setOffline(false);
   }, []);
 
+  const updateUser = useCallback((patch: Partial<Identity>) => {
+    setUser((current) => (current ? { ...current, ...patch } : current));
+  }, []);
+
   const value = useMemo(
-    () => ({ user, loading, offline, retry, signIn, signOut }),
-    [user, loading, offline, retry, signIn, signOut],
+    () => ({ user, loading, offline, retry, signIn, signOut, updateUser }),
+    [user, loading, offline, retry, signIn, signOut, updateUser],
   );
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }

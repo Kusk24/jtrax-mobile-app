@@ -7,16 +7,20 @@ import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { Clock3, Paperclip, UserRound, X } from "lucide-react-native";
 import type { AnnouncementV2, SenderKind } from "@/lib/parent-v2-data";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
+import type { PPKey } from "@/lib/theme";
 
-export const SENDER_STYLE: Record<SenderKind, { labelKey: string; c: string; bg: string }> = {
-  teacher: { labelKey: "senderTeacher", c: PP.blue, bg: PP.soft },
-  branch: { labelKey: "senderBranch", c: PP.green, bg: PP.greenSoft },
-  admin: { labelKey: "senderAdmin", c: PP.deep, bg: "#efeefa" },
+/* Palette keys rather than hexes: the colour is looked up in the current
+   scheme when drawn. */
+export const SENDER_STYLE: Record<SenderKind, { labelKey: string; c: PPKey; bg: PPKey }> = {
+  teacher: { labelKey: "senderTeacher", c: "blue", bg: "soft" },
+  branch: { labelKey: "senderBranch", c: "green", bg: "greenSoft" },
+  admin: { labelKey: "senderAdmin", c: "deep", bg: "plumSoft" },
 };
 
 export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: () => void }) {
   const t = useTranslations("pv2");
+  const { pp } = usePalette();
   const ss = SENDER_STYLE[a.sender];
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
@@ -40,7 +44,7 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
                 accessibilityLabel={t("cancel")}
                 className="size-[30px] items-center justify-center rounded-[10px] border-[1.5px] border-pp-line bg-pp-card"
               >
-                <X size={14} color={PP.ink} />
+                <X size={14} color={pp.ink} />
               </Pressable>
             </View>
 
@@ -48,10 +52,10 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
 
             <View className="flex-row items-center gap-2 border-t border-pp-line pt-2">
               <View
-                style={{ backgroundColor: ss.bg }}
+                style={{ backgroundColor: pp[ss.bg] }}
                 className="size-8 items-center justify-center rounded-full"
               >
-                <UserRound size={15} color={ss.c} strokeWidth={2} />
+                <UserRound size={15} color={pp[ss.c]} strokeWidth={2} />
               </View>
               <View className="min-w-0 flex-1">
                 <Text className="font-pp-bold text-[13px] text-pp-ink">{a.senderName}</Text>
@@ -64,7 +68,7 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
 
             {a.child && (
               <View className="flex-row items-center gap-1.5">
-                <UserRound size={13} color={PP.muted} strokeWidth={2} />
+                <UserRound size={13} color={pp.muted} strokeWidth={2} />
                 <Text className="font-pp text-xs text-pp-muted">
                   {t("forChild", { name: a.child })}
                 </Text>
@@ -73,12 +77,12 @@ export function AnnouncementModal({ a, onClose }: { a: AnnouncementV2; onClose: 
 
             <View className="flex-row items-center justify-between gap-2">
               <View className="flex-row items-center gap-1.5">
-                <Clock3 size={12} color={PP.faint} strokeWidth={2} />
+                <Clock3 size={12} color={pp.faint} strokeWidth={2} />
                 <Text className="font-pp text-[11px] text-pp-faint">{a.time}</Text>
               </View>
               {a.attachment && (
                 <View className="flex-row items-center gap-1.5">
-                  <Paperclip size={12} color={PP.blue} strokeWidth={2} />
+                  <Paperclip size={12} color={pp.blue} strokeWidth={2} />
                   <Text className="font-pp text-[11px] text-pp-blue">{t("oneAttachment")}</Text>
                 </View>
               )}

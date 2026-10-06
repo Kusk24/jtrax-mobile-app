@@ -22,7 +22,7 @@ import {
 import { useParentData } from "@/components/parent/ParentData";
 import { TournamentBanner } from "@/components/parent/TournamentBanner";
 import { BackHeader } from "@/components/parent/BackHeader";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 /* "done" is a fee that has been settled; "held" is a place taken with the fee
    still owed — the screen used to show the first for both, and for the card
@@ -40,9 +40,10 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 function Radio({ selected }: { selected: boolean }) {
+  const { pp } = usePalette();
   return (
     <View
-      style={{ borderColor: selected ? PP.blue : PP.line }}
+      style={{ borderColor: selected ? pp.blue : pp.line }}
       className="size-5 items-center justify-center rounded-full border-[1.5px]"
     >
       {selected && <View className="size-[11px] rounded-full bg-pp-blue" />}
@@ -73,6 +74,7 @@ function Cta({ label, onPress, disabled }: { label: string; onPress: () => void;
 }
 
 export default function TournamentFlow() {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const router = useRouter();
   const {
@@ -135,8 +137,8 @@ export default function TournamentFlow() {
           }`}
         >
           {settled
-            ? <Check size={30} color={PP.green} strokeWidth={2} />
-            : <CalendarClock size={30} color={PP.amber} strokeWidth={2} />}
+            ? <Check size={30} color={pp.green} strokeWidth={2} />
+            : <CalendarClock size={30} color={pp.amber} strokeWidth={2} />}
         </View>
         <Text className="text-center font-pp-display-semibold text-[22px] text-pp-ink">
           {settled ? t("regConfirmed") : t("placeHeld")}
@@ -179,7 +181,7 @@ export default function TournamentFlow() {
                 onPress={() => setChild(c.key)}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: child === c.key }}
-                style={{ borderColor: child === c.key ? PP.blue : PP.line }}
+                style={{ borderColor: child === c.key ? pp.blue : pp.line }}
                 className="flex-row items-center gap-3 rounded-card border-[1.5px] bg-pp-card p-4"
               >
                 <Radio selected={child === c.key} />
@@ -200,7 +202,7 @@ export default function TournamentFlow() {
             value={notes.medical}
             onChangeText={(v) => setNotes({ ...notes, medical: v })}
             placeholder={t("none")}
-            placeholderTextColor={PP.faint}
+            placeholderTextColor={pp.faint}
             accessibilityLabel={t("medicalNotes")}
             multiline
             numberOfLines={3}
@@ -218,7 +220,7 @@ export default function TournamentFlow() {
             value={notes.remarks}
             onChangeText={(v) => setNotes({ ...notes, remarks: v })}
             placeholder={t("remarksPh")}
-            placeholderTextColor={PP.faint}
+            placeholderTextColor={pp.faint}
             accessibilityLabel={t("remarks")}
             multiline
             numberOfLines={3}
@@ -234,7 +236,7 @@ export default function TournamentFlow() {
             value={contact.name}
             onChangeText={(v) => setContact({ ...contact, name: v })}
             placeholder={t("fullName")}
-            placeholderTextColor={PP.faint}
+            placeholderTextColor={pp.faint}
             accessibilityLabel={t("fullName")}
             className={input}
           />
@@ -242,7 +244,7 @@ export default function TournamentFlow() {
             value={contact.phone}
             onChangeText={(v) => setContact({ ...contact, phone: v })}
             placeholder={t("phoneNumber")}
-            placeholderTextColor={PP.faint}
+            placeholderTextColor={pp.faint}
             accessibilityLabel={t("phoneNumber")}
             keyboardType="phone-pad"
             className={input}
@@ -251,7 +253,7 @@ export default function TournamentFlow() {
             value={contact.email}
             onChangeText={(v) => setContact({ ...contact, email: v })}
             placeholder={t("emailAddress")}
-            placeholderTextColor={PP.faint}
+            placeholderTextColor={pp.faint}
             accessibilityLabel={t("emailAddress")}
             keyboardType="email-address"
             autoCapitalize="none"
@@ -309,7 +311,7 @@ export default function TournamentFlow() {
                 onPress={() => setPay(k)}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: pay === k }}
-                style={{ borderColor: pay === k ? PP.blue : PP.line }}
+                style={{ borderColor: pay === k ? pp.blue : pp.line }}
                 className="flex-row items-center gap-3 rounded-card border-[1.5px] bg-pp-card px-4 py-3.5"
               >
                 <Radio selected={pay === k} />
@@ -405,18 +407,18 @@ export default function TournamentFlow() {
 
       <View className={`${CARD} gap-3`}>
         <View className="flex-row items-center gap-2.5">
-          <MapPin size={16} color={PP.blue} strokeWidth={1.8} />
+          <MapPin size={16} color={pp.blue} strokeWidth={1.8} />
           <Text className="flex-1 font-pp text-[13px] text-pp-ink">{tournament.venue}</Text>
         </View>
         <View className="flex-row items-center gap-2.5">
-          <CalendarDays size={16} color={PP.blue} strokeWidth={1.8} />
+          <CalendarDays size={16} color={pp.blue} strokeWidth={1.8} />
           <Text className="flex-1 font-pp text-[13px] text-pp-ink">{tournament.date}</Text>
         </View>
         {/* A time-of-day row sat here showing "9:00 AM – 5:00 PM" for every
             event; the backend records no such times. */}
         <View className="flex-row items-center justify-between gap-2.5 border-t border-pp-line pt-3">
           <View className="flex-row items-center gap-2">
-            <CalendarClock size={15} color={PP.amber} strokeWidth={1.8} />
+            <CalendarClock size={15} color={pp.amber} strokeWidth={1.8} />
             <Text className="font-pp-bold text-[12.5px] text-pp-amber">{t("regCloses")}</Text>
           </View>
           <Text className="font-pp-bold text-[12.5px] text-pp-amber">
@@ -437,7 +439,7 @@ export default function TournamentFlow() {
             ] as const
           ).map(([Icon, text, strong], i) => (
             <View key={i} className="w-1/2 gap-1 pb-3.5 pr-3.5">
-              <Icon size={18} color={PP.blue} strokeWidth={1.8} />
+              <Icon size={18} color={pp.blue} strokeWidth={1.8} />
               <Text className="font-pp text-[12.5px] text-pp-ink">{text}</Text>
               {!!strong && (
                 <Text className="font-pp-bold text-[12.5px] text-pp-ink">{strong}</Text>
@@ -479,7 +481,7 @@ export default function TournamentFlow() {
                     }`}
                   >
                     <Text
-                      style={{ color: e.paid ? PP.green : PP.amber }}
+                      style={{ color: e.paid ? pp.green : pp.amber }}
                       className="font-pp-bold text-[11px]"
                     >
                       {e.paid ? t("feePaid") : t("feeUnpaid")}

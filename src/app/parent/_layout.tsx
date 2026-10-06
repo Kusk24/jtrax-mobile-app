@@ -11,9 +11,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { RequireRole } from "@/components/RequireRole";
 import { ParentDataProvider } from "@/components/parent/ParentData";
 import { ParentAccountChip, ParentBottomNav2 } from "@/components/parent/ParentNav2";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 export default function ParentLayout() {
+  const { pp } = usePalette();
   return (
     <RequireRole role="Parent">
       <SafeAreaView className="flex-1 bg-pp-bg" edges={["top"]}>
@@ -23,7 +24,7 @@ export default function ParentLayout() {
             <Stack
               screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: PP.bg },
+                contentStyle: { backgroundColor: pp.bg },
               }}
             />
           </View>

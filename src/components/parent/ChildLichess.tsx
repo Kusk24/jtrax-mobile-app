@@ -11,9 +11,10 @@ import { useTranslations } from "use-intl";
 import { ExternalLink } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { PERF_ORDER, sortRatings, type LichessLink } from "@/lib/lichess";
-import { PP } from "@/lib/colors";
+import { usePalette } from "@/components/ThemeProvider";
 
 export function ChildLichess({ studentId }: { studentId: string }) {
+  const { pp } = usePalette();
   const t = useTranslations("pv2");
   const [link, setLink] = useState<LichessLink | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -57,7 +58,7 @@ export function ChildLichess({ studentId }: { studentId: string }) {
           <Text className="font-pp-semibold text-[12px] text-pp-ink underline">
             {link.username}
           </Text>
-          <ExternalLink size={12} color={PP.ink} />
+          <ExternalLink size={12} color={pp.ink} />
         </Pressable>
       </View>
 
