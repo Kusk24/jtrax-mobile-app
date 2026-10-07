@@ -7,9 +7,10 @@
  * name; and the conditions of entry, accepted. The family's contact details
  * come from their record on the server, so they are not asked for again.
  *
- * The card option opens Stripe Checkout in the system browser; the other two
- * methods are taken at the front desk, and say so rather than pretending money
- * moved.
+ * The card option opens Stripe Checkout in the system browser; PromptPay and
+ * bank transfer are taken at the front desk, and Pay later holds the place for
+ * the fee to be paid by card here or at the desk — each says so rather than
+ * pretending money moved.
  */
 import { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -28,6 +29,7 @@ import { API_BASE, api, getAuthToken } from "@/lib/api";
 import { Directory, File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { ageFromDOB, categoryAllows, type PublicCategory } from "@/lib/registration";
+import { heldBodyKey, payCtaKey, type PayChoice } from "@/lib/pay-choice";
 
 /* "done" is a fee that has been settled; "held" is a place taken with the fee
    still owed — the screen used to show the first for both, and for the card
@@ -131,7 +133,7 @@ export default function TournamentFlow() {
   const [payFailed, setPayFailed] = useState(false);
   const [step, setStep] = useState<Step>("detail");
   const [child, setChild] = useState(childList[0]?.key ?? "");
-  const [pay, setPay] = useState<"card" | "promptpay" | "bank">("card");
+  const [pay, setPay] = useState<PayChoice>("card");
   /* What the public form asks too. The family's contact details are on
      file, so they are not asked for again. */
   const [nickname, setNickname] = useState("");
@@ -221,7 +223,7 @@ export default function TournamentFlow() {
         <Text className="text-center font-pp text-[13.5px] leading-relaxed text-pp-sub">
           {settled
             ? t("regConfirmedBody", { name: participant.name, event: tournament.name })
-            : t("placeHeldBody", {
+            : t(heldBodyKey(pay), {
               name: participant.name,
               event: tournament.name,
               fee: tournament.fee,
@@ -424,6 +426,7 @@ export default function TournamentFlow() {
                 ["card", t("creditCard")],
                 ["promptpay", t("promptpay")],
                 ["bank", t("bankTransfer")],
+                ["later", t("payLater")],
               ] as const
             ).map(([k, lbl]) => (
               <Pressable
@@ -435,7 +438,10 @@ export default function TournamentFlow() {
                 className="flex-row items-center gap-3 rounded-card border-[1.5px] bg-pp-card px-4 py-3.5"
               >
                 <Radio selected={pay === k} />
-                <Text className="font-pp-bold text-[13.5px] text-pp-ink">{lbl}</Text>
+                <View className="flex-1">
+                  <Text className="font-pp-bold text-[13.5px] text-pp-ink">{lbl}</Text>
+                  {k === "later" && <Text className="font-pp text-[12px] text-pp-muted">{t("payLaterHint")}</Text>}
+                </View>
               </Pressable>
             ))}
           </View>
@@ -459,7 +465,7 @@ export default function TournamentFlow() {
         )}
 
         <Cta
-          label={submitting && pay === "card" ? t("openingPayment") : t("payNow")}
+          label={t(payCtaKey(pay, submitting))}
           disabled={submitting}
           onPress={async () => {
             setSubmitting(true);
@@ -482,10 +488,10 @@ export default function TournamentFlow() {
               return;
             }
             /* The place exists from here on, whatever happens to the money.
-               PromptPay and bank transfer are taken at the front desk, so
-               choosing either means exactly that and nothing is charged — which
-               is what the screen now says instead of claiming a payment went
-               through. */
+               PromptPay and bank transfer are taken at the front desk, and Pay
+               later leaves the fee for later, so choosing any of them means
+               exactly that and nothing is charged — which is what the screen
+               now says instead of claiming a payment went through. */
             if (pay !== "card") {
               setStep("held");
               setSubmitting(false);
