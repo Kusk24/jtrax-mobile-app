@@ -30,8 +30,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# local env files — .env holds the deployed API's domain, which stays out of
+# this public repo; only the example is tracked
+.env*
+!.env.example
 
 # typescript
 *.tsbuildinfo
