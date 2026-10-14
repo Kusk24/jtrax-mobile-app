@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import { useTranslations } from "use-intl";
 import { LogOut } from "lucide-react-native";
 import { useParentData } from "@/components/parent/ParentData";
+import { NotifChannelSwitches } from "@/components/parent/NotifChannelSwitches";
 import { useSession } from "@/lib/session";
 import { useLocaleSwitch } from "@/i18n";
 import { usePalette } from "@/components/ThemeProvider";
@@ -78,12 +79,8 @@ export default function ParentSettings() {
             <Text className="px-4 py-3.5 font-pp text-[13px] text-pp-muted">{t("notifNoneFromSchool")}</Text>
           )}
           {prefDefs.map((p, i) => (
-            <View
-              key={p.k}
-              className={`flex-row items-center justify-between gap-3 px-4 py-3.5 ${
-                i < prefDefs.length - 1 ? "border-b border-pp-panel" : ""
-              }`}
-            >
+            <View key={p.k} className={i < prefDefs.length - 1 ? "border-b border-pp-panel" : ""}>
+            <View className="flex-row items-center justify-between gap-3 px-4 py-3.5">
               <Text className="min-w-0 flex-1 font-pp-bold text-sm text-pp-ink">{p.label}</Text>
               <Pressable
                 onPress={() => {
@@ -101,6 +98,12 @@ export default function ParentSettings() {
                   className="absolute size-[22px] rounded-full bg-pp-card"
                 />
               </Pressable>
+            </View>
+            {/* Email, phone, browser: only while the type itself is on,
+                since a type switched off arrives nowhere. */}
+            {prefs[p.k] && (
+              <NotifChannelSwitches type={p.k} typeLabel={p.label} onError={() => setPrefError(true)} />
+            )}
             </View>
           ))}
           {prefError && (
