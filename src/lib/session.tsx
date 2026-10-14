@@ -99,6 +99,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       if (e instanceof ApiError && e.status === 0) return "offline";
       if (e instanceof ApiError && e.status === 401) return "badCredentials";
+      // The right password for an account the academy has archived.
+      if (e instanceof ApiError && e.status === 403) return "archived";
       if (e instanceof ApiError && e.status === 429) return "tooMany";
       return "failed";
     }

@@ -431,6 +431,7 @@
       "badCredentials": "That doesn't match an account. Students sign in with the ID on their card, not an email address.",
       "needEmail": "Enter your email or student ID first. A student's reset link goes to their parent's email.",
       "tooMany": "Too many attempts. Try again in a minute.",
+      "archived": "This account is archived. Please contact the academy.",
       "offline": "Can't reach the server. Check your connection.",
       "failed": "Something went wrong. Try again."
     }
