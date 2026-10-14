@@ -12,7 +12,7 @@
  * the fee to be paid by card here or at the desk — each says so rather than
  * pretending money moved.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
@@ -30,6 +30,8 @@ import { Directory, File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { ageFromDOB, categoryAllows, type PublicCategory } from "@/lib/registration";
 import { heldBodyKey, payCtaKey, type PayChoice } from "@/lib/pay-choice";
+import { stepBefore } from "@/lib/url-state";
+import { useHardwareBack, useMemoryDraft, useParam } from "@/lib/use-url-state";
 
 /* "done" is a fee that has been settled; "held" is a place taken with the fee
    still owed — the screen used to show the first for both, and for the card
@@ -40,7 +42,20 @@ import { heldBodyKey, payCtaKey, type PayChoice } from "@/lib/pay-choice";
    NativeWind cannot restyle a view that way after its first render: it
    remounts it, and in development its warning about doing so crashed the
    payment stage outright. */
-type Step = "detail" | "register" | "payment" | "done" | "held";
+const STEPS = ["detail", "register", "payment", "done", "held"] as const;
+type Step = (typeof STEPS)[number];
+/* The order Back walks: from a result there is nothing to go back to. */
+const FLOW: readonly Step[] = ["detail", "register", "payment"];
+
+/* What the parent has typed and chosen, kept in memory so leaving the screen
+   and coming back — or Back from payment — finds it filled in. */
+type Draft = {
+  child: string; pay: PayChoice; nickname: string; nameTh: string; acceptTerms: boolean;
+  categoryId: string; idRead: IdCardRead | null;
+};
+const EMPTY_DRAFT: Draft = {
+  child: "", pay: "card", nickname: "", nameTh: "", acceptTerms: false, categoryId: "", idRead: null,
+};
 
 const CARD = "rounded-card bg-pp-card p-4 shadow-clay";
 
@@ -131,21 +146,40 @@ export default function TournamentFlow() {
      parent: one says the child has no place, the other says the child has a
      place and the fee is still owed. */
   const [payFailed, setPayFailed] = useState(false);
-  const [step, setStep] = useState<Step>("detail");
-  const [child, setChild] = useState(childList[0]?.key ?? "");
-  const [pay, setPay] = useState<PayChoice>("card");
-  /* What the public form asks too. The family's contact details are on
-     file, so they are not asked for again. */
-  const [nickname, setNickname] = useState("");
-  const [nameTh, setNameTh] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(false);
-
-  /* The ID card step: what the card said, for the child it was read for,
-     and the category that birth year allows. */
-  const [idRead, setIdRead] = useState<IdCardRead | null>(null);
-  const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState<PublicCategory[]>([]);
+  /* The step is a route param, so the web build's refresh and a deep link
+     keep it, and Android's Back walks back through the steps. */
+  const [step, setStep] = useParam("step", STEPS, "detail");
   const tournamentId = tournament?.id ?? "";
+  /* What the public form asks too — the family's contact details are on
+     file, so they are not asked for again — and the ID card step: what the
+     card said, for the child it was read for, and the category that birth
+     year allows. */
+  const [draft, setDraft] = useMemoryDraft(`tournament-entry:${tournamentId}`, EMPTY_DRAFT);
+  const { child, pay, nickname, nameTh, acceptTerms, idRead, categoryId } = draft;
+  const field = <K extends keyof Draft>(key: K) => (value: Draft[K]) =>
+    setDraft((d) => ({ ...d, [key]: value }));
+  const setChild = field("child");
+  const setPay = field("pay");
+  const setNickname = field("nickname");
+  const setNameTh = field("nameTh");
+  const setAcceptTerms = field("acceptTerms");
+  const setIdRead = field("idRead");
+  const setCategoryId = field("categoryId");
+  const [categories, setCategories] = useState<PublicCategory[]>([]);
+  /* The entry exists from here: the form is emptied for the next child,
+     keeping only who and how, which the result names. */
+  const finish = (result: "done" | "held") => {
+    setDraft((d) => ({ ...EMPTY_DRAFT, child: d.child, pay: d.pay }));
+    setStep(result);
+  };
+  useHardwareBack(
+    useCallback(() => {
+      const previous = stepBefore(step, FLOW);
+      if (!previous) return false;
+      setStep(previous);
+      return true;
+    }, [step, setStep]),
+  );
   useEffect(() => {
     if (!tournamentId) return;
     let live = true;
@@ -186,6 +220,13 @@ export default function TournamentFlow() {
      used to hit. They get the fee button instead. */
   const entered = new Set(tournamentEntries.map((e) => e.studentId));
   const available = childList.filter((c) => !entered.has(c.key));
+  /* The route can name a step this family cannot be on — the web build
+     reloaded after the draft was lost, a deep link — so the screen shows the
+     furthest step that still makes sense rather than a broken one. */
+  const shown: Step =
+    step === "payment" && missing !== "" ? "register"
+      : step === "register" && available.length === 0 ? "detail"
+        : step;
   const input =
     "rounded-[13px] border-[1.5px] border-pp-line bg-pp-card px-3.5 py-3 font-pp text-[13px] text-pp-ink";
 
@@ -204,8 +245,8 @@ export default function TournamentFlow() {
     );
   }
 
-  if (step === "done" || step === "held") {
-    const settled = step === "done";
+  if (shown === "done" || shown === "held") {
+    const settled = shown === "done";
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-pp-bg px-5">
         <View
@@ -240,7 +281,7 @@ export default function TournamentFlow() {
     );
   }
 
-  if (step === "register") {
+  if (shown === "register") {
     return (
       <ScrollView
         key="register"
@@ -350,7 +391,7 @@ export default function TournamentFlow() {
               </Text>
             ))}
             <Pressable
-              onPress={() => setAcceptTerms((v) => !v)}
+              onPress={() => setAcceptTerms(!acceptTerms)}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: acceptTerms }}
               className="flex-row items-start gap-2.5 border-t border-pp-line pt-3"
@@ -376,7 +417,7 @@ export default function TournamentFlow() {
     );
   }
 
-  if (step === "payment") {
+  if (shown === "payment") {
     return (
       <ScrollView
         key="payment"
@@ -493,14 +534,14 @@ export default function TournamentFlow() {
                exactly that and nothing is charged — which is what the screen
                now says instead of claiming a payment went through. */
             if (pay !== "card") {
-              setStep("held");
+              finish("held");
               setSubmitting(false);
               return;
             }
             try {
               const url = await payCardFee(registrationId);
               if (!url) {
-                setStep("held");
+                finish("held");
                 return;
               }
               await openCheckout(url);
@@ -509,7 +550,7 @@ export default function TournamentFlow() {
                  the charge went through. So the honest screen is the one that
                  says a place is held — a settled fee shows as paid on the event
                  screen the next time the portal loads. */
-              setStep("held");
+              finish("held");
             } catch {
               setPayFailed(true);
             } finally {
@@ -679,7 +720,7 @@ export default function TournamentFlow() {
         <Cta
           label={tournamentEntries.length > 0 ? t("registerAnother") : t("registerMyChild")}
           onPress={() => {
-            setChild(available[0].key);
+            if (!available.some((c) => c.key === child)) setChild(available[0].key);
             setStep("register");
           }}
         />
