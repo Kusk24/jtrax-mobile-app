@@ -887,6 +887,10 @@
     "tierIntermediateSub": "Medium • 800–1199",
     "tierAdvancedSub": "Hard • 1200+",
     "todaysChallenge": "Daily Challenge",
+    "earnStars": "Let's play",
+    "earnedStars": "You earned {n} stars!",
+    "puzzlesCompleted": "<b>{n}</b>/<b>{total}</b> puzzles completed",
+    "starsEarned": "{n} of {total} stars earned",
     "challengeCompleted": "{n} / {total} completed",
     "playAgain": "Play again",
     "theme": {

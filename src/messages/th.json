@@ -887,6 +887,10 @@
     "tierIntermediateSub": "ปานกลาง • 800–1199",
     "tierAdvancedSub": "ยาก • 1200 ขึ้นไป",
     "todaysChallenge": "โจทย์ประจำวัน",
+    "earnStars": "มาเล่นกันเลย",
+    "earnedStars": "ได้ครบ {n} ดาวแล้ว!",
+    "puzzlesCompleted": "ทำแล้ว <b>{n}</b>/<b>{total}</b> ข้อ",
+    "starsEarned": "ได้ {n} จาก {total} ดาว",
     "challengeCompleted": "ทำแล้ว {n} / {total}",
     "playAgain": "เล่นอีกครั้ง",
     "theme": {
