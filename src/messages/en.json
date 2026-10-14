@@ -449,6 +449,7 @@
     "viewAll": "View All",
     "new": "New",
     "upcomingTournament": "Upcoming Tournament",
+    "slideOf": "{n} of {total}",
     "registerCloses": "Register closes",
     "days": "days",
     "registerNow": "Register Now",

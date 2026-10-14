@@ -449,6 +449,7 @@
     "viewAll": "ดูทั้งหมด",
     "new": "ใหม่",
     "upcomingTournament": "ทัวร์นาเมนต์ที่กำลังจะมาถึง",
+    "slideOf": "{n} จาก {total}",
     "registerCloses": "ปิดรับสมัครใน",
     "days": "วัน",
     "registerNow": "สมัครเลย",
