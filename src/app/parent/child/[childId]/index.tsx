@@ -23,6 +23,7 @@ import { ChildLichess } from "@/components/parent/ChildLichess";
 import { BackHeader } from "@/components/parent/BackHeader";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
+import { ChildCertificates } from "@/components/parent/ChildCertificates";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const GOAL = 30;
@@ -236,6 +237,10 @@ export default function ChildProfile() {
           </Text>
         )}
       </View>
+
+      {/* Below the enrolled classes: hours toward each course's certificate,
+          read-only. Hidden for a child in no certificate course. */}
+      <ChildCertificates studentId={ch.id} childKey={ch.key} refreshKey={ch.hoursAttended} />
 
       {/* Attendance history preview */}
       <View className="gap-3">
