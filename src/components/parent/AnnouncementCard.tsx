@@ -1,5 +1,5 @@
-/* One announcement as a notice — the web's AnnouncementCard: white, a single
-   blue edge, a megaphone and the word "Announcement" beside the date, the
+/* One announcement as a notice — the web's AnnouncementCard: white, a thin
+   blue outline, a megaphone and the word "Announcement" beside the date, the
    title, two lines of the message, and who it is from. The same card on the
    home and on the Announcements page — no colour per sender, so it reads as
    the academy speaking rather than a chat bubble. */
@@ -33,7 +33,7 @@ export function AnnouncementCard({
       onPress={onOpen}
       accessibilityRole="button"
       style={style}
-      className={`gap-2 rounded-xl border border-l-[3px] border-pp-line border-l-pp-blue bg-pp-card px-4 py-3.5 active:bg-pp-mist ${className}`}
+      className={`gap-2 rounded-xl border border-pp-blue/30 bg-pp-card px-4 py-3.5 active:bg-pp-mist ${className}`}
     >
       <View className="flex-row items-center justify-between gap-2">
         <View className="flex-row items-center gap-1.5">
