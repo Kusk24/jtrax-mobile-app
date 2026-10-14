@@ -18,6 +18,7 @@ import { LiveTournamentCard, useLiveTournaments } from "@/components/parent/Live
 import { ParentBell } from "@/components/parent/ParentNav2";
 import { TapTip } from "@/components/parent/TapTip";
 import { TournamentHomeCard } from "@/components/parent/TournamentHomeCard";
+import { SwipeCards } from "@/components/parent/SwipeCards";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
 import { homeAnnouncements } from "@/lib/home-announcements";
@@ -125,11 +126,15 @@ export default function ParentHome() {
         {upcoming.length > 0 && (
           <>
             <View className="mt-2">
-              <SectionLabel>{t("upcomingTournament")}</SectionLabel>
+              <SectionLabel>{`${t("upcomingTournament")} (${upcoming.length})`}</SectionLabel>
             </View>
-            {upcoming.map((card) => (
-              <TournamentHomeCard key={card.id} card={card} />
-            ))}
+            {/* One at a time, soonest first, so several do not push the
+                children down the page. */}
+            <SwipeCards label={t("upcomingTournament")} width={cardWidth}>
+              {upcoming.map((card) => (
+                <TournamentHomeCard key={card.id} card={card} />
+              ))}
+            </SwipeCards>
           </>
         )}
       </View>

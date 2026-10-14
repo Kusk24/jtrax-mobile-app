@@ -8,7 +8,7 @@
 import { Link } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { BadgeCheck, ChevronRight, Mail, Pencil, Phone } from "lucide-react-native";
+import { BadgeCheck, ChevronRight, Mail, Phone } from "lucide-react-native";
 import { ChildFace } from "@/components/parent/ChildFace";
 import { PaymentHistory } from "@/components/parent/PaymentHistory";
 import { useParentData } from "@/components/parent/ParentData";
@@ -66,15 +66,6 @@ export default function ParentProfile() {
             </Text>
           </View>
         </View>
-        <Link href="/parent/settings" asChild>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t("navSettings")}
-            className="size-9 items-center justify-center rounded-card border border-pp-line"
-          >
-            <Pencil size={16} color={pp.muted} />
-          </Pressable>
-        </Link>
       </View>
 
       <View className="gap-3">

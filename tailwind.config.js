@@ -11,7 +11,7 @@ const PP_TOKENS = [
 const ST_TOKENS = [
   "hero", "orange", "orange-soft", "orange-line", "gold", "gold-soft",
   "brand", "brand-deep", "brand-ink", "brand-soft", "brand-line",
-  "hero-a", "hero-b", "hero-c", "hero-line", "ring",
+  "hero-a", "hero-b", "hero-c", "hero-line", "ring", "star-empty", "star-line",
   "indigo", "indigo-soft", "indigo-line", "amber", "amber-soft", "amber-line",
   "emerald", "emerald-soft", "emerald-line",
 ];

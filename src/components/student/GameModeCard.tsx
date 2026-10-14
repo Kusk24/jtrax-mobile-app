@@ -5,7 +5,7 @@
  * nothing moved to another screen. Home's tiles open a card on arrival with
  * `/student/play?open=<id>`.
  */
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import { usePalette } from "@/components/ThemeProvider";
@@ -17,13 +17,25 @@ const TONE = {
   room: { tile: "bg-pp-green-soft", arrow: "bg-pp-green-soft", ink: "green" },
 } as const;
 
+/* Cards in one group open one at a time: opening a card closes the others,
+   as on the web portal. */
+const Group = createContext<{ openId: string | null; setOpenId: (id: string | null) => void } | null>(null);
+
+export function GameModeGroup({ children }: { children: React.ReactNode }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  return <Group.Provider value={{ openId, setOpenId }}>{children}</Group.Provider>;
+}
+
 export function GameModeCard({
+  id,
   tone,
   art,
   title,
   open: openFromRoute = false,
   children,
 }: {
+  /** Names the card within its group. */
+  id: string;
   tone: keyof typeof TONE;
   art: React.ReactNode;
   title: string;
@@ -31,21 +43,27 @@ export function GameModeCard({
   open?: boolean;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(openFromRoute);
+  const group = useContext(Group);
+  const [ownOpen, setOwnOpen] = useState(openFromRoute);
+  const open = group ? group.openId === id : ownOpen;
+  const toggle = () => (group ? group.setOpenId(open ? null : id) : setOwnOpen(!open));
   const { pp, st } = usePalette();
   const c = TONE[tone];
   const arrowInk = c.ink === "orange" ? st.orange : pp[c.ink];
 
   /* The tab stays mounted, so a second arrival with a different card named
      has to open it here rather than on mount. */
+  const setGroupOpen = group?.setOpenId;
   useEffect(() => {
-    if (openFromRoute) setOpen(true);
-  }, [openFromRoute]);
+    if (!openFromRoute) return;
+    if (setGroupOpen) setGroupOpen(id);
+    else setOwnOpen(true);
+  }, [openFromRoute, setGroupOpen, id]);
 
   return (
     <View className="overflow-hidden rounded-xl border-[1.5px] border-pp-line bg-pp-card">
       <Pressable
-        onPress={() => setOpen((o) => !o)}
+        onPress={toggle}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         className="flex-row items-center gap-3 px-3 py-2.5 active:bg-pp-mist"

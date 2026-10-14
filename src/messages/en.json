@@ -17,6 +17,8 @@
     "play": "Play"
   },
   "common": {
+    "hoursText": "{hours} h",
+    "hoursMinutesText": "{hours} h {minutes} min",
     "hi": "Hi, {name}!",
     "viewAll": "View All",
     "edit": "Edit",
@@ -431,6 +433,7 @@
       "badCredentials": "That doesn't match an account. Students sign in with the ID on their card, not an email address.",
       "needEmail": "Enter your email or student ID first. A student's reset link goes to their parent's email.",
       "tooMany": "Too many attempts. Try again in a minute.",
+      "archived": "This account is archived. Please contact the academy.",
       "offline": "Can't reach the server. Check your connection.",
       "failed": "Something went wrong. Try again."
     }
@@ -448,6 +451,7 @@
     "viewAll": "View All",
     "new": "New",
     "upcomingTournament": "Upcoming Tournament",
+    "slideOf": "{n} of {total}",
     "registerCloses": "Register closes",
     "days": "days",
     "registerNow": "Register Now",
@@ -600,7 +604,6 @@
     "notifCreditsBody": "Credits expire on {date} — {days} days left.",
     "expired": "Expired",
     "classesAttended": "Classes attended",
-    "certNote": "A certificate is awarded after {count} hours of class.",
     "navSettings": "Settings",
     "settingsTitle": "Settings",
     "brandSub": "Chess School",
@@ -626,6 +629,19 @@
     "creditsBoughtTotal": "Credits bought",
     "creditsUsedTotal": "Credits used",
     "noActiveCourse": "Not enrolled in a course right now.",
+    "certificates": "Certificates",
+    "certCourse_starters": "JCA Starters",
+    "certCourse_juniors": "JCA Juniors",
+    "certCourse_nxt": "JCA NXT",
+    "certInProgress": "In Progress",
+    "certCertified": "Certified",
+    "certHoursOf": "{hours} / {required}",
+    "certView": "View certificate",
+    "certDownload": "Download PDF",
+    "certNotIssued": "This certificate has not been issued.",
+    "certHeading": "Certificate of Completion",
+    "certBody": "has completed {hours} of the {course} course and passed the assessment",
+    "certDate": "Date",
     "creditsDeducted": "{n, plural, =1 {−1 credit} other {−{count} credits}}",
     "noCreditDeducted": "No credit deducted",
     "accountSecurity": "Account & Security",
@@ -659,7 +675,8 @@
     "payStatus": {
       "Paid": "Paid",
       "Pending": "Pending",
-      "Cancelled": "Cancelled"
+      "Cancelled": "Cancelled",
+      "Voided": "Voided"
     },
     "payMethodName": {
       "Cash": "Cash",
@@ -732,6 +749,23 @@
     "idCardCamera": "Take a photo",
     "scanRead": "From the card: {name}, born {dob} (age {age}).",
     "scanFailed": "The card could not be read. Try a clearer photo.",
+    "scanWhy": {
+      "model_unavailable": "The card could not be read: the scan model isn't available. Please tell the academy.",
+      "key_rejected": "The card could not be read: the scan service refused the academy's key. Please tell the academy.",
+      "quota": "The card could not be read: the scan service's limit is used up. Try again later.",
+      "provider_error": "The card could not be read: the scan service had an error. Try again.",
+      "unreachable": "The card could not be read: the scan service could not be reached. Try again.",
+      "no_answer": "Nothing could be read from this photo. Try a clearer, straighter photo.",
+      "no_date_of_birth": "Could not read the date of birth. Try a clearer, straighter photo.",
+      "not_an_image": "That file isn't a photo. Upload a JPEG, PNG, WebP or HEIC photo of the card.",
+      "too_large": "The photo is too large to send. Try a smaller photo.",
+      "no_image": "The photo didn't arrive. Choose it again.",
+      "not_configured": "ID card reading isn't available right now. Please try again later.",
+      "busy": "Too many tries. Wait a minute and try again.",
+      "server": "The server could not read the card. Try again.",
+      "unsent": "The photo could not be sent. Check your connection and try again."
+    },
+    "scanErrorCode": "error: {code}",
     "category": "Category",
     "categoryNeedsDob": "Upload the ID card first",
     "categoryOpen": "Open to all ages",
@@ -853,6 +887,10 @@
     "tierIntermediateSub": "Medium • 800–1199",
     "tierAdvancedSub": "Hard • 1200+",
     "todaysChallenge": "Daily Challenge",
+    "earnStars": "Let's play",
+    "earnedStars": "You earned {n} stars!",
+    "puzzlesCompleted": "<b>{n}</b>/<b>{total}</b> puzzles completed",
+    "starsEarned": "{n} of {total} stars earned",
     "challengeCompleted": "{n} / {total} completed",
     "playAgain": "Play again",
     "theme": {

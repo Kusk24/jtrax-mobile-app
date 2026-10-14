@@ -12,8 +12,9 @@ import * as ImagePicker from "expo-image-picker";
 import { useTranslations } from "use-intl";
 import { Camera, Lock, Upload } from "lucide-react-native";
 import { usePalette } from "@/components/ThemeProvider";
-import { ApiError } from "@/lib/api";
 import { ageFromDOB, categoryAllows, scanChildIDCard, type PublicCategory } from "@/lib/registration";
+import { scanErrorText } from "@/lib/scan-error";
+import { shrinkPhoto } from "@/lib/shrink-photo";
 
 export type IdCardRead = {
   studentId: string;
@@ -82,7 +83,9 @@ export function TournamentIdCheck({
 
     setScanning(true);
     try {
-      const { fields, checkId } = await scanChildIDCard(tournamentId, studentId, asset);
+      // Shrunk first: a camera photo is too large for the server to take.
+      const photo = await shrinkPhoto(asset);
+      const { fields, checkId } = await scanChildIDCard(tournamentId, studentId, photo);
       onRead({
         studentId,
         checkId,
@@ -95,9 +98,9 @@ export function TournamentIdCheck({
     } catch (err) {
       onRead(null);
       onCategory("");
-      /* The server's own sentence when it gave one ("not available right
-         now", "too large"); a plain one when the phone lost signal. */
-      setFailed(err instanceof ApiError && err.status !== 0 ? err.message : t("scanFailed"));
+      /* Why, and the code it came with, so the parent can tell the academy
+         exactly what went wrong. */
+      setFailed(scanErrorText(err, t));
     } finally {
       setScanning(false);
     }

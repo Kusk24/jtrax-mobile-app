@@ -18,9 +18,13 @@ export const API_BASE =
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  /** The decoded error reply. A failed scan says more than its sentence: a
+      reason code and the scan service's status (lib/scan-error). */
+  body: unknown;
+  constructor(status: number, message: string, body?: unknown) {
     super(message);
     this.status = status;
+    this.body = body;
   }
 }
 
@@ -67,7 +71,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new ApiError(res.status, (data as { error?: string }).error ?? `request failed (${res.status})`);
+    throw new ApiError(res.status, (data as { error?: string }).error ?? `request failed (${res.status})`, data);
   }
   return data as T;
 }
@@ -89,7 +93,7 @@ function upload<T>(method: string, path: string, form: FormData): Promise<T> {
         /* not JSON: the status says what happened */
       }
       if (xhr.status >= 200 && xhr.status < 300) resolve(data as T);
-      else reject(new ApiError(xhr.status, (data as { error?: string }).error ?? `request failed (${xhr.status})`));
+      else reject(new ApiError(xhr.status, (data as { error?: string }).error ?? `request failed (${xhr.status})`, data));
     };
     xhr.onerror = () => reject(new ApiError(0, "offline"));
     xhr.send(form);

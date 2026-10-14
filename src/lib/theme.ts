@@ -106,6 +106,9 @@ export const ST_LIGHT = {
   heroC: "#dde9ff",
   heroLine: "#cfdffc",
   ring: "#c7dcfd",
+  /* A Daily Challenge star not yet earned: its fill and its outline. */
+  starEmpty: "#dbe6fd",
+  starLine: "#9db4f0",
   indigo: "#4f46e5",
   indigoSoft: "#f3f5ff",
   indigoLine: "#e0e7ff",
@@ -136,6 +139,8 @@ export const ST_DARK: Palette<STKey> = {
   heroC: "#1d2d4e",
   heroLine: "#2a3a5c",
   ring: "#2a3a5c",
+  starEmpty: "#7f9be6",
+  starLine: "#b4c6f7",
   indigo: "#a5b4fc",
   indigoSoft: "#1f2447",
   indigoLine: "#2e3566",
