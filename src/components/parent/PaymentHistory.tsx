@@ -34,6 +34,7 @@ function StatusChip({ status }: { status: PaymentRecord["status"] }) {
   const tone =
     status === "Paid" ? "bg-pp-green-soft text-pp-green"
     : status === "Cancelled" ? "bg-pp-danger-soft text-pp-danger"
+    : status === "Voided" ? "bg-pp-mist text-pp-muted"
     : "bg-pp-amber-soft text-pp-amber";
   const [bg, ink] = tone.split(" ");
   return (

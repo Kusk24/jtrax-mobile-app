@@ -660,7 +660,8 @@
     "payStatus": {
       "Paid": "Paid",
       "Pending": "Pending",
-      "Cancelled": "Cancelled"
+      "Cancelled": "Cancelled",
+      "Voided": "Voided"
     },
     "payMethodName": {
       "Cash": "Cash",
