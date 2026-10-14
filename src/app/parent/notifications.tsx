@@ -1,6 +1,5 @@
 /* The inbox the backend wrote for this account — not a list re-derived from
    attendance stamps, which could only ever imitate the sender. */
-import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useLocale, useTranslations } from "use-intl";
@@ -11,6 +10,7 @@ import { useParentData } from "@/components/parent/ParentData";
 import { BackHeader } from "@/components/parent/BackHeader";
 import { usePalette } from "@/components/ThemeProvider";
 import type { PPKey } from "@/lib/theme";
+import { useParam } from "@/lib/use-url-state";
 
 /* One face per notification type in the backend's catalogue. A type this map
    has never heard of gets the announcement look rather than a crash — the
@@ -26,13 +26,16 @@ const TYPE_STYLE: Record<string, { icon: LucideIcon; color: PPKey; bg: PPKey }> 
 };
 const FALLBACK_STYLE = TYPE_STYLE.announcement;
 
+const TABS = ["all", "unread"] as const;
+
 export default function ParentNotifications() {
   const { pp } = usePalette();
   const t = useTranslations("pv2");
   const locale = useLocale();
   const router = useRouter();
   const { notifs, unreadNotifs, isNotifRead, markNotifRead, markAllNotifsRead } = useParentData();
-  const [tab, setTab] = useState<"all" | "unread">("all");
+  /* A route param, so the web build's refresh keeps the tab. */
+  const [tab, setTab] = useParam("tab", TABS, "all");
 
   const shown = notifs.filter((n) => tab === "all" || !isNotifRead(n.id));
 
