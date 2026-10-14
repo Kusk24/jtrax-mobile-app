@@ -17,7 +17,7 @@ import { MyGames } from "@/components/game/MyGames";
 import { JoinForm } from "@/components/game/JoinForm";
 import { ChallengePanel } from "@/components/student/ChallengePanel";
 import { FriendPawns } from "@/components/student/FriendPawns";
-import { GameModeCard } from "@/components/student/GameModeCard";
+import { GameModeCard, GameModeGroup } from "@/components/student/GameModeCard";
 import { RecentGames } from "@/components/student/RecentGames";
 import { useSession } from "@/lib/session";
 import type { PPKey } from "@/lib/theme";
@@ -41,8 +41,10 @@ export default function GamesScreen() {
       {/* Draws nothing when there are none. */}
       {user?.userAccountId && <MyGames myAccountId={user.userAccountId} />}
 
+      {/* One open at a time. */}
+      <GameModeGroup>
       <View className="gap-2">
-        <GameModeCard tone="ai" title={t3("playVsAi")} art={<Bot size={24} color={pp.blue} strokeWidth={2} />} open={open === "computer"}>
+        <GameModeCard id="computer" tone="ai" title={t3("playVsAi")} art={<Bot size={24} color={pp.blue} strokeWidth={2} />} open={open === "computer"}>
           <View className="flex-row gap-2">
             {LEVELS.map(({ key, level, icon: Icon, tile, label, ink, border }) => (
               <Pressable
@@ -62,14 +64,15 @@ export default function GamesScreen() {
           </View>
         </GameModeCard>
 
-        <GameModeCard tone="friend" title={t3("playWithFriend")} art={<FriendPawns size={26} />} open={open === "challenge"}>
+        <GameModeCard id="challenge" tone="friend" title={t3("playWithFriend")} art={<FriendPawns size={26} />} open={open === "challenge"}>
           <ChallengePanel myStudentId={user?.studentId ?? ""} />
         </GameModeCard>
 
-        <GameModeCard tone="room" title={t3("joinRoom")} art={<DoorOpen size={24} color={pp.green} strokeWidth={2} />} open={open === "room"}>
+        <GameModeCard id="room" tone="room" title={t3("joinRoom")} art={<DoorOpen size={24} color={pp.green} strokeWidth={2} />} open={open === "room"}>
           <JoinForm />
         </GameModeCard>
       </View>
+      </GameModeGroup>
 
       {user?.studentId && <RecentGames studentId={user.studentId} />}
     </PlayShell>
