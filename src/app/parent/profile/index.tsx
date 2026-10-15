@@ -11,6 +11,7 @@ import { useTranslations } from "use-intl";
 import { BadgeCheck, ChevronRight, Mail, Phone } from "lucide-react-native";
 import { ChildFace } from "@/components/parent/ChildFace";
 import { PaymentHistory } from "@/components/parent/PaymentHistory";
+import { MyData } from "@/components/parent/MyData";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
 
@@ -124,6 +125,8 @@ export default function ParentProfile() {
       </View>
 
       <PaymentHistory payments={payments} />
+
+      <MyData />
     </ScrollView>
   );
 }
