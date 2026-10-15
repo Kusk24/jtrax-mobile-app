@@ -50,11 +50,11 @@ const FLOW: readonly Step[] = ["detail", "register", "payment"];
 /* What the parent has typed and chosen, kept in memory so leaving the screen
    and coming back — or Back from payment — finds it filled in. */
 type Draft = {
-  child: string; pay: PayChoice; nickname: string; nameTh: string; acceptTerms: boolean;
+  child: string; pay: PayChoice; nickname: string; nameTh: string; acceptTerms: boolean; privacyNotice: boolean;
   categoryId: string; idRead: IdCardRead | null;
 };
 const EMPTY_DRAFT: Draft = {
-  child: "", pay: "card", nickname: "", nameTh: "", acceptTerms: false, categoryId: "", idRead: null,
+  child: "", pay: "card", nickname: "", nameTh: "", acceptTerms: false, privacyNotice: false, categoryId: "", idRead: null,
 };
 
 const CARD = "rounded-card bg-pp-card p-4 shadow-clay";
@@ -155,7 +155,7 @@ export default function TournamentFlow() {
      card said, for the child it was read for, and the category that birth
      year allows. */
   const [draft, setDraft] = useMemoryDraft(`tournament-entry:${tournamentId}`, EMPTY_DRAFT);
-  const { child, pay, nickname, nameTh, acceptTerms, idRead, categoryId } = draft;
+  const { child, pay, nickname, nameTh, acceptTerms, privacyNotice, idRead, categoryId } = draft;
   const field = <K extends keyof Draft>(key: K) => (value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
   const setChild = field("child");
@@ -163,6 +163,7 @@ export default function TournamentFlow() {
   const setNickname = field("nickname");
   const setNameTh = field("nameTh");
   const setAcceptTerms = field("acceptTerms");
+  const setPrivacyNotice = field("privacyNotice");
   const setIdRead = field("idRead");
   const setCategoryId = field("categoryId");
   const [categories, setCategories] = useState<PublicCategory[]>([]);
@@ -214,6 +215,8 @@ export default function TournamentFlow() {
         ? tReg("needNickname")
         : !acceptTerms
           ? tReg("needTerms")
+          : !privacyNotice
+            ? tReg("needPrivacy")
           : "";
   /* A child with a place cannot be registered again — the second attempt is
      refused by a unique index, which is what a family who had a card declined
@@ -407,6 +410,29 @@ export default function TournamentFlow() {
                 <Text className="text-pp-danger"> *</Text>
               </Text>
             </Pressable>
+            <Pressable
+              onPress={() => setPrivacyNotice(!privacyNotice)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: privacyNotice }}
+              className="flex-row items-start gap-2.5 pt-1"
+            >
+              <View
+                style={{ borderColor: privacyNotice ? pp.blue : pp.faint, backgroundColor: privacyNotice ? pp.blue : "transparent" }}
+                className="mt-0.5 size-[18px] items-center justify-center rounded-[5px] border-[1.5px]"
+              >
+                {privacyNotice && <Check size={12} color="#ffffff" strokeWidth={3} />}
+              </View>
+              <Text className="flex-1 font-pp-semibold text-[13px] text-pp-ink">
+                {tReg.rich("privacyAccept", {
+                  link: (chunks) => (
+                    <Text className="text-pp-blue underline" onPress={() => router.push("/privacy")}>
+                      {chunks}
+                    </Text>
+                  ),
+                })}
+                <Text className="text-pp-danger"> *</Text>
+              </Text>
+            </Pressable>
           </View>
         </View>
 
@@ -522,6 +548,7 @@ export default function TournamentFlow() {
                 nickname: nickname.trim(),
                 nameTh: nameTh.trim(),
                 acceptTerms,
+                privacyNotice,
               });
             } catch {
               setRegisterFailed(true);

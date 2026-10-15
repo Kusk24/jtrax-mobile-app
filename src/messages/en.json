@@ -806,7 +806,9 @@
     "termsConductTitle": "Code of conduct",
     "termsConductBody": "Participants must uphold high sportsmanship standards. Unethical behavior may result in disqualification.",
     "termsLiabilityTitle": "Liability",
-    "termsLiabilityBody": "Organizers are not liable for participant injuries, losses, or damages."
+    "termsLiabilityBody": "Organizers are not liable for participant injuries, losses, or damages.",
+    "privacyAccept": "I am the player's parent or guardian (or the player, aged 20 or over), and I have read the <link>privacy notice</link>.",
+    "needPrivacy": "Please confirm you have read the privacy notice."
   },
   "st": {
     "puzzlesOf": "{n} / {total} puzzles",
