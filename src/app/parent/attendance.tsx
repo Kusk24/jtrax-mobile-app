@@ -4,7 +4,6 @@
  * leave cost, and every session the academy wrote, by date, each with what
  * it cost. The children themselves and today's practice are on the home.
  */
-import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslations } from "use-intl";
@@ -17,6 +16,7 @@ import { CourseFilter, CreditsUsed } from "@/components/parent/CourseFilter";
 import { FilterPicker } from "@/components/parent/FilterPicker";
 import { useParentData } from "@/components/parent/ParentData";
 import { usePalette } from "@/components/ThemeProvider";
+import { useParamValue } from "@/lib/use-url-state";
 
 const WD_KEYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
@@ -24,9 +24,19 @@ export default function ParentAttendance() {
   const { pp } = usePalette();
   const t = useTranslations("pv2");
   const { children: childList, att: ATT, hist, months } = useParentData();
-  const [filter, setFilter] = useState<"all" | ChildKey>("all");
-  const [month, setMonth] = useState(CURRENT);
-  const [course, setCourse] = useState("");
+  /* Which child, month and course are showing are route params, so the web
+     build's refresh keeps them. Each is checked against the family's data. */
+  const [childParam, setChildParam] = useParamValue("child");
+  const [monthParam, setMonthParam] = useParamValue("month");
+  const [course, setCourse] = useParamValue("course");
+  const filter: "all" | ChildKey = childList.some((c) => c.key === childParam) ? (childParam as ChildKey) : "all";
+  const asked = monthParam === "" ? CURRENT : Number(monthParam);
+  const month = Number.isInteger(asked) && asked >= 0 && asked < months.length ? asked : CURRENT;
+  const setFilter = (k: "all" | ChildKey) => setChildParam(k === "all" ? "" : k);
+  const setMonth = (step: (m: number) => number) => {
+    const next = step(month);
+    setMonthParam(next === CURRENT ? "" : String(next));
+  };
 
   const M = months[month];
   /* The rows the child filter allows, then the course: the picker offers only

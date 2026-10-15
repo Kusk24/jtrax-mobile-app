@@ -25,6 +25,7 @@ import {
   type HistoryEntry,
   type Progress,
 } from "@/lib/progress";
+import { useParam } from "@/lib/use-url-state";
 
 type Tab = "games" | "challenges";
 
@@ -34,10 +35,11 @@ export default function HistoryScreen() {
   const { pp } = usePalette();
   const { user } = useSession();
   const studentId = user?.studentId ?? "";
-  const [tab, setTab] = useState<Tab>("games");
+  /* Route params, so the web build's refresh keeps the tab and the filter. */
+  const [tab, setTab] = useParam<Tab>("tab", ["games", "challenges"], "games");
   const [history, setHistory] = useState<HistoryEntry[] | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
-  const [filter, setFilter] = useState<ResultChoice>("all");
+  const [filter, setFilter] = useParam<ResultChoice>("result", ["all", "win", "loss", "draw"], "all");
   const today = academyToday();
 
   useFocusEffect(
