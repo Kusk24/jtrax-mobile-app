@@ -11,10 +11,14 @@ import Constants from "expo-constants";
 /** Configured per build. The Expo Go default points at a dev machine, which is
     useless on a phone — a device cannot reach the laptop's localhost — so a
     LAN address or the deployed API has to be supplied. */
-export const API_BASE =
+export const API_BASE = (
   process.env.EXPO_PUBLIC_API_URL ??
   (Constants.expoConfig?.extra?.apiUrl as string | undefined) ??
-  "http://localhost:8790";
+  "http://localhost:8790"
+  /* A trailing slash made every path `//api/v1/…`. The server redirects that,
+     and iOS drops the Authorization header on a redirect, so every signed-in
+     screen read as signed out. */
+).replace(/\/+$/, "");
 
 export class ApiError extends Error {
   status: number;
