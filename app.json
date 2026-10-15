@@ -61,7 +61,11 @@
           "cameraPermission": "JCA uses the camera only to photograph your child's ID card when you enter them in a tournament.",
           "microphonePermission": false
         }
-      ]
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
